@@ -8,8 +8,21 @@ import javax.swing.*;
 
 public class BattleShip extends JFrame implements Runnable {
 
+    /**
+     * Số frame mỗi giây hiện tại
+     */
     static int currentFPS = 0;
+    /**
+     * Luồng render và update game
+     */
     private final Thread thread = new Thread(this);
+    /**
+     * Panel chứa game
+     */
+    GamePanel panel;
+    /**
+     * Biến đánh dấu có đang chạy hay không
+     */
     private boolean running;
 
     private BattleShip() {
@@ -17,7 +30,8 @@ public class BattleShip extends JFrame implements Runnable {
         setSize(GameSetting.WIDTH, GameSetting.HEIGHT);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
-        add(new GamePanel());
+        panel = new GamePanel(this);
+        add(panel);
     }
 
     public static int getCurrentFPS() {
@@ -42,13 +56,38 @@ public class BattleShip extends JFrame implements Runnable {
 
     @Override
     public void run() {
+        float lastFrameTime = System.nanoTime();
+        float lastTime = System.nanoTime();
+        int fpsCount = 0;
+        float lastTickTime = System.nanoTime();
+        float nsFramePerSecond = 1e9f / GameSetting.FPS;
+        float nsTickPerSecond = 1e9f / GameSetting.TPS;
+
         while (running) {
-            updateData();
-            render();
+            float now = System.nanoTime();
+
+            if (now - lastFrameTime > nsFramePerSecond) {
+                lastFrameTime = now;
+                render();
+                fpsCount++;
+            }
+
+            if (now - lastTickTime > nsTickPerSecond) {
+                lastTickTime = now;
+                updateData();
+            }
+
+
+            if (now - lastTime > 1e9f) {
+                lastTime = now;
+                currentFPS = fpsCount;
+                fpsCount = 0;
+            }
         }
     }
 
     private void render() {
+        setTitle("BattleShip - FPS: " + currentFPS);
     }
 
     private void updateData() {

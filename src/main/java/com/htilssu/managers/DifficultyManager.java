@@ -9,5 +9,5 @@ public class DifficultyManager {
             NORMAL, 10,
             HARD, 15
     );
-    public static int difficulty = DifficultyManager.NORMAL;
+    public static int DIFFICULTY = DifficultyManager.NORMAL;
 }
