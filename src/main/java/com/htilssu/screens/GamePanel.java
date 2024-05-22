@@ -1,5 +1,6 @@
-package com.htilssu;
+package com.htilssu.screens;
 
+import com.htilssu.BattleShip;
 import com.htilssu.utils.AssetUtil;
 
 import javax.swing.*;

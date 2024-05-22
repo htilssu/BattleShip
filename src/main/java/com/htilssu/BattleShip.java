@@ -1,9 +1,12 @@
 package com.htilssu;
 
 
+import com.htilssu.screens.GamePanel;
+import com.htilssu.screens.MenuScreen;
 import com.htilssu.settings.GameSetting;
 
 import javax.swing.*;
+import java.awt.*;
 
 
 public class BattleShip extends JFrame implements Runnable {
@@ -20,6 +23,7 @@ public class BattleShip extends JFrame implements Runnable {
      * Panel chứa game
      */
     GamePanel panel;
+    MenuScreen menuScreen = new MenuScreen();
     /**
      * Biến đánh dấu có đang chạy hay không
      */
@@ -32,6 +36,7 @@ public class BattleShip extends JFrame implements Runnable {
         setLocationRelativeTo(null);
         panel = new GamePanel(this);
         add(panel);
+        add(menuScreen);
     }
 
     public static int getCurrentFPS() {
