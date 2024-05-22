@@ -6,7 +6,6 @@ import com.htilssu.screens.MenuScreen;
 import com.htilssu.settings.GameSetting;
 
 import javax.swing.*;
-import java.awt.*;
 
 
 public class BattleShip extends JFrame implements Runnable {
@@ -35,7 +34,7 @@ public class BattleShip extends JFrame implements Runnable {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         panel = new GamePanel(this);
-        add(panel);
+//        add(panel);
         add(menuScreen);
     }
 
@@ -61,38 +60,38 @@ public class BattleShip extends JFrame implements Runnable {
 
     @Override
     public void run() {
-        float lastFrameTime = System.nanoTime();
-        float lastTime = System.nanoTime();
-        int fpsCount = 0;
-        float lastTickTime = System.nanoTime();
-        float nsFramePerSecond = 1e9f / GameSetting.FPS;
-        float nsTickPerSecond = 1e9f / GameSetting.TPS;
+        long lastFrameTime = System.nanoTime();
+        long lastTickTime = System.nanoTime();
+        float nsPerTick = 1e9f / GameSetting.TPS;
+        float nsPerFrame = 1e9f / GameSetting.FPS;
+        int frame = 0;
+        long lastTime = System.currentTimeMillis();
+
 
         while (running) {
-            float now = System.nanoTime();
-
-            if (now - lastFrameTime > nsFramePerSecond) {
-                lastFrameTime = now;
-                render();
-                fpsCount++;
-            }
-
-            if (now - lastTickTime > nsTickPerSecond) {
-                lastTickTime = now;
+            long now = System.nanoTime();
+            if (now - lastTickTime > nsPerTick) {
                 updateData();
+                lastTickTime = now;
+
+            }
+            if (now - lastFrameTime > nsPerFrame) {
+                render();
+                frame++;
+                lastFrameTime = now;
+            }
+            if (System.currentTimeMillis() - lastTime > 1000) {
+                currentFPS = frame;
+                frame = 0;
+                lastTime = System.currentTimeMillis();
             }
 
-
-            if (now - lastTime > 1e9f) {
-                lastTime = now;
-                currentFPS = fpsCount;
-                fpsCount = 0;
-            }
         }
     }
 
     private void render() {
         setTitle("BattleShip - FPS: " + currentFPS);
+        panel.repaint();
     }
 
     private void updateData() {
