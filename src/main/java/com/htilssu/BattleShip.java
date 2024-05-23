@@ -1,20 +1,12 @@
 package com.htilssu;
 
 
-import com.htilssu.managers.EventManager;
-import com.htilssu.managers.ScreenManager;
-import com.htilssu.multiplayer.Client;
-import com.htilssu.multiplayer.Host;
+import com.htilssu.screens.GamePanel;
+import com.htilssu.screens.MenuScreen;
 import com.htilssu.settings.GameSetting;
-import com.htilssu.utils.NetworkUtils;
 
 import javax.swing.*;
-import java.io.*;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.util.ArrayList;
-import java.util.List;
+import java.awt.*;
 
 
 public class BattleShip extends JFrame implements Runnable {
