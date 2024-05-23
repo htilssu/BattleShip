@@ -4,7 +4,7 @@ public class GameSetting {
     /**
      * Kích thước của 1 TILE
      */
-    public static final int TILE_SIZE = 64;
+    public static final int TILE_SIZE = 32;
 
     /**
      * &#x110;&#x1ED9; t&#x103;ng tr&#x1B0;&#x1EDF;ng c&#x1EE7;a game (g&#x1EA5;p m&#x1EA5;y l&#x1EA7;n k&iacute;ch th&#x1B0;&#x1EDB;c ban &#x111;&#x1EA7;u)
@@ -13,11 +13,11 @@ public class GameSetting {
     /**
      * S&#x1ED1; l&#x1B0;&#x1EE3;ng TILE trong chi&#x1EC1;u r&#x1ED9;ng
      */
-    public static final int TILE_IN_WIDTH = 20;
+    public static final int TILE_IN_WIDTH = 28;
     /**
      * S&#x1ED1; l&#x1B0;&#x1EE3;ng TILE trong chi&#x1EC1;u cao
      */
-    public static final int TILE_IN_HEIGHT = 10;
+    public static final int TILE_IN_HEIGHT = 20;
     /**
      * Chi&#x1EC1;u r&#x1ED9;ng c&#x1EE7;a c&#x1EED;a s&#x1ED5; game
      * <p>

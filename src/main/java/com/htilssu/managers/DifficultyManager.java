@@ -10,4 +10,8 @@ public class DifficultyManager {
             HARD, 15
     );
     public static int DIFFICULTY = DifficultyManager.NORMAL;
+
+    public static int getGameBoardSize() {
+        return difficultyMap.get(DIFFICULTY);
+    }
 }

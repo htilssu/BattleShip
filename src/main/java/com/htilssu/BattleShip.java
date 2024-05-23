@@ -1,8 +1,10 @@
 package com.htilssu;
 
 
+import com.htilssu.managers.EventManager;
+import com.htilssu.managers.ScreenManager;
+import com.htilssu.multiplayer.Hoster;
 import com.htilssu.screens.GamePanel;
-import com.htilssu.screens.MenuScreen;
 import com.htilssu.settings.GameSetting;
 
 import javax.swing.*;
@@ -19,10 +21,17 @@ public class BattleShip extends JFrame implements Runnable {
      */
     private final Thread thread = new Thread(this);
     /**
+     * Quản lý sự kiện
+     */
+    private final EventManager eventManager = new EventManager();
+    /**
      * Panel chứa game
      */
     GamePanel panel;
-    MenuScreen menuScreen = new MenuScreen();
+    /**
+     * Quản lý các màn hình trong game
+     */
+    ScreenManager screenManager = new ScreenManager(this);
     /**
      * Biến đánh dấu có đang chạy hay không
      */
@@ -33,9 +42,11 @@ public class BattleShip extends JFrame implements Runnable {
         setSize(GameSetting.WIDTH, GameSetting.HEIGHT);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
-        panel = new GamePanel(this);
-//        add(panel);
-        add(menuScreen);
+        add(screenManager.getCurrentScreen());
+
+        pack();
+
+        setUp();
     }
 
     public static int getCurrentFPS() {
@@ -46,6 +57,13 @@ public class BattleShip extends JFrame implements Runnable {
         BattleShip battleShip = new BattleShip();
         battleShip.start();
 
+    }
+
+    /**
+     * Hàm cài đặt các sự kiện
+     */
+    private void setUp() {
+//        eventManager.registerEvent();
     }
 
     public void start() {
@@ -66,12 +84,14 @@ public class BattleShip extends JFrame implements Runnable {
         float nsPerFrame = 1e9f / GameSetting.FPS;
         int frame = 0;
         long lastTime = System.currentTimeMillis();
+        new Hoster();
 
 
         while (running) {
             long now = System.nanoTime();
             if (now - lastTickTime > nsPerTick) {
                 updateData();
+                checkEvent();
                 lastTickTime = now;
 
             }
@@ -89,9 +109,13 @@ public class BattleShip extends JFrame implements Runnable {
         }
     }
 
+    private void checkEvent() {
+        eventManager.checkEvents();
+    }
+
     private void render() {
         setTitle("BattleShip - FPS: " + currentFPS);
-        panel.repaint();
+        screenManager.getCurrentScreen().repaint();
     }
 
     private void updateData() {
