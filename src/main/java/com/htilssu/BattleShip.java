@@ -3,11 +3,13 @@ package com.htilssu;
 
 import com.htilssu.managers.EventManager;
 import com.htilssu.managers.ScreenManager;
-import com.htilssu.multiplayer.Hoster;
-import com.htilssu.screens.GamePanel;
+import com.htilssu.multiplayer.Host;
 import com.htilssu.settings.GameSetting;
+import com.htilssu.utils.NetworkUtils;
 
 import javax.swing.*;
+import java.io.*;
+import java.net.Socket;
 
 
 public class BattleShip extends JFrame implements Runnable {
@@ -24,10 +26,7 @@ public class BattleShip extends JFrame implements Runnable {
      * Quản lý sự kiện
      */
     private final EventManager eventManager = new EventManager();
-    /**
-     * Panel chứa game
-     */
-    GamePanel panel;
+    private final Host host = new Host();
     /**
      * Quản lý các màn hình trong game
      */
@@ -56,22 +55,31 @@ public class BattleShip extends JFrame implements Runnable {
     public static void main(String[] args) {
         BattleShip battleShip = new BattleShip();
         battleShip.start();
-
     }
 
     /**
      * Hàm cài đặt các sự kiện
      */
     private void setUp() {
-//        eventManager.registerEvent();
+//        eventManager.registerEvent(new PlayerShootEvent());
     }
 
+    /**
+     * Gọi hàm này để bắt đầu chạy app
+     */
     public void start() {
         running = true;
         thread.start();
-        setVisible(true);
+        host.start();
+        NetworkUtils.find(5555);
+//        setVisible(true);
+
+
     }
 
+    /**
+     * Gọi hàm này để dừng app
+     */
     public void stop() {
         running = false;
     }
@@ -84,7 +92,7 @@ public class BattleShip extends JFrame implements Runnable {
         float nsPerFrame = 1e9f / GameSetting.FPS;
         int frame = 0;
         long lastTime = System.currentTimeMillis();
-        new Hoster();
+        new Host();
 
 
         while (running) {
@@ -109,6 +117,9 @@ public class BattleShip extends JFrame implements Runnable {
         }
     }
 
+    /**
+     * Hàm check event
+     */
     private void checkEvent() {
         eventManager.checkEvents();
     }

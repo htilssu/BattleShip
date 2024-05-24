@@ -1,7 +1,7 @@
 package com.htilssu.managers;
 
 import com.htilssu.BattleShip;
-import com.htilssu.screens.GamePanel;
+import com.htilssu.screens.PlayScreen;
 import com.htilssu.screens.MenuScreen;
 
 import javax.swing.*;
@@ -28,7 +28,7 @@ public class ScreenManager {
     int currentScreen = START_SCREEN;
 
     public ScreenManager(BattleShip battleShip) {
-        screenMap.put(1, new GamePanel(battleShip));
+        screenMap.put(1, new PlayScreen(battleShip));
         screenMap.put(2, new MenuScreen(battleShip));
     }
 
