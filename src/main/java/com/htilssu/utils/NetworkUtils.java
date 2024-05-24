@@ -2,23 +2,24 @@ package com.htilssu.utils;
 
 import java.io.IOException;
 import java.net.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.util.concurrent.Executors.newFixedThreadPool;
 
 public class NetworkUtils {
 
-    public static InetAddress find(int port) {
+    public static final int DEFAULT_PORT = 5555;
+    private static final int SOCKET_TIMEOUT = 1;
+    private static final int THREAD_POOL_SIZE = 50;
+
+    public static List<InetAddress> find(int port) {
+        List<InetAddress> inetAddresses;
+        long time = System.currentTimeMillis();
         try {
             Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
-
+            inetAddresses = new ArrayList<>();
             while (interfaces.hasMoreElements()) {
                 NetworkInterface networkInterface = interfaces.nextElement();
 
@@ -30,21 +31,18 @@ public class NetworkUtils {
                 for (InterfaceAddress address : networkInterface.getInterfaceAddresses()) {
                     InetAddress inetAddress = address.getAddress();
 
-                    if (address.getNetworkPrefixLength() != 24) continue;
                     if (inetAddress instanceof Inet4Address) {
                         InetAddress subnetMask = getSubnetMask(address.getNetworkPrefixLength());
-                        List<InetAddress> aa = checkPort(getDefaultGateway(inetAddress, subnetMask), subnetMask, port);
-                        for (InetAddress inetAddress1 : aa) {
-                            System.out.println(inetAddress1.getHostAddress());
-
-                        }
+                        inetAddresses.addAll(checkPort(getDefaultGateway(inetAddress, subnetMask), subnetMask, port));
                     }
                 }
             }
         } catch (SocketException ignored) {
-
+            return null;
         }
-        return null;
+
+        System.out.println("Time: " + (System.currentTimeMillis() - time) + "ms");
+        return inetAddresses;
     }
 
 
@@ -77,17 +75,22 @@ public class NetworkUtils {
     private static List<InetAddress> checkPort(InetAddress defaultGateway, InetAddress subnetMask, int port) {
         byte[] address = defaultGateway.getAddress();
         byte[] mask = subnetMask.getAddress();
+        AtomicInteger atomicInteger = new AtomicInteger(0);
         boolean con = true;
 
 
-        List<InetAddress> inetAddresses = new ArrayList<>();
-        try (ExecutorService executorService = newFixedThreadPool(10)) {
+        ConcurrentLinkedQueue<InetAddress> inetAddresses = new ConcurrentLinkedQueue<>();
+        try (ExecutorService executorService = newFixedThreadPool(THREAD_POOL_SIZE)) {
             while (con) {
+                byte[] currentAddress = Arrays.copyOf(address, address.length);
                 executorService.submit(() -> {
-                    try (Socket socket = new Socket(InetAddress.getByAddress(address), port)) {
-                        if (socket.isConnected()) inetAddresses.add(socket.getInetAddress());
+                    try (Socket socket = new Socket()) {
+                        atomicInteger.incrementAndGet();
+//                        System.out.println("Connecting to: " + InetAddress.getByAddress(currentAddress));
+                        socket.connect(new InetSocketAddress(InetAddress.getByAddress(currentAddress), port), SOCKET_TIMEOUT);
+                        inetAddresses.add(socket.getInetAddress());
+//                        System.out.println("Connected to: " + socket.getInetAddress());
                     } catch (IOException ignored) {
-
                     }
                 });
 
@@ -100,6 +103,7 @@ public class NetworkUtils {
                     if (i - 1 >= 0 && (address[i - 1] | mask[i - 1]) != (byte) 0xff) {
                         address[i - 1]++;
                         address[i] = 0;
+                        break;
                     }
 
                     count--;
@@ -109,8 +113,9 @@ public class NetworkUtils {
                 }
             }
 
+            executorService.shutdown();
             try {
-                if (!executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS)) {
+                if (!executorService.awaitTermination(20, TimeUnit.SECONDS)) {
                     executorService.shutdownNow();
                 }
             } catch (InterruptedException e) {
@@ -118,8 +123,8 @@ public class NetworkUtils {
             }
         }
 
+        return new ArrayList<>(inetAddresses);
 
-        return inetAddresses;
     }
 
 }

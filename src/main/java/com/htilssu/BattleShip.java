@@ -3,13 +3,18 @@ package com.htilssu;
 
 import com.htilssu.managers.EventManager;
 import com.htilssu.managers.ScreenManager;
+import com.htilssu.multiplayer.Client;
 import com.htilssu.multiplayer.Host;
 import com.htilssu.settings.GameSetting;
 import com.htilssu.utils.NetworkUtils;
 
 import javax.swing.*;
 import java.io.*;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class BattleShip extends JFrame implements Runnable {
@@ -32,7 +37,11 @@ public class BattleShip extends JFrame implements Runnable {
      */
     ScreenManager screenManager = new ScreenManager(this);
     /**
-     * Biến đánh dấu có đang chạy hay không
+     * Quản lý giao tiếp với server
+     */
+    Client client = new Client();
+    /**
+     * Biến đánh dấu có đang chạy thread render hay không
      */
     private boolean running;
 
@@ -82,6 +91,7 @@ public class BattleShip extends JFrame implements Runnable {
      */
     public void stop() {
         running = false;
+        host.stop();
     }
 
     @Override

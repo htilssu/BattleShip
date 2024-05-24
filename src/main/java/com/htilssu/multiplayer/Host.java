@@ -12,20 +12,18 @@ public class Host implements Runnable {
     Thread hostListenThread = new Thread(this);
     boolean canHost = true;
 
-    {
-        try {
-            serverSocket = new ServerSocket(5555);
-            serverSocket.setSoTimeout(0);
-        } catch (IOException e) {
-            canHost = false;
-        }
-    }
 
     public Host() {
 
     }
 
     public void start() {
+        try {
+            serverSocket = new ServerSocket(5555);
+            serverSocket.setSoTimeout(0);
+        } catch (IOException e) {
+            canHost = false;
+        }
         hostListenThread.start();
     }
 
@@ -56,13 +54,10 @@ public class Host implements Runnable {
                 } catch (IOException ignored) {
                 }
             }
-        } else {
-            try {
-                serverSocket = new ServerSocket(5555);
-                serverSocket.setSoTimeout(0);
-                canHost = true;
-            } catch (IOException ignored) {
-            }
         }
+    }
+
+    public void stop() {
+        canHost = false;
     }
 }
