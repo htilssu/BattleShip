@@ -15,7 +15,7 @@ public class ScreenManager {
     /**
      * Màn hình bắt đầu - màn hình chọn thể loại, setting
      */
-    public static final int START_SCREEN = 1;
+    public static final int MENU_SCREEN = 1;
 
     /**
      * Màn hình chơi game
@@ -25,11 +25,11 @@ public class ScreenManager {
     /***
      * Màn hình hiện tại
      */
-    int currentScreen = START_SCREEN;
+    int currentScreen = MENU_SCREEN;
 
     public ScreenManager(BattleShip battleShip) {
-        screenMap.put(1, new PlayScreen(battleShip));
-        screenMap.put(2, new MenuScreen(battleShip));
+        screenMap.put(2, new PlayScreen(battleShip));
+        screenMap.put(1, new MenuScreen(battleShip));
     }
 
     /**

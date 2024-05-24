@@ -1,7 +1,9 @@
 package com.htilssu.screens;
+import com.htilssu.BattleShip;
 import com.htilssu.components.CustomButton;
+import com.htilssu.managers.ScreenManager;
 import com.htilssu.settings.GameSetting;
-import com.htilssu.utils.AssetUtil;
+import com.htilssu.utils.AssetUtils;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -10,22 +12,27 @@ public class MenuScreen extends JPanel {
     private BufferedImage backgroundImage,menuImage;
     private CardLayout cardLayout;//card layout quan ly nhieu the card khac nhau trong 1 container
     private JPanel parentPanel;//tao 1 hieu ung chuyen gia 2 man gamemenu va gamepanel
-    public MenuScreen(JPanel parentPanel, CardLayout cardLayout) {
-        this.parentPanel = parentPanel;
-        this.cardLayout = cardLayout;
+    private BattleShip window;
+
+
+    public MenuScreen(BattleShip battleShip) {
+        window = battleShip;
+        cardLayout = new CardLayout();
+        parentPanel = new JPanel(cardLayout);
         setLayout(null); // We will use absolute positioning
         loadBackgroundImage();
         loadMenu();
         createButtons();
+        setPreferredSize(new Dimension(GameSetting.WIDTH, GameSetting.HEIGHT));
     }
 
     private void loadBackgroundImage() {
 
-            backgroundImage = AssetUtil.loadAsset("/sea.png");// Load background image
+            backgroundImage = AssetUtils.loadAsset("/sea.png");// Load background image
 
     }
     private void loadMenu() {
-        menuImage = AssetUtil.loadAsset("/MENU_.png"); // Tải hình ảnh biểu tượng menu
+        menuImage = AssetUtils.loadAsset("/MENU_.png"); // Tải hình ảnh biểu tượng menu
     }
     private void createButtons() {
         int buttonWidth = 200;
@@ -38,7 +45,7 @@ public class MenuScreen extends JPanel {
         int startY = (GameSetting.HEIGHT - totalHeight) / 2 + menuImageHeight -20; // Adjusted to avoid overlapping
 
         addButton("/btnplay.png", centerX, startY, buttonWidth, buttonHeight, "PLAY");
-        addButton("/MUTIPLAYER.png", centerX, startY + 1 * (buttonHeight + spacing), buttonWidth, buttonHeight, "MULTIPLAYER");
+        addButton("/MUTIPLAYER.png", centerX, startY + (buttonHeight + spacing), buttonWidth, buttonHeight, "MULTIPLAYER");
         addButton("/HELP.png", centerX, startY + 2 * (buttonHeight + spacing), buttonWidth, buttonHeight, "HELP");
         addButton("/SETTINGS.png", centerX, startY + 3 * (buttonHeight + spacing), buttonWidth, buttonHeight, "SETTING");
         addButton("/QUIT.png", centerX, startY + 4 * (buttonHeight + spacing), buttonWidth, buttonHeight, "QUIT");
@@ -52,12 +59,10 @@ public class MenuScreen extends JPanel {
         add(button);
     }
     private void handleButtonClick(String actionCommand) {
-        if ("PLAY".equals(actionCommand)) {
-            cardLayout.show(parentPanel, "GAME_PANEL");}
-            else if ("SETTING".equals(actionCommand)) {
-                cardLayout.show(parentPanel, "SETTINGS_SCREEN");
-        } else if ("QUIT".equals(actionCommand)) {
-            System.exit(0);
+        switch (actionCommand) {
+            case "PLAY" -> window.changeScreen(ScreenManager.GAME_SCREEN);
+            case "SETTING" -> cardLayout.show(parentPanel, "SETTINGS_SCREEN");
+            case "QUIT" -> System.exit(0);
         }
     }
 

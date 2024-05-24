@@ -1,6 +1,6 @@
 package com.htilssu.components;
 
-import com.htilssu.utils.AssetUtil;
+import com.htilssu.utils.AssetUtils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -13,7 +13,7 @@ public class CustomButton extends JButton {
     private boolean isHovered;//tao check xem da hover chua
 
     public CustomButton(String imagePath) {
-        normalImage = AssetUtil.loadAsset(imagePath);
+        normalImage = AssetUtils.loadAsset(imagePath);
 
         setBorderPainted(false);
         setContentAreaFilled(false);
