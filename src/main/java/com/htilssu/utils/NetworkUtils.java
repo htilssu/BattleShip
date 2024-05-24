@@ -80,7 +80,8 @@ public class NetworkUtils {
 
 
         ConcurrentLinkedQueue<InetAddress> inetAddresses = new ConcurrentLinkedQueue<>();
-        try (ExecutorService executorService = newFixedThreadPool(THREAD_POOL_SIZE)) {
+        ExecutorService executorService = newFixedThreadPool(THREAD_POOL_SIZE);
+        try {
             while (con) {
                 byte[] currentAddress = Arrays.copyOf(address, address.length);
                 executorService.submit(() -> {
@@ -112,7 +113,6 @@ public class NetworkUtils {
                     }
                 }
             }
-
             executorService.shutdown();
             try {
                 if (!executorService.awaitTermination(20, TimeUnit.SECONDS)) {
@@ -122,9 +122,12 @@ public class NetworkUtils {
                 executorService.shutdownNow();
             }
         }
+        catch (Exception igoreg)
+        {
+
+        }
 
         return new ArrayList<>(inetAddresses);
-
     }
 
 }
