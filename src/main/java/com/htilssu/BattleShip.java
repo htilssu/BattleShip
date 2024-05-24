@@ -138,9 +138,9 @@ public class BattleShip extends JFrame implements Runnable {
 
     }
 
-    public void changeScreen(int screen
-    ) {
+    public void changeScreen(int screen) {
         remove(screenManager.getCurrentScreen());
-        add(screenManager.getScreen(screen));
+        repaint();
+        screenManager.setCurrentScreen(screen);
     }
 }

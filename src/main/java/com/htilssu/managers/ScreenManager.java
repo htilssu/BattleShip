@@ -45,4 +45,8 @@ public class ScreenManager {
     public JPanel getCurrentScreen() {
         return screenMap.get(currentScreen);
     }
+
+    public void setCurrentScreen(int currentScreen) {
+        this.currentScreen = currentScreen;
+    }
 }
