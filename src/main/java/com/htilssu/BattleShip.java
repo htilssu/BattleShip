@@ -36,6 +36,8 @@ public class BattleShip extends JFrame implements Runnable {
      * Biến đánh dấu có đang chạy thread render hay không
      */
     private boolean running;
+    private CardLayout cardLayout;
+    private JPanel parentPanel;
 
     private BattleShip() {
         setTitle("BattleShip");
@@ -43,7 +45,14 @@ public class BattleShip extends JFrame implements Runnable {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         add(screenManager.getCurrentScreen());
+        cardLayout = new CardLayout();
+        parentPanel = new JPanel(cardLayout);
+        MenuScreen menuScreen = new MenuScreen(parentPanel, cardLayout);
+        GamePanel gamePanel = new GamePanel(this);
+        parentPanel.add(menuScreen, "MENU_SCREEN");
+        parentPanel.add(gamePanel, "GAME_PANEL");
 
+        add(parentPanel);
         pack();
 
         setUp();
