@@ -1,8 +1,9 @@
 package com.htilssu.multiplayer;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
+import com.htilssu.setting.GameSetting;
+import com.htilssu.util.GameLogger;
+
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -19,7 +20,7 @@ public class Host implements Runnable {
 
     public void start() {
         try {
-            serverSocket = new ServerSocket(5555);
+            serverSocket = new ServerSocket(GameSetting.DEFAULT_PORT);
             serverSocket.setSoTimeout(0);
         } catch (IOException e) {
             canHost = false;
@@ -35,17 +36,20 @@ public class Host implements Runnable {
     public void run() {
         if (canHost) {
             try {
-                socket = serverSocket.accept();
-                InputStream ip = socket.getInputStream();
-                BufferedReader reader = new BufferedReader(new java.io.InputStreamReader(ip));
+                while (canHost) {
+                    socket = serverSocket.accept();
+                    InputStream ip = socket.getInputStream();
+                    BufferedReader reader = new BufferedReader(new java.io.InputStreamReader(ip));
+                    OutputStream op = socket.getOutputStream();
+                    PrintWriter writer = new PrintWriter(op, true);
+                    while (canHost) {
+                        String message = reader.readLine();
+                        if (message == null) {
+                            break;
+                        }
+                        MultiHandler.handle(message);
 
-
-                while (true) {
-                    String message = reader.readLine();
-                    if (message == null) {
-                        break;
                     }
-                    System.out.println(message);
                 }
 
             } catch (IOException e) {

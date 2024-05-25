@@ -1,0 +1,64 @@
+package com.htilssu.manager;
+
+import com.htilssu.BattleShip;
+import com.htilssu.screen.PlayScreen;
+import com.htilssu.screen.MenuScreen;
+
+import javax.swing.*;
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * Lớp quản lý các màn hình trong game
+ */
+public class ScreenManager {
+    /**
+     * Màn hình bắt đầu - màn hình chọn thể loại, setting
+     */
+    public static final int MENU_SCREEN = 1;
+
+    /**
+     * Màn hình chơi game
+     */
+    public static final int GAME_SCREEN = 2;
+    private final Map<Integer, JPanel> screenMap = new HashMap<>();
+    /***
+     * Màn hình hiện tại
+     */
+    int currentScreen = MENU_SCREEN;
+
+    public ScreenManager(BattleShip battleShip) {
+        screenMap.put(1, new MenuScreen(battleShip));
+        screenMap.put(2, new PlayScreen(battleShip));
+    }
+
+    /**
+     * Lấy màn hình theo loại screen
+     *
+     * @param startScreen số nguyên biểu diễn loại màn hình
+     * @return Màn hình được kế thừa từ {@link JPanel} hoặc {@code null} nếu không tìm thấy
+     */
+    public JPanel getScreen(int startScreen) {
+        return screenMap.get(startScreen);
+    }
+
+    /**
+     * Lấy màn hình hiện tại
+     *
+     * @return Màn hình hiện tại
+     */
+
+    public JPanel getCurrentScreen() {
+        return screenMap.get(currentScreen);
+    }
+
+    /**
+     * Đặt màn hình hiện tại
+     * ex: {@link #GAME_SCREEN} là màn hình chơi game hoặc {@link #MENU_SCREEN} là màn hình chính
+     *
+     * @param currentScreen số nguyên biểu diễn loại màn hình
+     */
+    public void setCurrentScreen(int currentScreen) {
+        this.currentScreen = currentScreen;
+    }
+}
