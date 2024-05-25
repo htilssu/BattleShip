@@ -1,8 +1,8 @@
-package com.htilssu.managers;
+package com.htilssu.manager;
 
 import com.htilssu.BattleShip;
-import com.htilssu.screens.PlayScreen;
-import com.htilssu.screens.MenuScreen;
+import com.htilssu.screen.PlayScreen;
+import com.htilssu.screen.MenuScreen;
 
 import javax.swing.*;
 import java.util.HashMap;
@@ -28,8 +28,8 @@ public class ScreenManager {
     int currentScreen = MENU_SCREEN;
 
     public ScreenManager(BattleShip battleShip) {
-        screenMap.put(2, new PlayScreen(battleShip));
         screenMap.put(1, new MenuScreen(battleShip));
+        screenMap.put(2, new PlayScreen(battleShip));
     }
 
     /**
@@ -42,10 +42,22 @@ public class ScreenManager {
         return screenMap.get(startScreen);
     }
 
+    /**
+     * Lấy màn hình hiện tại
+     *
+     * @return Màn hình hiện tại
+     */
+
     public JPanel getCurrentScreen() {
         return screenMap.get(currentScreen);
     }
 
+    /**
+     * Đặt màn hình hiện tại
+     * ex: {@link #GAME_SCREEN} là màn hình chơi game hoặc {@link #MENU_SCREEN} là màn hình chính
+     *
+     * @param currentScreen số nguyên biểu diễn loại màn hình
+     */
     public void setCurrentScreen(int currentScreen) {
         this.currentScreen = currentScreen;
     }

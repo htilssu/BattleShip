@@ -1,7 +1,6 @@
-package com.htilssu.screens;
+package com.htilssu.screen;
 
 import javax.swing.*;
-import java.awt.*;
 
 public class SettingScreen extends JPanel {
 //    private Audio audioPlayer;
