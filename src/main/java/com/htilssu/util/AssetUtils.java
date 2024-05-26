@@ -22,6 +22,13 @@ public class AssetUtils {
         }
     }
 
+    /**
+     * Phương thức load asset từ resources folder.
+     * Nếu không load được sẽ trả về null
+     *
+     * @param path đường dẫn file phải bắt đầu bằng /
+     * @return trả về {@link BufferedImage} nếu load thành công, ngược lại trả về {@code null}
+     */
     public static BufferedImage loadAsset(String path) {
         try {
             InputStream ip = AssetUtils.class.getResourceAsStream(path);
@@ -33,6 +40,12 @@ public class AssetUtils {
         return null;
     }
 
+    /**
+     * Phương thức lấy asset đã được load trước đó và lưu vào map ở phương thức {@link AssetUtils#initAsset()}
+     *
+     * @param assetBoardFrame id của asset cần lấy
+     * @return trả về {@link BufferedImage} nếu asset tồn tại, ngược lại trả về {@code null}
+     */
     public static BufferedImage getAsset(int assetBoardFrame) {
         return assetMap.get(assetBoardFrame);
     }

@@ -10,7 +10,7 @@ import java.awt.image.BufferedImage;
 
 public class CustomButton extends JButton {
     private BufferedImage normalImage;
-    private boolean isHovered;//tao check xem da hover chua
+    private boolean isHovered; // tao check xem da hover chua
 
     public CustomButton(String imagePath) {
         normalImage = AssetUtils.loadAsset(imagePath);
@@ -20,29 +20,30 @@ public class CustomButton extends JButton {
         setFocusPainted(false);
         setOpaque(false);
 
-        addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseEntered(MouseEvent e) {//khi tro chuot vao
-                isHovered = true;
-                repaint();
-            }
+        addMouseListener(
+                new MouseAdapter() {
+                    @Override
+                    public void mouseEntered(MouseEvent e) { // khi tro chuot vao
+                        isHovered = true;
+                        repaint();
+                    }
 
-            @Override
-            public void mouseExited(MouseEvent e) {
-                isHovered = false;
-                repaint();
-            }
-        });
+                    @Override
+                    public void mouseExited(MouseEvent e) {
+                        isHovered = false;
+                        repaint();
+                    }
+                });
     }
 
     @Override
     protected void paintComponent(Graphics g) {
-        if (isHovered) {//neu da hover
+        if (isHovered) { // neu da hover
             int shrinkAmount = 18; // Kích thước thu nhỏ
-            int newWidth = getWidth() - shrinkAmount;//chieu rong moi khi hover
-            int newHeight = getHeight() - shrinkAmount;//chieu dai moi khi hover
-            int xOffset = (getWidth() - newWidth) / 2;//toa do x kho hover
-            int yOffset = (getHeight() - newHeight) / 2;//toa do y khi hover
+            int newWidth = getWidth() - shrinkAmount; // chieu rong moi khi hover
+            int newHeight = getHeight() - shrinkAmount; // chieu dai moi khi hover
+            int xOffset = (getWidth() - newWidth) / 2; // toa do x kho hover
+            int yOffset = (getHeight() - newHeight) / 2; // toa do y khi hover
             g.drawImage(normalImage, xOffset, yOffset, newWidth, newHeight, this);
         } else {
             g.drawImage(normalImage, 0, 0, getWidth(), getHeight(), this);

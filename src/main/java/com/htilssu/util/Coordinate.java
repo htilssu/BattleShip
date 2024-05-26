@@ -37,12 +37,6 @@ public class Coordinate {
         return x == that.x && y == that.y;
     }
 
-    @Override
-    public int hashCode() {
-        int result = x;
-        result = 31 * result + y;
-        return result;
-    }
 
     //De tim bug
     public String toString() {
