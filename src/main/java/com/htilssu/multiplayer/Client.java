@@ -3,20 +3,16 @@ package com.htilssu.multiplayer;
 import com.htilssu.BattleShip;
 import com.htilssu.component.Position;
 import com.htilssu.setting.GameSetting;
+import com.htilssu.util.GameLogger;
 import com.htilssu.util.NetworkUtils;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Lớp quản lý kết nối giữa client với server
- */
+/** Lớp quản lý kết nối giữa client với server */
 public class Client {
     private static Client instance;
     Socket socket;
@@ -32,7 +28,6 @@ public class Client {
     public static Client getInstance() {
         return instance;
     }
-
 
     public String getStatus() {
         return status;
@@ -50,13 +45,20 @@ public class Client {
     public void connect(InetAddress ip, short port) {
         try {
             socket = new Socket(ip, port);
-            OutputStream op = socket.getOutputStream();
-            PrintWriter writer = new PrintWriter(op, true);
-            writer.println("Hello");
+            sendData("JOIN|HISU");
         } catch (IOException e) {
             status = "Không thể kết nối đến máy chủ";
         }
+    }
 
+    public void sendData(String data) {
+        try {
+            OutputStream op = socket.getOutputStream();
+            PrintWriter writer = new PrintWriter(op, true);
+            writer.println(data);
+        } catch (IOException e) {
+            GameLogger.log("Error while sending data to host");
+        }
     }
 
     public void scanHost() {
@@ -66,6 +68,4 @@ public class Client {
     public List<InetAddress> getHostList() {
         return hostList;
     }
-
-
 }
