@@ -3,57 +3,68 @@ package com.htilssu.multiplayer;
 import com.htilssu.setting.GameSetting;
 import com.htilssu.util.GameLogger;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Arrays;
 
 public class Host implements Runnable {
-  ServerSocket serverSocket;
-  Socket socket;
-  Thread hostListenThread = new Thread(this);
-  boolean canHost = true;
+    private static Host instance;
+    ServerSocket serverSocket;
+    Socket socket;
+    Thread hostListenThread = new Thread(this);
+    boolean canHost = true;
 
-  public Host() {}
-
-  public void start() {
-    try {
-      serverSocket = new ServerSocket(GameSetting.DEFAULT_PORT);
-      serverSocket.setSoTimeout(0);
-    } catch (IOException e) {
-      canHost = false;
+    public Host() {
+        instance = this;
     }
-    hostListenThread.start();
-  }
 
-  public boolean isCanHost() {
-    return canHost;
-  }
+    @NotNull
+    public static Host getInstance() {
+        return instance;
+    }
 
-  @Override
-  public void run() {
-    while (canHost) {
-      try {
-        socket = serverSocket.accept();
-        InputStream ip = socket.getInputStream();
-        BufferedReader bis = new BufferedReader(new InputStreamReader(ip));
+    public void start() {
+        try {
+            serverSocket = new ServerSocket(GameSetting.DEFAULT_PORT);
+            serverSocket.setSoTimeout(0);
+        } catch (IOException e) {
+            canHost = false;
+        }
+        hostListenThread.start();
+    }
 
-        while (true) {
-          String message = bis.readLine();
-          if (message == null) {
-            break;
-          }
+    public boolean isCanHost() {
+        return canHost;
+    }
 
-          MultiHandler.handle(message);
+    @Override
+    public void run() {
+        try {
+            socket = serverSocket.accept();
+        } catch (IOException e) {
+            GameLogger.error("Có lỗi khi chấp nhận kết nối từ client");
         }
 
-      } catch (IOException e) {
-        GameLogger.log("Error while connecting to client");
-      }
+        while (canHost) {
+            if (socket != null) {
+                MultiHandler.getInstance().readData(socket);
+            }
+        }
     }
-  }
 
-  public void stop() {
-    canHost = false;
-  }
+    public void send(String message) {
+        try {
+            OutputStream os = socket.getOutputStream();
+            PrintWriter pw = new PrintWriter(os, true);
+            pw.println(message);
+        } catch (IOException e) {
+            GameLogger.error("Có lỗi khi gửi dữ liệu tới client");
+        }
+    }
+
+    public void stop() {
+        canHost = false;
+    }
 }

@@ -9,8 +9,11 @@ public class GameLogger {
     private static final String ANSI_RESET = "\u001B[0m";
     private static final Logger logger = Logger.getLogger("GameLogger", null);
 
-
     public static void log(String message) {
         logger.info(ANSI_GREEN + message + ANSI_RESET);
+    }
+
+    public static void error(String s) {
+        logger.warning(s);
     }
 }

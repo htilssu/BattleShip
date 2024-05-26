@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /** Lớp quản lý kết nối giữa client với server */
-public class Client {
+public class Client implements Runnable {
     private static Client instance;
     Socket socket;
     BattleShip window;
@@ -45,10 +45,18 @@ public class Client {
     public void connect(InetAddress ip, short port) {
         try {
             socket = new Socket(ip, port);
-            sendData("JOIN|HISU");
+            new Thread(this).start();
+            GameLogger.log(getPing() + "");
+
         } catch (IOException e) {
             status = "Không thể kết nối đến máy chủ";
         }
+    }
+
+    public int getPing() {
+        long time = System.currentTimeMillis();
+        sendData(MultiHandler.PING + "");
+        return (int) (System.currentTimeMillis() - time);
     }
 
     public void sendData(String data) {
@@ -57,7 +65,7 @@ public class Client {
             PrintWriter writer = new PrintWriter(op, true);
             writer.println(data);
         } catch (IOException e) {
-            GameLogger.log("Error while sending data to host");
+            GameLogger.log("Không thể gửi dữ liệu, kiểm tra kết nối");
         }
     }
 
@@ -67,5 +75,12 @@ public class Client {
 
     public List<InetAddress> getHostList() {
         return hostList;
+    }
+
+    @Override
+    public void run() {
+        while (socket.isConnected()) {
+            MultiHandler.getInstance().readData(socket);
+        }
     }
 }

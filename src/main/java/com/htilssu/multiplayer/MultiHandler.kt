@@ -1,29 +1,64 @@
 package com.htilssu.multiplayer
 
+import com.htilssu.BattleShip
+import com.htilssu.entity.player.PlayerAction
 import com.htilssu.util.GameLogger
+import java.io.BufferedReader
+import java.io.IOException
+import java.io.InputStreamReader
+import java.net.Socket
 
-class MultiHandler {
+class MultiHandler(var battleShip: BattleShip) {
+
+
     companion object {
+        private var instance: MultiHandler? = null
+        const val PING = -1;
+        const val PONG = -2;
+
         @JvmStatic
-        fun handle(message: String) {
-            val messageParts = message.split("|")
-            when (messageParts[0]) {
-                "JOIN" -> {
-                    GameLogger.log("Player ${messageParts[1]} joined the game")
-                }
+        fun getInstance(): MultiHandler {
+            return instance!!
+        }
 
-                "LEAVE" -> {
-                    GameLogger.log("Player ${messageParts[1]} left the game")
-                }
+        @JvmStatic
+        fun createInstance(battleShip: BattleShip) {
+            instance = MultiHandler(battleShip)
+        }
+    }
 
-                "MOVE" -> {
-                    GameLogger.log("Player ${messageParts[1]} moved to ${messageParts[2]}")
-                }
-
-                else -> {
-                    GameLogger.log("Unknown message: $message")
-                }
+    private fun handle(message: String) {
+        val messageParts = message.split("|")
+        when (messageParts[0].toIntOrNull()) {
+            PlayerAction.JOIN -> {
+                GameLogger.log("Player ${messageParts[1]} joined the game")
             }
+
+            PlayerAction.ATTACK -> {
+                GameLogger.log("Player ${messageParts[1]} left the game")
+            }
+
+            PING -> {
+                Host.getInstance().send(PONG.toString())
+            }
+
+            else -> {
+                GameLogger.log("Unknown message: $message")
+            }
+        }
+    }
+
+    fun readData(socket: Socket) {
+        try {
+            val ip = socket.getInputStream()
+            val bis = BufferedReader(InputStreamReader(ip))
+
+            while (true) {
+                val message = bis.readLine() ?: break
+                handle(message)
+            }
+        } catch (e: IOException) {
+            Client.getInstance().status = "Mất kết nối với máy chủ"
         }
     }
 
