@@ -39,7 +39,7 @@ public class CustomButton extends JButton {
     @Override
     protected void paintComponent(Graphics g) {
         if (isHovered) { // neu da hover
-            int shrinkAmount = 18; // Kích thước thu nhỏ
+            int shrinkAmount = 10; // Kích thước thu nhỏ
             int newWidth = getWidth() - shrinkAmount; // chieu rong moi khi hover
             int newHeight = getHeight() - shrinkAmount; // chieu dai moi khi hover
             int xOffset = (getWidth() - newWidth) / 2; // toa do x kho hover

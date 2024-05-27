@@ -7,17 +7,27 @@ import com.htilssu.setting.GameSetting;
 import com.htilssu.util.AssetUtils;
 import com.htilssu.util.GameLogger;
 
+import javax.sound.sampled.*;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.image.BufferedImage;
-
+import java.io.IOException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 public class MenuScreen extends JPanel {
     private BufferedImage backgroundImage, menuImage;
     private CardLayout cardLayout; // card layout quan ly nhieu the card khac nhau trong 1 container
     private JPanel parentPanel; // tao 1 hieu ung chuyen gia 2 man gamemenu va gamepanel
     private BattleShip window;
+    private Clip backgroundMusicClip;
+    private List<CustomButton> buttons;
+    private static MenuScreen instance; // Tham chiếu tĩnh
 
     public MenuScreen(BattleShip battleShip) {
+        instance = this; // Gán tham chiếu tĩnh
         window = battleShip;
         cardLayout = new CardLayout();
         parentPanel = new JPanel(cardLayout);
@@ -25,7 +35,24 @@ public class MenuScreen extends JPanel {
         loadBackgroundImage();
         loadMenu();
         setPreferredSize(new Dimension(GameSetting.WIDTH, GameSetting.HEIGHT));
+        buttons = new ArrayList<>();
         createButtons();
+        playBackgroundMusic();
+        // Thêm listener để phát hiện khi cửa sổ thay đổi kích thước
+        addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                repositionButtons();
+
+            }
+        });
+
+
+
+    }
+
+    public static MenuScreen getInstance() {
+        return instance;
     }
 
     private void loadBackgroundImage() {
@@ -36,60 +63,38 @@ public class MenuScreen extends JPanel {
     private void loadMenu() {
         menuImage = AssetUtils.loadAsset("/MENU_.png"); // Tải hình ảnh biểu tượng menu
     }
-
-    private void createButtons() {
-        /* TODO: chỉnh lại size nút các thứ khi nhấn f11 để full màn hình
-        (dùng getWidth() và getHeight() để lấy kích thước màn hình hiện tại)
-        */
-        int buttonWidth = 200;
-        int buttonHeight = 80;
-        int centerX = (getPreferredSize().width - buttonWidth) / 2;
-        int totalButtons = 5;
-        int spacing = 5; // Increased spacing between buttons
-        int totalHeight = (buttonHeight * totalButtons) + (spacing * (totalButtons - 1));
-        int menuImageHeight = (menuImage != null) ? menuImage.getHeight() : 0;
-        int startY =
-                (GameSetting.HEIGHT - totalHeight) / 2
-                        + menuImageHeight
-                        - 20; // Adjusted to avoid overlapping
-
-        addButton("/btnplay.png", centerX, startY, buttonWidth, buttonHeight, "PLAY");
-        addButton(
-                "/MUTIPLAYER.png",
-                centerX,
-                startY + (buttonHeight + spacing),
-                buttonWidth,
-                buttonHeight,
-                "MULTIPLAYER");
-        addButton(
-                "/HELP.png",
-                centerX,
-                startY + 2 * (buttonHeight + spacing),
-                buttonWidth,
-                buttonHeight,
-                "HELP");
-        addButton(
-                "/SETTINGS.png",
-                centerX,
-                startY + 3 * (buttonHeight + spacing),
-                buttonWidth,
-                buttonHeight,
-                "SETTING");
-        addButton(
-                "/QUIT.png",
-                centerX,
-                startY + 4 * (buttonHeight + spacing),
-                buttonWidth,
-                buttonHeight,
-                "QUIT");
+    public Clip getBackgroundMusicClip() {
+        return backgroundMusicClip;
     }
 
-    private void addButton(
-            String imagePath, int x, int y, int width, int height, String actionCommand) {
+    public void setBackgroundMusicClip(Clip clip) {
+        this.backgroundMusicClip = clip;
+    }
+    public void setVolume(int volume) {
+        if (backgroundMusicClip != null) {
+            FloatControl volumeControl = (FloatControl) backgroundMusicClip.getControl(FloatControl.Type.MASTER_GAIN);
+            float minVolume = volumeControl.getMinimum();
+            float maxVolume = volumeControl.getMaximum();
+            float newVolume = minVolume + (maxVolume - minVolume) * (volume / 100f);
+            volumeControl.setValue(newVolume);
+        }
+    }
+
+    private void createButtons() {
+
+        addButton("/btnplay.png", "PLAY");
+        addButton("/MUTIPLAYER.png", "MULTIPLAYER");
+        addButton("/HELP.png", "HELP");
+        addButton("/SETTINGS.png", "SETTING");
+        addButton("/QUIT.png", "QUIT");
+        repositionButtons();
+    }
+
+    private void addButton(String imagePath, String actionCommand) {
         CustomButton button = new CustomButton(imagePath);
-        button.setBounds(x, y, width, height);
         button.setActionCommand(actionCommand);
         button.addActionListener(e -> handleButtonClick(e.getActionCommand()));
+        buttons.add(button);
         add(button);
     }
 
@@ -99,12 +104,53 @@ public class MenuScreen extends JPanel {
                 window.changeScreen(ScreenManager.GAME_SCREEN);
                 break;
             case "SETTING":
-                cardLayout.show(parentPanel, "SETTINGS_SCREEN");
+                window.changeScreen(ScreenManager.SETTING_SCREEN);
                 break;
             case "QUIT":
                 System.exit(0);
                 break;
         }
+    }
+    private void repositionButtons() {//định hinh cac nut khi thay doi kich thuoc man hinh
+        int buttonWidth = 200;
+        int buttonHeight = 80;
+        int centerX = (getWidth() - buttonWidth) / 2;
+        int totalButtons = buttons.size();
+        int spacing = 20;
+        int totalHeight = (buttonHeight * totalButtons) + (spacing * (totalButtons - 1));
+        int menuImageHeight = (menuImage != null) ? menuImage.getHeight() : 0;
+        int startY = (getHeight() - totalHeight) / 2 + menuImageHeight-10;
+
+
+        for (int i = 0; i < buttons.size(); i++) {
+            CustomButton button = buttons.get(i);
+            button.setBounds(centerX, startY + i * (buttonHeight + spacing), buttonWidth, buttonHeight);
+        }
+    }
+    private void playBackgroundMusic() {
+        try {
+            URL musicURL = getClass().getResource("/Action_4.wav");//nhac nen
+            if (musicURL != null) { //neu tim dc nhac nen
+                System.out.println("Music file found at: " + musicURL.getPath());//in ra tep am thanh tim thay xem co dung k
+                AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(musicURL);//Đoạn này tạo một AudioInputStream từ đường dẫn của tệp âm thanh. AudioInputStream là một luồng dữ liệu âm thanh có thể được sử dụng để đọc dữ liệu từ tệp âm thanh.
+                backgroundMusicClip = AudioSystem.getClip();//òng này tạo một đối tượng Clip mới. Clip là một loại đối tượng trong Java Sound API được sử dụng để phát lại các tệp âm thanh ngắn.
+                backgroundMusicClip.open(audioInputStream);//Dòng này mở Clip với AudioInputStream đã được tạo trước đó, nạp dữ liệu âm thanh từ tệp vào bộ nhớ để chuẩn bị cho việc phát.
+                backgroundMusicClip.loop(Clip.LOOP_CONTINUOUSLY);//òng này thực hiện việc phát lại âm thanh lặp đi lặp lại không ngừng. Điều này có nghĩa là khi âm thanh kết thúc, nó sẽ tự động phát lại từ đầu.
+                System.out.println("Background music started.");
+            } else {
+                System.err.println("Music file not found: /Action_4.wav");
+            }
+            //cac dong case la cac ngoai le khi xay ra loi
+        } catch (UnsupportedAudioFileException e) {
+            System.err.println("Unsupported audio file format: " + e.getMessage());
+        } catch (IOException e) {
+            System.err.println("Error reading the audio file: " + e.getMessage());
+        } catch (LineUnavailableException e) {
+            System.err.println("Audio line unavailable: " + e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
     @Override
@@ -115,8 +161,8 @@ public class MenuScreen extends JPanel {
         }
         if (menuImage != null) {
             // Vẽ biểu tượng menu tại vị trí mong muốn
-            int iconX = (GameSetting.WIDTH - menuImage.getWidth()) / 2;
-            int iconY = 60;
+            int iconX = (getWidth() - menuImage.getWidth()) / 2;
+             int iconY = 60;
             g.drawImage(menuImage, iconX, iconY, this);
         }
     }
