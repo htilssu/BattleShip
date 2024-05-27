@@ -17,14 +17,15 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+
 public class MenuScreen extends JPanel {
+    private static MenuScreen instance; // Tham chiếu tĩnh
     private BufferedImage backgroundImage, menuImage;
     private CardLayout cardLayout; // card layout quan ly nhieu the card khac nhau trong 1 container
     private JPanel parentPanel; // tao 1 hieu ung chuyen gia 2 man gamemenu va gamepanel
     private BattleShip window;
     private Clip backgroundMusicClip;
     private List<CustomButton> buttons;
-    private static MenuScreen instance; // Tham chiếu tĩnh
 
     public MenuScreen(BattleShip battleShip) {
         instance = this; // Gán tham chiếu tĩnh
@@ -39,16 +40,13 @@ public class MenuScreen extends JPanel {
         createButtons();
         playBackgroundMusic();
         // Thêm listener để phát hiện khi cửa sổ thay đổi kích thước
-        addComponentListener(new ComponentAdapter() {
-            @Override
-            public void componentResized(ComponentEvent e) {
-                repositionButtons();
-
-            }
-        });
-
-
-
+        addComponentListener(
+                new ComponentAdapter() {
+                    @Override
+                    public void componentResized(ComponentEvent e) {
+                        repositionButtons();
+                    }
+                });
     }
 
     public static MenuScreen getInstance() {
@@ -63,6 +61,7 @@ public class MenuScreen extends JPanel {
     private void loadMenu() {
         menuImage = AssetUtils.loadAsset("/MENU_.png"); // Tải hình ảnh biểu tượng menu
     }
+
     public Clip getBackgroundMusicClip() {
         return backgroundMusicClip;
     }
@@ -70,12 +69,15 @@ public class MenuScreen extends JPanel {
     public void setBackgroundMusicClip(Clip clip) {
         this.backgroundMusicClip = clip;
     }
+
     public void setVolume(int volume) {
         if (backgroundMusicClip != null) {
-            FloatControl volumeControl = (FloatControl) backgroundMusicClip.getControl(FloatControl.Type.MASTER_GAIN);
-            float minVolume = volumeControl.getMinimum();
+            FloatControl volumeControl =
+                    (FloatControl) backgroundMusicClip.getControl(FloatControl.Type.MASTER_GAIN);
+            float minVol = volumeControl.getMinimum();
             float maxVolume = volumeControl.getMaximum();
-            float newVolume = minVolume + (maxVolume - minVolume) * (volume / 100f);
+            float newVolume = -30 + Math.abs(-30 - maxVolume) * volume / 100;
+            GameLogger.log(newVolume + "");
             volumeControl.setValue(newVolume);
         }
     }
@@ -111,7 +113,8 @@ public class MenuScreen extends JPanel {
                 break;
         }
     }
-    private void repositionButtons() {//định hinh cac nut khi thay doi kich thuoc man hinh
+
+    private void repositionButtons() { // định hinh cac nut khi thay doi kich thuoc man hinh
         int buttonWidth = 200;
         int buttonHeight = 80;
         int centerX = (getWidth() - buttonWidth) / 2;
@@ -119,28 +122,47 @@ public class MenuScreen extends JPanel {
         int spacing = 20;
         int totalHeight = (buttonHeight * totalButtons) + (spacing * (totalButtons - 1));
         int menuImageHeight = (menuImage != null) ? menuImage.getHeight() : 0;
-        int startY = (getHeight() - totalHeight) / 2 + menuImageHeight-10;
-
+        int startY = (getHeight() - totalHeight) / 2 + menuImageHeight - 10;
 
         for (int i = 0; i < buttons.size(); i++) {
             CustomButton button = buttons.get(i);
-            button.setBounds(centerX, startY + i * (buttonHeight + spacing), buttonWidth, buttonHeight);
+            button.setBounds(
+                    centerX, startY + i * (buttonHeight + spacing), buttonWidth, buttonHeight);
         }
     }
+
     private void playBackgroundMusic() {
         try {
-            URL musicURL = getClass().getResource("/Action_4.wav");//nhac nen
-            if (musicURL != null) { //neu tim dc nhac nen
-                System.out.println("Music file found at: " + musicURL.getPath());//in ra tep am thanh tim thay xem co dung k
-                AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(musicURL);//Đoạn này tạo một AudioInputStream từ đường dẫn của tệp âm thanh. AudioInputStream là một luồng dữ liệu âm thanh có thể được sử dụng để đọc dữ liệu từ tệp âm thanh.
-                backgroundMusicClip = AudioSystem.getClip();//òng này tạo một đối tượng Clip mới. Clip là một loại đối tượng trong Java Sound API được sử dụng để phát lại các tệp âm thanh ngắn.
-                backgroundMusicClip.open(audioInputStream);//Dòng này mở Clip với AudioInputStream đã được tạo trước đó, nạp dữ liệu âm thanh từ tệp vào bộ nhớ để chuẩn bị cho việc phát.
-                backgroundMusicClip.loop(Clip.LOOP_CONTINUOUSLY);//òng này thực hiện việc phát lại âm thanh lặp đi lặp lại không ngừng. Điều này có nghĩa là khi âm thanh kết thúc, nó sẽ tự động phát lại từ đầu.
+            URL musicURL = getClass().getResource("/Action_4.wav"); // nhac nen
+            if (musicURL != null) { // neu tim dc nhac nen
+                System.out.println(
+                        "Music file found at: "
+                                + musicURL.getPath()); // in ra tep am thanh tim thay xem co dung k
+                AudioInputStream audioInputStream =
+                        AudioSystem.getAudioInputStream(
+                                musicURL); // Đoạn này tạo một AudioInputStream từ đường dẫn của tệp
+                // âm thanh. AudioInputStream là một luồng dữ liệu âm
+                // thanh có thể được sử dụng để đọc dữ liệu từ tệp âm
+                // thanh.
+                backgroundMusicClip =
+                        AudioSystem
+                                .getClip(); // òng này tạo một đối tượng Clip mới. Clip là một loại
+                // đối tượng trong Java Sound API được sử dụng để phát
+                // lại các tệp âm thanh ngắn.
+                backgroundMusicClip.open(
+                        audioInputStream); // Dòng này mở Clip với AudioInputStream đã được tạo
+                // trước đó, nạp dữ liệu âm thanh từ tệp vào bộ nhớ để
+                // chuẩn bị cho việc phát.
+                backgroundMusicClip.loop(
+                        Clip.LOOP_CONTINUOUSLY); // òng này thực hiện việc phát lại âm thanh lặp
+                // đi lặp lại không ngừng. Điều này có nghĩa là
+                // khi âm thanh kết thúc, nó sẽ tự động phát
+                // lại từ đầu.
                 System.out.println("Background music started.");
             } else {
                 System.err.println("Music file not found: /Action_4.wav");
             }
-            //cac dong case la cac ngoai le khi xay ra loi
+            // cac dong case la cac ngoai le khi xay ra loi
         } catch (UnsupportedAudioFileException e) {
             System.err.println("Unsupported audio file format: " + e.getMessage());
         } catch (IOException e) {
@@ -150,7 +172,6 @@ public class MenuScreen extends JPanel {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
     @Override
@@ -162,7 +183,7 @@ public class MenuScreen extends JPanel {
         if (menuImage != null) {
             // Vẽ biểu tượng menu tại vị trí mong muốn
             int iconX = (getWidth() - menuImage.getWidth()) / 2;
-             int iconY = 60;
+            int iconY = 60;
             g.drawImage(menuImage, iconX, iconY, this);
         }
     }
