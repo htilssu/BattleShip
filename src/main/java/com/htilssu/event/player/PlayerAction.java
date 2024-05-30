@@ -1,9 +1,8 @@
-package com.htilssu.entity.player;
+package com.htilssu.event.player;
 
 public final class PlayerAction {
-    /**
-     * Người chơi thực hiện hành động bắn đạn
-     */
+    /** Người chơi thực hiện hành động bắn đạn */
     public static final int ATTACK = 1;
+
     public static final int JOIN = 2;
 }

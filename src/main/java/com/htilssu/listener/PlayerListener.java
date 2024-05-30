@@ -5,6 +5,7 @@ import com.htilssu.entity.game.GamePlay;
 import com.htilssu.entity.player.Player;
 import com.htilssu.event.player.PlayerAttackEvent;
 import com.htilssu.event.player.PlayerJoinEvent;
+import com.htilssu.manager.GameManager;
 
 public class PlayerListener implements Listener {
 
@@ -12,10 +13,8 @@ public class PlayerListener implements Listener {
     public void onPlayerAttack(PlayerAttackEvent e) {}
 
     @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent e) {
+    public void onPlayerJoin(PlayerJoinEvent e, GameManager gameManager) {
         Player player = e.getPlayer();
-        GamePlay gamePlay = e.getGamePlay();
-        gamePlay.addPlayer(player);
-        // TODO add player to game play
+        gameManager.addPlayer(player);
     }
 }

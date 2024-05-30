@@ -41,13 +41,14 @@ public class Host implements Runnable {
 
     @Override
     public void run() {
-        try {
-            socket = serverSocket.accept();
-        } catch (IOException e) {
-            GameLogger.error("Có lỗi khi chấp nhận kết nối từ client");
-        }
-
         while (canHost) {
+            try {
+                socket = serverSocket.accept();
+                GameLogger.log(String.valueOf(socket.getInetAddress()));
+            } catch (IOException e) {
+                GameLogger.error("Có lỗi khi chấp nhận kết nối từ client");
+            }
+
             if (socket != null) {
                 MultiHandler.getInstance().readData(socket);
             }

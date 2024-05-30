@@ -1,7 +1,6 @@
 package com.htilssu.multiplayer;
 
 import com.htilssu.BattleShip;
-import com.htilssu.component.Position;
 import com.htilssu.setting.GameSetting;
 import com.htilssu.util.GameLogger;
 import com.htilssu.util.NetworkUtils;
@@ -46,8 +45,7 @@ public class Client implements Runnable {
         try {
             socket = new Socket(ip, port);
             new Thread(this).start();
-            GameLogger.log(getPing() + "");
-
+            status = "Đã kết nối đến máy chủ";
         } catch (IOException e) {
             status = "Không thể kết nối đến máy chủ";
         }
@@ -59,13 +57,13 @@ public class Client implements Runnable {
         return (int) (System.currentTimeMillis() - time);
     }
 
-    public void sendData(String data) {
+    private void sendData(String s) {
         try {
-            OutputStream op = socket.getOutputStream();
-            PrintWriter writer = new PrintWriter(op, true);
-            writer.println(data);
+            OutputStream os = socket.getOutputStream();
+            PrintWriter pw = new PrintWriter(os, true);
+            pw.println(s);
         } catch (IOException e) {
-            GameLogger.log("Không thể gửi dữ liệu, kiểm tra kết nối");
+            GameLogger.error("Có lỗi khi gửi dữ liệu");
         }
     }
 

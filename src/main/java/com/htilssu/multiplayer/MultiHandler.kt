@@ -1,7 +1,9 @@
 package com.htilssu.multiplayer
 
 import com.htilssu.BattleShip
-import com.htilssu.entity.player.PlayerAction
+import com.htilssu.entity.player.Player
+import com.htilssu.event.player.PlayerAction
+import com.htilssu.event.player.PlayerJoinEvent
 import com.htilssu.util.GameLogger
 import java.io.BufferedReader
 import java.io.IOException
@@ -31,11 +33,19 @@ class MultiHandler(var battleShip: BattleShip) {
         val messageParts = message.split("|")
         when (messageParts[0].toIntOrNull()) {
             PlayerAction.JOIN -> {
-                GameLogger.log("Player ${messageParts[1]} joined the game")
+                if (messageParts.count() < 3) {
+                    GameLogger.error("Message không hợp lệ (Player Join): $message")
+                    return
+                }
+                val playerId = messageParts[1]
+                val playerName = messageParts[2]
+                val player = Player(playerId, playerName)
+                battleShip.listenerManager.callEvent(PlayerJoinEvent(player), battleShip.gameManager)
             }
 
             PlayerAction.ATTACK -> {
                 GameLogger.log("Player ${messageParts[1]} left the game")
+
             }
 
             PING -> {

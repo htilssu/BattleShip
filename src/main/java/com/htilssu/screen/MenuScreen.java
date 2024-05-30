@@ -74,10 +74,9 @@ public class MenuScreen extends JPanel {
         if (backgroundMusicClip != null) {
             FloatControl volumeControl =
                     (FloatControl) backgroundMusicClip.getControl(FloatControl.Type.MASTER_GAIN);
-            float minVol = volumeControl.getMinimum();
+            float minVol = -20;
             float maxVolume = volumeControl.getMaximum();
-            float newVolume = -30 + Math.abs(-30 - maxVolume) * volume / 100;
-            GameLogger.log(newVolume + "");
+            float newVolume = minVol + Math.abs(minVol - maxVolume) * volume / 100;
             volumeControl.setValue(newVolume);
         }
     }
@@ -135,9 +134,6 @@ public class MenuScreen extends JPanel {
         try {
             URL musicURL = getClass().getResource("/Action_4.wav"); // nhac nen
             if (musicURL != null) { // neu tim dc nhac nen
-                System.out.println(
-                        "Music file found at: "
-                                + musicURL.getPath()); // in ra tep am thanh tim thay xem co dung k
                 AudioInputStream audioInputStream =
                         AudioSystem.getAudioInputStream(
                                 musicURL); // Đoạn này tạo một AudioInputStream từ đường dẫn của tệp
@@ -158,9 +154,8 @@ public class MenuScreen extends JPanel {
                 // đi lặp lại không ngừng. Điều này có nghĩa là
                 // khi âm thanh kết thúc, nó sẽ tự động phát
                 // lại từ đầu.
-                System.out.println("Background music started.");
-            } else {
-                System.err.println("Music file not found: /Action_4.wav");
+                backgroundMusicClip.close();
+                // TODO: xoa
             }
             // cac dong case la cac ngoai le khi xay ra loi
         } catch (UnsupportedAudioFileException e) {

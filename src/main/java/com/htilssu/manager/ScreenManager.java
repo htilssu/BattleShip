@@ -16,19 +16,26 @@ public class ScreenManager {
 
     /** Màn hình chơi game */
     public static final int GAME_SCREEN = 2;
+
     public static final int SETTING_SCREEN = 3;
 
     private final Map<Integer, JPanel> screenMap = new HashMap<>();
+    private final BattleShip battleShip;
 
     /***
      * Màn hình hiện tại
      */
-    int currentScreen = MENU_SCREEN;
+    int currentScreen = GAME_SCREEN;
 
     public ScreenManager(BattleShip battleShip) {
+        this.battleShip = battleShip;
         screenMap.put(1, new MenuScreen(battleShip));
         screenMap.put(2, new PlayScreen(battleShip));
         screenMap.put(3, new SettingScreen(battleShip));
+    }
+
+    public BattleShip getBattleShip() {
+        return battleShip;
     }
 
     /**
@@ -37,7 +44,7 @@ public class ScreenManager {
      * <p>Nếu tham số {@code update} là {@code true} thì sẽ cập nhật lại màn hình hiện tại được đánh
      * dấu khi lấy, ngược lại là {@code false}
      *
-     * @param startScreen số nguyên biểu diễn loại màn hình
+     * @param screen số nguyên biểu diễn loại màn hình
      * @return Màn hình được kế thừa từ {@link JPanel} hoặc {@code null} nếu không tìm thấy
      */
     public JPanel getScreen(int screen) {
