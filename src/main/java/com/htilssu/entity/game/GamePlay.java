@@ -1,16 +1,26 @@
 package com.htilssu.entity.game;
 
+import com.htilssu.component.Position;
 import com.htilssu.entity.player.Player;
 import com.htilssu.entity.player.PlayerBoard;
+import com.htilssu.event.player.PlayerShootEvent;
 import com.htilssu.manager.DifficultyManager;
+import com.htilssu.manager.GameManager;
+import com.htilssu.setting.GameSetting;
+
 import java.awt.*;
 import java.util.List;
 
 /** Mỗi {@link GamePlay} là 1 trận đấu giữa 2 người chơi */
 public class GamePlay {
+  public static final int MODE_SETUP = 0;
+  public static final int MODE_PLAY = 1;
+  int gameMode = MODE_SETUP;
   List<Player> playerList;
   int turn;
   int difficulty;
+  boolean isMultiPlayer = false;
+  private GameManager gameManager;
 
   public GamePlay(List<Player> playerList, int turn, int difficulty) {
     this.playerList = playerList;
@@ -19,16 +29,34 @@ public class GamePlay {
     initBoard();
   }
 
+  public GamePlay(List<Player> playerList, int turn, int difficulty, boolean isMultiPlayer) {
+    this(playerList, turn, difficulty);
+    this.isMultiPlayer = isMultiPlayer;
+  }
+
+  public int getGameMode() {
+    return gameMode;
+  }
+
+  public void setGameMode(int gameMode) {
+    this.gameMode = gameMode;
+  }
+
   public void renderShootBoard(Graphics g) {
     getCurrentPlayer().getBoard().render(g);
   }
 
   private void initBoard() {
-    int boardSize = DifficultyManager.getGameBoardSize(difficulty);
+    int boardSize = getBoardSize();
     for (Player player : playerList) {
       player.setPlayerBoard(new PlayerBoard(boardSize));
       player.setShot(new byte[boardSize][boardSize]);
+      player.setGamePlay(this);
     }
+  }
+
+  private int getBoardSize() {
+    return DifficultyManager.getGameBoardSize(difficulty);
   }
 
   /**
@@ -54,25 +82,36 @@ public class GamePlay {
     turn = (turn + 1) % playerList.size();
   }
 
+  /**
+   * Lấy vị trí của hàng và cột trên bảng mà chuột của người chơi hiện tại đang trỏ tới ví dụ: nếu
+   * chuột đang trỏ tới hàng 2 cột 3 thì trả về (2, 3)
+   *
+   * @param position vị trí của chuột hiện tại
+   * @return vị trí hàng và cột trên bảng
+   */
   public void handleClick(Point position) {
-    PlayerBoard playerBoard = getCurrentPlayer().getBoard();
-    Point boardPoint = playerBoard.getPosition();
+    PlayerBoard board = getCurrentPlayer().getBoard();
 
-    int maxX = boardPoint.x + playerBoard.width;
-    int maxY = boardPoint.y + playerBoard.height;
+    if (!board.isInsideBoard(position)) return;
+    Position pos = board.getBoardRowCol(position);
 
-    if (position.x < boardPoint.x
-        || position.y < boardPoint.y
-        || position.x > maxX
-        || position.y > maxY) return;
+    // Call shot listener
+    getGameManager()
+        .getBattleShip()
+        .getListenerManager()
+        .callEvent(new PlayerShootEvent(getCurrentPlayer(), getOpponent(), pos, false));
+  }
 
-    // TODO: call shot method or listener
+  public GameManager getGameManager() {
+    return gameManager;
+  }
 
-    /*  GameLogger.log(
-        "HIT row: "
-            + (position.x - boardPoint.x) / (int) (GameSetting.SCALE * GameSetting.TILE_SIZE)));
-    GameLogger.log(
-        "HIT col: "
-            + (position.y - boardPoint.y) / (int) (GameSetting.SCALE * GameSetting.TILE_SIZE));*/
+  public void setGameManager(GameManager gameManager) {
+    this.gameManager = gameManager;
+  }
+
+  public void handleMouseMoved(Point point) {
+    // TODO: xử lý đặt thuyền
+
   }
 }

@@ -1,65 +1,54 @@
 package com.htilssu.entity;
 
-import com.htilssu.component.Coordinate;
+import com.htilssu.component.Position;
+import com.htilssu.entity.player.PlayerBoard;
+import com.htilssu.render.Renderable;
+import org.jetbrains.annotations.NotNull;
+
+import java.awt.*;
+import java.awt.image.BufferedImage;
 
 // Lớp Ship đại diện cho một con TÀU
-public class Ship {
-    // Mảng tọa độ của tàu
-    Coordinate[] coordinates;
+public class Ship implements Renderable {
+  public static final int SHIP_2 = 2;
+  public static final int SHIP_3 = 3;
+  public static final int SHIP_4 = 4;
+  public static final int SHIP_5 = 5;
+  public static final int HORIZONTAL = 0;
+  public static final int VERTICAL = 1;
 
-    // Mảng boolean để kiểm tra xem các tọa độ tương ứng đã bị bắn trúng hay chưa.
-    boolean[] hits;
+  /**
+   *
+   *
+   * <pre>{@code
+   * 0 - Ngang
+   * 1 - Dọc
+   * }</pre>
+   */
+  int direction = HORIZONTAL;
 
-    // Constructor cho tàu với 2 tọa độ
-    public Ship(Coordinate a, Coordinate b) {
-        this.coordinates = new Coordinate[] {a, b};
-        this.hits = new boolean[2]; // Mảng boolean có 2 phần tử
-    }
+  BufferedImage asset;
+  Position position;
+  PlayerBoard playerBoard;
+  int shipType;
 
-    // Constructor cho tàu với 3 tọa độ
-    public Ship(Coordinate a, Coordinate b, Coordinate c) {
-        this.coordinates = new Coordinate[] {a, b, c};
-        this.hits = new boolean[3]; // Mảng boolean có 3 phần tử
-    }
+  public Ship(
+      int direction,
+      BufferedImage asset,
+      Position position,
+      PlayerBoard playerBoard,
+      int shipType) {
+    this(direction, asset, position, shipType);
+    this.playerBoard = playerBoard;
+  }
 
-    // Constructor cho tàu với 4 tọa độ
-    public Ship(Coordinate a, Coordinate b, Coordinate c, Coordinate d) {
-        this.coordinates = new Coordinate[] {a, b, c, d};
-        this.hits = new boolean[4]; // Mảng boolean có 4 phần tử
-    }
+  public Ship(int direction, BufferedImage asset, Position position, int shipType) {
+    this.direction = direction;
+    this.asset = asset;
+    this.position = position;
+    this.shipType = shipType;
+  }
 
-    // Constructor cho tàu với 5 tọa độ
-    public Ship(Coordinate a, Coordinate b, Coordinate c, Coordinate d, Coordinate e) {
-        this.coordinates = new Coordinate[] {a, b, c, d, e};
-        this.hits = new boolean[5]; // Mảng boolean có 5 phần tử
-    }
-
-    // Phương thức kiểm tra xem một điểm có bị bắn trúng không. Nếu trúng thì gán hit = true.
-    public boolean isPointHit(Coordinate hit) {
-        for (int i = 0; i < coordinates.length; i++) {
-            if (coordinates[i].compareCoord(hit)) {
-                hits[i] = true;
-                return true;
-            }
-        }
-        return false;
-    }
-
-    // Phương thức kiểm tra xem tàu đã bị chìm hay chưa
-    public boolean isShipSunk() {
-        for (boolean hit : hits) {
-            if (!hit) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    // Phương thức dùng để in ra tọa độ của tàu, gỡ lỗi.
-    public void printShip() {
-        for (Coordinate coordinate : coordinates) {
-            System.out.print("(" + coordinate.getX() + ", " + coordinate.getY() + ") ");
-        }
-        System.out.println();
-    }
+  @Override
+  public void render(@NotNull Graphics g) {}
 }

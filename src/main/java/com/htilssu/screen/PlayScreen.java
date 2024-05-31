@@ -1,6 +1,7 @@
 package com.htilssu.screen;
 
 import com.htilssu.BattleShip;
+import com.htilssu.entity.game.GamePlay;
 import com.htilssu.manager.GameManager;
 import com.htilssu.setting.GameSetting;
 import com.htilssu.util.GameLogger;
@@ -10,7 +11,8 @@ import java.awt.*;
 import java.awt.event.*;
 
 /** Màn hình chơi game */
-public class PlayScreen extends JPanel implements MouseListener, ComponentListener {
+public class PlayScreen extends JPanel
+    implements MouseListener, ComponentListener, MouseMotionListener {
 
   private final BattleShip window;
 
@@ -34,8 +36,22 @@ public class PlayScreen extends JPanel implements MouseListener, ComponentListen
   public void mouseClicked(MouseEvent e) {
     Point position = new Point(e.getX(), e.getY());
 
-    // handle click on gameBoard
+    // handle click on gameBoard (shoot)
     window.getGameManager().getCurrentGamePlay().handleClick(position);
+  }
+
+  /**
+   * Thêm sự kiện lắng nghe di chuột vào màn hình chơi game, để xử lý các sự kiện di chuột Thêm sự
+   * kiện này khi cần xử lý đặt tàu vào bảng chơi {@link GamePlay#MODE_SETUP} là đang bật chế độ đặt
+   * tàu
+   */
+  public void setMouseMotion() {
+    addMouseMotionListener(this);
+  }
+
+  /** Xóa sự kiện lắng nghe di chuột khỏi màn hình chơi game, để tránh xử lý không cần thiết */
+  public void removeMouseMotion() {
+    removeMouseMotionListener(this);
   }
 
   @Override
@@ -63,4 +79,13 @@ public class PlayScreen extends JPanel implements MouseListener, ComponentListen
 
   @Override
   public void componentHidden(ComponentEvent e) {}
+
+  @Override
+  public void mouseDragged(MouseEvent e) {}
+
+  @Override
+  public void mouseMoved(MouseEvent e) {
+    Point pos = new Point(e.getX(), e.getY());
+    window.getGameManager().getCurrentGamePlay().handleMouseMoved(pos);
+  }
 }

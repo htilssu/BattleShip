@@ -1,6 +1,7 @@
 package com.htilssu.multiplayer
 
 import com.htilssu.BattleShip
+import com.htilssu.component.Position
 import com.htilssu.entity.player.Player
 import com.htilssu.event.player.PlayerAction
 import com.htilssu.event.player.PlayerJoinEvent
@@ -43,9 +44,12 @@ class MultiHandler(var battleShip: BattleShip) {
                 battleShip.listenerManager.callEvent(PlayerJoinEvent(player), battleShip.gameManager)
             }
 
-            PlayerAction.ATTACK -> {
-                GameLogger.log("Player ${messageParts[1]} left the game")
-
+            PlayerAction.SHOOT -> {
+                if (messageParts.count() < 3) {
+                    GameLogger.error("Message không hợp lệ (Player Shoot): $message")
+                    return
+                }
+                val pos = Position(messageParts[1].toInt(), messageParts[2].toInt())
             }
 
             PING -> {

@@ -9,61 +9,76 @@ import java.util.List;
 
 public final class GameManager {
 
-    public static final int MAX_PLAYER = 2;
-    public static final int MIN_PLAYER = 1;
-    public static final Player gamePlayer = new Player();
-    BattleShip battleShip;
-    List<Player> players;
-    GamePlay currentGamePlay;
-    int turn = 0;
+  public static final int HIT = 2;
+  public static final int MISS = 1;
+  public static final int UNKNOWN = 0;
 
-    {
-        initPlayerList();
+  public static final int MAX_PLAYER = 2;
+  public static final int MIN_PLAYER = 1;
+  public static final Player gamePlayer = new Player();
+  BattleShip battleShip;
+  List<Player> players;
+  GamePlay currentGamePlay;
+  int turn = 0;
+  private boolean multiPlayer;
+
+  {
+    initPlayerList();
+  }
+
+  public GameManager(BattleShip battleShip) {
+    this.battleShip = battleShip;
+  }
+
+  public BattleShip getBattleShip() {
+    return battleShip;
+  }
+
+  public void setTurn(int turn) {
+    this.turn = turn;
+  }
+
+  public void addPlayer(Player player) {
+    if (players.size() < MAX_PLAYER) {
+      players.add(player);
+    }
+  }
+
+  public GamePlay createNewGamePlay() {
+    if (players.size() < MIN_PLAYER) {
+      return null;
     }
 
-    public GameManager(BattleShip battleShip) {
-        this.battleShip = battleShip;
-    }
+    GamePlay newGamePlay = new GamePlay(players, turn, DifficultyManager.DIFFICULTY, multiPlayer);
+    newGamePlay.setGameManager(this);
 
-    public void setTurn(int turn) {
-        this.turn = turn;
-    }
+    initPlayerList();
+    setCurrentGamePlay(newGamePlay);
+    return currentGamePlay;
+  }
 
-    public void addPlayer(Player player) {
-        if (players.size() < MAX_PLAYER) {
-            players.add(player);
-        }
-    }
+  private void initPlayerList() {
+    players = new ArrayList<>();
+    players.add(gamePlayer);
+  }
 
-    public GamePlay createNewGamePlay() {
-        if (players.size() < MIN_PLAYER) {
-            return null;
-        }
+  public GamePlay getCurrentGamePlay() {
+    return currentGamePlay;
+  }
 
-        GamePlay newGamePlay = new GamePlay(players, turn, DifficultyManager.DIFFICULTY);
+  private void setCurrentGamePlay(GamePlay currentGamePlay) {
+    this.currentGamePlay = currentGamePlay;
+    this.currentGamePlay.setGameManager(this);
+  }
 
-        initPlayerList();
-        currentGamePlay = newGamePlay;
-        return currentGamePlay;
-    }
+  public void createTestGamePlay() {
+    List<Player> testPlayers = new ArrayList<>();
+    testPlayers.add(GameManager.gamePlayer);
+    testPlayers.add(new Player());
+    setCurrentGamePlay(new GamePlay(testPlayers, 0, DifficultyManager.DIFFICULTY));
+  }
 
-    private void initPlayerList() {
-        players = new ArrayList<>();
-        players.add(gamePlayer);
-    }
-
-    public GamePlay getCurrentGamePlay() {
-        return currentGamePlay;
-    }
-
-    public void setCurrentGamePlay(GamePlay currentGamePlay) {
-        this.currentGamePlay = currentGamePlay;
-    }
-
-    public void createTestGamePlay() {
-        List<Player> testPlayers = new ArrayList<>();
-        testPlayers.add(new Player());
-        testPlayers.add(new Player());
-        currentGamePlay = new GamePlay(testPlayers, 0, DifficultyManager.DIFFICULTY);
-    }
+  public void setMultiPlayer(boolean multiPlayer) {
+    this.multiPlayer = multiPlayer;
+  }
 }
