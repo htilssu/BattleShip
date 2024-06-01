@@ -66,7 +66,7 @@ public class AssetUtils {
     return assetMap.get(assetBoardFrame);
   }
 
-  public static BufferedImage rotateImage(BufferedImage image, double angle) {
+  public static BufferedImage rotate90(BufferedImage image) {
     int w = image.getWidth();
     int h = image.getHeight();
     BufferedImage rotatedImage = new BufferedImage(h, w, image.getType());
@@ -74,21 +74,12 @@ public class AssetUtils {
     Graphics2D g2d = rotatedImage.createGraphics();
 
     AffineTransform transform = new AffineTransform();
-    transform.rotate(angle, (double) w, (double) h / 2);
-
+    transform.rotate(Math.toRadians(90), 0, 0);
+    transform.translate(0, -h);
     AffineTransformOp op = new AffineTransformOp(transform, AffineTransformOp.TYPE_BILINEAR);
     op.filter(image, rotatedImage);
 
     g2d.dispose();
-
-    File outputfile = new File("image.png");
-    GameLogger.log(outputfile.getAbsolutePath());
-    try {
-      ImageIO.write(rotatedImage, "png", outputfile);
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
-
     return rotatedImage;
   }
 }

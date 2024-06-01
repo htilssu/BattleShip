@@ -11,7 +11,7 @@ import java.io.IOException
 import java.io.InputStreamReader
 import java.net.Socket
 
-class MultiHandler(var battleShip: BattleShip) {
+open class MultiHandler(var battleShip: BattleShip) {
 
 
     companion object {
@@ -53,7 +53,9 @@ class MultiHandler(var battleShip: BattleShip) {
             }
 
             PING -> {
-                Host.getInstance().send(PONG.toString())
+                if (this is Host) {
+                    this.send(PONG.toString())
+                }
             }
 
             else -> {
@@ -71,8 +73,7 @@ class MultiHandler(var battleShip: BattleShip) {
                 val message = bis.readLine() ?: break
                 handle(message)
             }
-        } catch (e: IOException) {
-            Client.getInstance().status = "Mất kết nối với máy chủ"
+        } catch (_: IOException) {
         }
     }
 

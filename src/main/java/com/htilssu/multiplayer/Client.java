@@ -12,20 +12,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 /** Lớp quản lý kết nối giữa client với server */
-public class Client implements Runnable {
+public class Client extends MultiHandler implements Runnable {
   private static Client instance;
   Socket socket;
-  BattleShip window;
   private List<InetAddress> hostList = new ArrayList<>();
   private String status;
 
   public Client(BattleShip battleShip) {
-    window = battleShip;
+    super(battleShip);
     instance = this;
-  }
-
-  public static Client getInstance() {
-    return instance;
   }
 
   public String getStatus() {
@@ -78,7 +73,7 @@ public class Client implements Runnable {
   @Override
   public void run() {
     while (socket.isConnected()) {
-      MultiHandler.getInstance().readData(socket);
+      readData(socket);
     }
   }
 }

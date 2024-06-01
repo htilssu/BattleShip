@@ -1,16 +1,10 @@
 package com.htilssu.entity.player;
 
 import com.htilssu.component.Position;
-import com.htilssu.entity.Ship;
 import com.htilssu.render.Renderable;
 import com.htilssu.setting.GameSetting;
 import java.awt.*;
 import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
-import java.nio.Buffer;
-
-import com.htilssu.util.AssetUtils;
-import com.htilssu.util.GameLogger;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -23,11 +17,6 @@ public class PlayerBoard extends Dimension implements Renderable {
 
   int cellSize;
   Point position = new Point(64, 64);
-  BufferedImage setUpShip = AssetUtils.getAsset(AssetUtils.ASSET_SHIP_2);
-
-  {
-    setUpShip = AssetUtils.rotateImage(setUpShip, Math.toRadians(90));
-  }
 
   /**
    * Khởi tạo bảng người chơi Bảng sẽ có size là size x size ô
@@ -41,10 +30,6 @@ public class PlayerBoard extends Dimension implements Renderable {
     update();
   }
 
-  public void setSetUpShip(BufferedImage setUpShip) {
-    this.setUpShip = setUpShip;
-  }
-
   /** Cập nhật kích thước của bảng người chơi */
   public void update() {
     cellSize = (int) Math.ceil(GameSetting.TILE_SIZE * GameSetting.SCALE + 16);
@@ -53,7 +38,6 @@ public class PlayerBoard extends Dimension implements Renderable {
 
   @Override
   public void render(@NotNull Graphics g) {
-    BufferedImage asset_shoot_miss = AssetUtils.getAsset(AssetUtils.ASSET_SHOOT_HIT);
 
     // Vẽ bảng người chơi
     Graphics2D g2d = (Graphics2D) g;
@@ -68,19 +52,6 @@ public class PlayerBoard extends Dimension implements Renderable {
                 cellSize,
                 cellSize));
         // TODO: Vẽ tàu khi ở chế độ MODE_SETUP
-
-        if (setUpShip != null) {
-          int size = setUpShip.getWidth() / 64;
-          if (i < size) {
-            g2d.drawImage(
-                setUpShip.getSubimage(64 * i, 0, 64, 64),
-                cellSize * i + position.x,
-                position.y,
-                cellSize,
-                cellSize,
-                null);
-          }
-        }
 
         //        g2d.drawImage(
         //            asset_shoot_miss,
@@ -133,10 +104,6 @@ public class PlayerBoard extends Dimension implements Renderable {
         && position.y >= this.position.y
         && position.x <= maxX
         && position.y <= maxY;
-  }
-
-  private void renderShip(Graphics g, Ship ship) {
-    int direction = Ship.HORIZONTAL;
   }
 
   public Position getBoardRowCol(Point point) {

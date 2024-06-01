@@ -7,14 +7,11 @@ import com.htilssu.manager.ListenerManager;
 import com.htilssu.manager.ScreenManager;
 import com.htilssu.multiplayer.Client;
 import com.htilssu.multiplayer.Host;
-import com.htilssu.multiplayer.MultiHandler;
 import com.htilssu.setting.GameSetting;
 import com.htilssu.util.AssetUtils;
-
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-
 import javax.swing.*;
 
 public class BattleShip extends JFrame implements Runnable, KeyListener {
@@ -29,7 +26,7 @@ public class BattleShip extends JFrame implements Runnable, KeyListener {
   private final ListenerManager listenerManager = new ListenerManager();
 
   /** Quản lý host */
-  private final Host host = new Host();
+  private final Host host = new Host(this);
 
   /** Quản lý các màn hình trong game */
   ScreenManager screenManager = new ScreenManager(this);
@@ -87,7 +84,6 @@ public class BattleShip extends JFrame implements Runnable, KeyListener {
     addKeyListener(this);
     setFocusable(true);
     setResizable(false);
-    MultiHandler.createInstance(this);
     gameManager.createTestGamePlay();
   }
 
