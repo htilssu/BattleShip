@@ -1,4 +1,4 @@
-package com.htilssu.screen;
+package com.htilssu.ui.screen;
 
 import com.htilssu.BattleShip;
 

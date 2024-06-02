@@ -19,6 +19,7 @@ public class AssetUtils {
   public static final int ASSET_SHIP_3 = 5;
   public static final int ASSET_SHIP_4 = 6;
   public static final int ASSET_SHIP_5 = 7;
+  public static final int ASSET_HOST_LIST_TEXT = 8;
 
   static Map<Integer, BufferedImage> assetMap = new HashMap<>();
 
@@ -35,6 +36,7 @@ public class AssetUtils {
       assetMap.put(ASSET_SHIP_3, asset_1.getSubimage(64, 64, 64, 64 * 3));
       assetMap.put(ASSET_SHIP_4, asset_1.getSubimage(128, 0, 64, 64 * 4));
       assetMap.put(ASSET_SHIP_5, asset_1.getSubimage(192, 0, 64, 64 * 5));
+      assetMap.put(ASSET_HOST_LIST_TEXT, asset_1.getSubimage(256, 0, 512, 64));
     }
   }
 

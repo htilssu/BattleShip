@@ -1,9 +1,6 @@
 package com.htilssu.entity.player;
 
-import com.htilssu.component.Position;
 import com.htilssu.entity.game.GamePlay;
-import com.htilssu.manager.GameManager;
-import com.htilssu.util.GameLogger;
 
 import java.util.UUID;
 
@@ -11,7 +8,15 @@ public class Player {
   String id = UUID.randomUUID().toString();
   String name = "DepTrai";
   PlayerBoard playerBoard;
+
+  /**
+   * Mảng lưu lịch sử bắn của người chơi
+   *
+   * <p>đánh dấu là {@code 0} nếu vị trí đó chưa được bắn, đánh dấu là {@code 2} nếu bắn trúng tàu,
+   * đánh dấu là {@code 1} nếu bắn trượt, đánh dấu là {@code 3} nếu tàu đó đã bị chìm
+   */
   byte[][] shot;
+
   private GamePlay gamePlay;
 
   public Player(String id, String name) {
@@ -61,11 +66,11 @@ public class Player {
     this.gamePlay = gamePlay;
   }
 
-  public boolean canShoot(Position position) {
+  /*  public boolean canShoot(Position position) {
     return shot[position.x][position.y] != GameManager.UNKNOWN;
   }
 
   public void shoot(Position position, int status) {
     shot[position.x][position.y] = (byte) status;
-  }
+  }*/
 }

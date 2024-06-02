@@ -1,49 +1,102 @@
 package com.htilssu.entity.game;
 
-import com.htilssu.component.Position;
+import com.htilssu.entity.Ship;
+import com.htilssu.entity.Sprite;
+import com.htilssu.entity.component.Position;
 import com.htilssu.entity.player.Player;
 import com.htilssu.entity.player.PlayerBoard;
 import com.htilssu.event.player.PlayerShootEvent;
-import com.htilssu.manager.DifficultyManager;
 import com.htilssu.manager.GameManager;
+import com.htilssu.render.Renderable;
 import com.htilssu.setting.GameSetting;
-
+import com.htilssu.util.AssetUtils;
+import com.htilssu.util.GameLogger;
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import javax.swing.*;
+import kotlin.Pair;
+import org.jetbrains.annotations.NotNull;
 
 /** Mỗi {@link GamePlay} là 1 trận đấu giữa 2 người chơi */
-public class GamePlay {
-  public static final int MODE_SETUP = 0;
-  public static final int MODE_PLAY = 1;
-  int gameMode = MODE_SETUP;
+public class GamePlay implements Renderable {
+  public static final int WAITING_MODE = 0;
+  public static final int PLAY_MODE = 1;
+  private final int margin = 10;
+  int gameMode = WAITING_MODE;
+  Map<Integer, Integer> shipInBoard = new HashMap<>();
+  List<Sprite> sprites = new ArrayList<>();
   List<Player> playerList;
+  Map<Player, Pair<PlayerBoard, byte[][]>> playerData = new HashMap<>();
   int turn;
-  int difficulty;
+  int size;
+  int direction = Ship.HORIZONTAL;
+  Sprite setUpSprite;
   boolean isMultiPlayer = false;
   private GameManager gameManager;
 
-  public GamePlay(List<Player> playerList, int turn, int difficulty) {
+  {
+    sprites.add(new Sprite(AssetUtils.getAsset(AssetUtils.ASSET_SHIP_2)));
+    sprites.add(new Sprite(AssetUtils.getAsset(AssetUtils.ASSET_SHIP_3)));
+    sprites.add(new Sprite(AssetUtils.getAsset(AssetUtils.ASSET_SHIP_4)));
+    sprites.add(new Sprite(AssetUtils.getAsset(AssetUtils.ASSET_SHIP_5)));
+
+    shipInBoard.put(Ship.SHIP_2, 1);
+    shipInBoard.put(Ship.SHIP_3, 2);
+    shipInBoard.put(Ship.SHIP_4, 1);
+    shipInBoard.put(Ship.SHIP_5, 1);
+  }
+
+  public GamePlay(List<Player> playerList, int turn, int size) {
     this.playerList = playerList;
     this.turn = turn;
-    this.difficulty = difficulty;
+    this.size = size;
+    PlayerBoard playerBoard = new PlayerBoard(size);
+    playerBoard.setGamePlay(this);
+    playerData.put(
+        GameManager.gamePlayer, new Pair<>(playerBoard, new byte[getBoardSize()][getBoardSize()]));
     initBoard();
   }
 
-  public GamePlay(List<Player> playerList, int turn, int difficulty, boolean isMultiPlayer) {
-    this(playerList, turn, difficulty);
+  public GamePlay(List<Player> playerList, int turn, int size, boolean isMultiPlayer) {
+    this(playerList, turn, size);
     this.isMultiPlayer = isMultiPlayer;
   }
 
-  public int getGameMode() {
-    return gameMode;
+  public int getDirection() {
+    return direction;
   }
 
-  public void setGameMode(int gameMode) {
-    this.gameMode = gameMode;
+  public void setDirection(int direction) {
+    if (this.direction == direction) return;
+
+    this.direction = direction;
+
+    if (setUpSprite != null) {
+      PlayerBoard playerBoard = playerData.get(GameManager.gamePlayer).getFirst();
+      if (direction == Ship.VERTICAL) {
+        setUpSprite.setAsset(AssetUtils.rotate90(setUpSprite.getAsset()));
+      } else {
+        setUpSprite.setAsset(AssetUtils.rotate90(setUpSprite.getAsset()));
+        setUpSprite.setAsset(AssetUtils.rotate90(setUpSprite.getAsset()));
+        setUpSprite.setAsset(AssetUtils.rotate90(setUpSprite.getAsset()));
+      }
+
+      float ratio = (float) setUpSprite.getHeight() / setUpSprite.getWidth();
+      if (ratio < 1 && ratio > 0) {
+        ratio = 1 / ratio;
+        setUpSprite.setSize((int) (playerBoard.getCellSize() * ratio), playerBoard.getCellSize());
+
+      } else {
+        setUpSprite.setSize(playerBoard.getCellSize(), (int) (playerBoard.getCellSize() * ratio));
+      }
+    }
   }
 
   public void renderShootBoard(Graphics g) {
-    getCurrentPlayer().getBoard().render(g);
+    playerData.get(getCurrentPlayer()).getFirst().render(g);
   }
 
   private void initBoard() {
@@ -56,7 +109,7 @@ public class GamePlay {
   }
 
   private int getBoardSize() {
-    return DifficultyManager.getGameBoardSize(difficulty);
+    return size;
   }
 
   /**
@@ -90,16 +143,71 @@ public class GamePlay {
    * @return vị trí hàng và cột trên bảng
    */
   public void handleClick(Point position) {
-    PlayerBoard board = getCurrentPlayer().getBoard();
+    switch (gameMode) {
+      case PLAY_MODE -> {
+        PlayerBoard board = getCurrentPlayer().getBoard();
 
-    if (!board.isInsideBoard(position)) return;
-    Position pos = board.getBoardRowCol(position);
+        if (!board.isInsideBoard(position)) return;
+        Position pos = board.getBoardRowCol(position);
 
-    // Call shot listener
-    getGameManager()
-        .getBattleShip()
-        .getListenerManager()
-        .callEvent(new PlayerShootEvent(getCurrentPlayer(), getOpponent(), pos, false));
+        GameLogger.log("Player " + getCurrentPlayer().getName() + " shoot at " + pos);
+
+        // Call shot listener
+        getGameManager()
+            .getBattleShip()
+            .getListenerManager()
+            .callEvent(new PlayerShootEvent(getCurrentPlayer(), getOpponent(), pos, false));
+      }
+      case WAITING_MODE -> {
+        PlayerBoard playerBoard = playerData.get(GameManager.gamePlayer).getFirst();
+
+        // handle click on ship
+        if (!playerBoard.isInsideBoard(position)) {
+          for (Sprite sprite : sprites) {
+            if (sprite.isInside(position.x, position.y)) {
+              setUpSprite = sprite;
+              int ratio = setUpSprite.getHeight() / setUpSprite.getWidth();
+              setUpSprite.setSize(playerBoard.getCellSize(), playerBoard.getCellSize() * ratio);
+              setUpSprite.setPosition(playerBoard.getPosition().x, playerBoard.getPosition().y);
+              sprites.remove(setUpSprite);
+              return;
+            }
+          }
+        } else {
+          // handle put ship into board
+          if (setUpSprite == null) {
+            Ship clickShip = playerBoard.getShip(position);
+            if (clickShip != null) {
+
+              playerBoard.removeShip(clickShip);
+              setUpSprite = clickShip.getSprite();
+              int count = shipInBoard.get(clickShip.getShipType());
+              shipInBoard.replace(clickShip.getShipType(), ++count);
+              return;
+            }
+
+            return;
+          }
+
+          Position mousePos = playerBoard.getBoardRowCol(position);
+          float ratio = (float) setUpSprite.getHeight() / setUpSprite.getWidth();
+          if (ratio < 1 && ratio > 0) {
+            ratio = 1 / ratio;
+          }
+          Ship ship = new Ship(direction, new Sprite(setUpSprite), mousePos, (int) ratio);
+          if (!playerBoard.canAddShip(ship)) return;
+          int count = shipInBoard.get((int) ratio);
+          if (count == 0) return;
+
+          playerBoard.addShip(ship);
+          count--;
+          shipInBoard.replace((int) ratio, count);
+          if (count == 0) {
+            setUpSprite = null;
+          }
+        }
+      }
+    }
   }
 
   public GameManager getGameManager() {
@@ -111,7 +219,69 @@ public class GamePlay {
   }
 
   public void handleMouseMoved(Point point) {
-    // TODO: xử lý đặt thuyền
+    switch (gameMode) {
+      case WAITING_MODE -> {
+        if (setUpSprite != null) {
+          PlayerBoard playerBoard = playerData.get(GameManager.gamePlayer).getFirst();
+          //          if (!playerBoard.isInside(point.x, point.y)) return;
+          Position pos = playerBoard.getBoardRowCol(point);
+          Point posB = playerBoard.getPosition();
 
+          int x = pos.x * playerBoard.getCellSize() + posB.x,
+              y = pos.y * playerBoard.getCellSize() + posB.y;
+          if (x + setUpSprite.getWidth() > posB.x + playerBoard.getWidth()) {
+            x = (int) (posB.x + playerBoard.getWidth() - setUpSprite.getWidth());
+          }
+          if (y + setUpSprite.getHeight() > posB.y + playerBoard.getHeight()) {
+            y = (int) (posB.y + playerBoard.getHeight() - setUpSprite.getHeight());
+          }
+
+          setUpSprite.setPosition(x, y);
+        }
+      }
+      case PLAY_MODE -> {}
+    }
+  }
+
+  @Override
+  public void render(@NotNull Graphics g) {
+
+    if (gameMode == WAITING_MODE) {
+      renderWaitingMode(g);
+      if (setUpSprite != null) setUpSprite.render(g);
+    } else if (gameMode == PLAY_MODE) {
+      renderPlayMode(g);
+    }
+  }
+
+  private void renderPlayMode(Graphics g) {}
+
+  private void renderWaitingMode(Graphics g) {
+    int margin = this.margin * Math.round(GameSetting.SCALE);
+
+    JPanel currentScreen = gameManager.getBattleShip().getScreenManager().getCurrentScreen();
+    int yMidPosition = currentScreen.getHeight() / 2;
+    int xMidPosition = currentScreen.getWidth() / 2;
+
+    PlayerBoard playerBoard = playerData.get(GameManager.gamePlayer).getFirst();
+    playerBoard.setPosition(xMidPosition - 100, (int) (yMidPosition - playerBoard.getHeight() / 2));
+    playerBoard.render(g);
+
+    for (int i = 0; i < sprites.size(); i++) {
+      Sprite sprite = sprites.get(i);
+
+      sprite.setPosition(
+          (int) (i * (sprite.getWidth() + margin) + 32 * GameSetting.SCALE),
+          yMidPosition - sprite.getHeight() / 2);
+      sprite.render(g);
+    }
+  }
+
+  public int getGameMode() {
+    return gameMode;
+  }
+
+  public void setGameMode(int gameMode) {
+    this.gameMode = gameMode;
   }
 }

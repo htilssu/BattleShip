@@ -1,22 +1,32 @@
 package com.htilssu.entity.player;
 
-import com.htilssu.component.Position;
+import com.htilssu.entity.Ship;
+import com.htilssu.entity.Sprite;
+import com.htilssu.entity.component.Position;
+import com.htilssu.entity.game.GamePlay;
+import com.htilssu.render.Collision;
 import com.htilssu.render.Renderable;
 import com.htilssu.setting.GameSetting;
 import java.awt.*;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.htilssu.util.GameLogger;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * Lớp chứa thông tin bảng của người chơi Bảng này lưu trữ các ô mà người chơi đã bắn và chứa các
  * tàu của người chơi
  */
-public class PlayerBoard extends Dimension implements Renderable {
+public class PlayerBoard extends Dimension implements Renderable, Collision {
+
+  List<Ship> ships = new ArrayList<>();
 
   int size;
-
   int cellSize;
   Point position = new Point(64, 64);
+  private GamePlay gamePlay;
 
   /**
    * Khởi tạo bảng người chơi Bảng sẽ có size là size x size ô
@@ -26,8 +36,11 @@ public class PlayerBoard extends Dimension implements Renderable {
   public PlayerBoard(int size) {
     super(0, 0);
     this.size = size;
-    cellSize = (int) Math.ceil(GameSetting.TILE_SIZE * GameSetting.SCALE + 16);
     update();
+  }
+
+  public int getCellSize() {
+    return cellSize;
   }
 
   /** Cập nhật kích thước của bảng người chơi */
@@ -38,6 +51,7 @@ public class PlayerBoard extends Dimension implements Renderable {
 
   @Override
   public void render(@NotNull Graphics g) {
+    update();
 
     // Vẽ bảng người chơi
     Graphics2D g2d = (Graphics2D) g;
@@ -63,6 +77,10 @@ public class PlayerBoard extends Dimension implements Renderable {
       }
     }
 
+    for (Ship ship : ships) {
+      ship.render(g);
+    }
+
     for (int i = 0; i <= size; i++) {
       g2d.setColor(Color.black);
       g2d.drawLine(
@@ -75,6 +93,10 @@ public class PlayerBoard extends Dimension implements Renderable {
           position.y,
           position.x + i * cellSize,
           position.y + size * cellSize);
+      g2d.drawString(
+          (position.x + size * cellSize) + ", " + (position.y + i * cellSize),
+          position.x + size * cellSize + 32,
+          position.y + i * cellSize);
     }
   }
 
@@ -97,8 +119,8 @@ public class PlayerBoard extends Dimension implements Renderable {
    * @see MouseEvent#getY()
    */
   public boolean isInsideBoard(Point position) {
-    int maxX = position.x + width;
-    int maxY = position.y + height;
+    int maxX = this.position.x + width;
+    int maxY = this.position.y + height;
 
     return position.x >= this.position.x
         && position.y >= this.position.y
@@ -109,8 +131,81 @@ public class PlayerBoard extends Dimension implements Renderable {
   public Position getBoardRowCol(Point point) {
     int row = (point.x - this.position.x) / cellSize;
     int col = (point.y - this.position.y) / cellSize;
-    row = row >= size ? size - 1 : row;
-    col = col >= size ? size - 1 : col;
+    if (row >= size) {
+      row = size - 1;
+    }
+    if (col >= size) {
+      col = size - 1;
+    }
+    if (row < 0) {
+      row = 0;
+    }
+    if (col < 0) {
+      col = 0;
+    }
     return new Position(row, col);
+  }
+
+  public void setPosition(int x, int y) {
+    position.setLocation(x, y);
+  }
+
+  @Override
+  public boolean isInside(int x, int y) {
+    return isInsideBoard(new Point(x, y));
+  }
+
+  public void addShip(Ship ship) {
+    if (canAddShip(
+        ship.getSprite().getX(),
+        ship.getSprite().getY(),
+        ship.getSprite().getWidth(),
+        ship.getSprite().getHeight())) {
+      ships.add(ship);
+      ship.setBoard(this);
+    }
+  }
+
+  public boolean canAddShip(int x, int y, int width, int height) {
+    int xMax = x + width;
+    int yMax = y + height;
+    for (Ship s : ships) {
+      Sprite sp = s.getSprite();
+      if (xMax > sp.getX()
+          && sp.getX() + sp.getWidth() > x
+          && yMax > sp.getY()
+          && y < sp.getY() + sp.getHeight()) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  public void removeShip(Ship ship) {
+    ships.remove(ship);
+  }
+
+  public Ship getShip(Point point) {
+    for (Ship ship : ships) {
+      if (ship.isInside(point.x, point.y)) return ship;
+    }
+
+    return null;
+  }
+
+  public GamePlay getGamePlay() {
+    return gamePlay;
+  }
+
+  public void setGamePlay(GamePlay gamePlay) {
+    this.gamePlay = gamePlay;
+  }
+
+  public boolean canAddShip(Ship ship) {
+    return canAddShip(
+        ship.getSprite().getX(),
+        ship.getSprite().getY(),
+        ship.getSprite().getWidth(),
+        ship.getSprite().getHeight());
   }
 }

@@ -1,8 +1,8 @@
-package com.htilssu.screen;
+package com.htilssu.ui.screen;
 
 import com.htilssu.BattleShip;
+import com.htilssu.entity.Ship;
 import com.htilssu.entity.game.GamePlay;
-import com.htilssu.manager.GameManager;
 import com.htilssu.setting.GameSetting;
 import com.htilssu.util.GameLogger;
 
@@ -12,7 +12,7 @@ import java.awt.event.*;
 
 /** Màn hình chơi game */
 public class PlayScreen extends JPanel
-    implements MouseListener, ComponentListener, MouseMotionListener {
+    implements MouseListener, ComponentListener, MouseMotionListener, KeyListener {
 
   private final BattleShip window;
 
@@ -22,14 +22,17 @@ public class PlayScreen extends JPanel
     setFocusable(true);
     setBackground(Color.GRAY);
     addMouseListener(this);
+    addMouseMotionListener(this);
     addComponentListener(this);
+    addKeyListener(this);
   }
 
   @Override
   protected void paintComponent(Graphics g) {
     super.paintComponent(g);
     Graphics2D g2d = (Graphics2D) g;
-    window.getGameManager().getCurrentGamePlay().renderShootBoard(g2d);
+    window.getGameManager().getCurrentGamePlay().render(g2d);
+    g2d.setColor(Color.BLACK);
   }
 
   @Override
@@ -42,8 +45,8 @@ public class PlayScreen extends JPanel
 
   /**
    * Thêm sự kiện lắng nghe di chuột vào màn hình chơi game, để xử lý các sự kiện di chuột Thêm sự
-   * kiện này khi cần xử lý đặt tàu vào bảng chơi {@link GamePlay#MODE_SETUP} là đang bật chế độ đặt
-   * tàu
+   * kiện này khi cần xử lý đặt tàu vào bảng chơi {@link GamePlay#WAITING_MODE} là đang bật chế độ
+   * đặt tàu
    */
   public void setMouseMotion() {
     addMouseMotionListener(this);
@@ -87,5 +90,27 @@ public class PlayScreen extends JPanel
   public void mouseMoved(MouseEvent e) {
     Point pos = new Point(e.getX(), e.getY());
     window.getGameManager().getCurrentGamePlay().handleMouseMoved(pos);
+  }
+
+  @Override
+  public void keyTyped(KeyEvent e) {}
+
+  @Override
+  public void keyPressed(KeyEvent e) {}
+
+  @Override
+  public void keyReleased(KeyEvent e) {
+    switch (e.getKeyCode()) {
+      case KeyEvent.VK_R -> {
+        GamePlay cP = window.getGameManager().getCurrentGamePlay();
+        if (cP.getGameMode() == GamePlay.WAITING_MODE) {
+          if (cP.getDirection() == Ship.HORIZONTAL) {
+            cP.setDirection(Ship.VERTICAL);
+          } else {
+            cP.setDirection(Ship.HORIZONTAL);
+          }
+        }
+      }
+    }
   }
 }

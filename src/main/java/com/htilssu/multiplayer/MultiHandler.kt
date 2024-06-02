@@ -1,7 +1,7 @@
 package com.htilssu.multiplayer
 
 import com.htilssu.BattleShip
-import com.htilssu.component.Position
+import com.htilssu.entity.component.Position
 import com.htilssu.entity.player.Player
 import com.htilssu.event.player.PlayerAction
 import com.htilssu.event.player.PlayerJoinEvent
@@ -49,7 +49,10 @@ open class MultiHandler(var battleShip: BattleShip) {
                     GameLogger.error("Message không hợp lệ (Player Shoot): $message")
                     return
                 }
-                val pos = Position(messageParts[1].toInt(), messageParts[2].toInt())
+                val pos = Position(
+                    messageParts[1].toInt(),
+                    messageParts[2].toInt()
+                )
             }
 
             PING -> {

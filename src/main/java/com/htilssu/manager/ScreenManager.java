@@ -1,12 +1,14 @@
 package com.htilssu.manager;
 
 import com.htilssu.BattleShip;
-import com.htilssu.screen.NetworkScreen;
-import com.htilssu.screen.PlayScreen;
-import com.htilssu.screen.MenuScreen;
-import com.htilssu.screen.SettingScreen;
+import com.htilssu.ui.screen.NetworkScreen;
+import com.htilssu.ui.screen.PlayScreen;
+import com.htilssu.ui.screen.MenuScreen;
+import com.htilssu.ui.screen.SettingScreen;
+import com.htilssu.setting.GameSetting;
 
 import javax.swing.*;
+import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,6 +21,7 @@ public class ScreenManager {
   public static final int GAME_SCREEN = 2;
 
   public static final int SETTING_SCREEN = 3;
+  private static final int NETWORK_SCREEN = 4;
 
   private final Map<Integer, JPanel> screenMap = new HashMap<>();
   private final BattleShip battleShip;
@@ -30,10 +33,18 @@ public class ScreenManager {
 
   public ScreenManager(BattleShip battleShip) {
     this.battleShip = battleShip;
-    screenMap.put(1, new MenuScreen(battleShip));
-    screenMap.put(2, new PlayScreen(battleShip));
-    screenMap.put(3, new SettingScreen(battleShip));
-    screenMap.put(4, new NetworkScreen(battleShip));
+    screenMap.put(MENU_SCREEN, new MenuScreen(battleShip));
+    screenMap.put(GAME_SCREEN, new PlayScreen(battleShip));
+    screenMap.put(SETTING_SCREEN, new SettingScreen(battleShip));
+    screenMap.put(NETWORK_SCREEN, new NetworkScreen(battleShip));
+
+    updateScreenSize();
+  }
+
+  private void updateScreenSize() {
+    for (JPanel screen : screenMap.values()) {
+      screen.setPreferredSize(new Dimension(GameSetting.WIDTH, GameSetting.HEIGHT));
+    }
   }
 
   public BattleShip getBattleShip() {
@@ -70,5 +81,6 @@ public class ScreenManager {
    */
   public void setCurrentScreen(int currentScreen) {
     this.currentScreen = currentScreen;
+    getCurrentScreen().requestFocus();
   }
 }

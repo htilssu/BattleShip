@@ -1,4 +1,4 @@
-package com.htilssu.component;
+package com.htilssu.entity.component;
 
 public class Position {
   public int x;

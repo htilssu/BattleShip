@@ -1,6 +1,6 @@
 package com.htilssu.event.player;
 
-import com.htilssu.component.Position;
+import com.htilssu.entity.component.Position;
 import com.htilssu.entity.player.Player;
 
 /**
@@ -12,6 +12,7 @@ public class PlayerShootEvent extends PlayerEvent {
   boolean isEnemy;
   Position position;
   Player targetPlayer;
+
   /**
    * Khởi tạo sự kiện bắn của người chơi
    *

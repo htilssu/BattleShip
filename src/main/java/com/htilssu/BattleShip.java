@@ -1,5 +1,7 @@
 package com.htilssu;
 
+import com.htilssu.entity.Ship;
+import com.htilssu.entity.game.GamePlay;
 import com.htilssu.listener.GameStartListener;
 import com.htilssu.listener.PlayerListener;
 import com.htilssu.manager.GameManager;
@@ -9,6 +11,8 @@ import com.htilssu.multiplayer.Client;
 import com.htilssu.multiplayer.Host;
 import com.htilssu.setting.GameSetting;
 import com.htilssu.util.AssetUtils;
+import com.htilssu.util.GameLogger;
+
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -162,6 +166,7 @@ public class BattleShip extends JFrame implements Runnable, KeyListener {
     remove(currentScreen);
     screenManager.setCurrentScreen(screen);
     add(screenManager.getCurrentScreen());
+    screenManager.getCurrentScreen().requestFocusInWindow();
     pack();
     repaint();
   }
@@ -178,6 +183,17 @@ public class BattleShip extends JFrame implements Runnable, KeyListener {
       case KeyEvent.VK_ESCAPE:
         changeScreen(ScreenManager.MENU_SCREEN);
         break;
+      case KeyEvent.VK_R:
+        {
+          GamePlay cP = getGameManager().getCurrentGamePlay();
+          if (cP.getGameMode() == GamePlay.WAITING_MODE) {
+            if (cP.getDirection() == Ship.HORIZONTAL) {
+              cP.setDirection(Ship.VERTICAL);
+            } else {
+              cP.setDirection(Ship.HORIZONTAL);
+            }
+          }
+        }
     }
   }
 
@@ -206,7 +222,7 @@ public class BattleShip extends JFrame implements Runnable, KeyListener {
       graphicsDevice.setFullScreenWindow(this);
       setExtendedState(JFrame.MAXIMIZED_BOTH);
       screenManager.getCurrentScreen().setPreferredSize(new Dimension(getWidth(), getHeight()));
-      GameSetting.SCALE = ((float) getHeight() / GameSetting.HEIGHT);
+      GameSetting.SCALE = ((float) getWidth() / GameSetting.WIDTH);
 
     } else {
       graphicsDevice.setFullScreenWindow(null);
@@ -216,5 +232,9 @@ public class BattleShip extends JFrame implements Runnable, KeyListener {
 
     pack();
     setVisible(true);
+  }
+
+  public ScreenManager getScreenManager() {
+    return screenManager;
   }
 }
