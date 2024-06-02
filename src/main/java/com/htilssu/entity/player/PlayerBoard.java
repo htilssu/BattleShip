@@ -11,8 +11,6 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.htilssu.util.GameLogger;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -46,6 +44,9 @@ public class PlayerBoard extends Dimension implements Renderable, Collision {
   /** Cập nhật kích thước của bảng người chơi */
   public void update() {
     cellSize = (int) Math.ceil(GameSetting.TILE_SIZE * GameSetting.SCALE + 16);
+    for (Ship ship : ships) {
+      ship.update();
+    }
     setSize(cellSize * size, cellSize * size);
   }
 

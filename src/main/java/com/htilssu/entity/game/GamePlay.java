@@ -70,7 +70,7 @@ public class GamePlay implements Renderable {
   }
 
   public void setDirection(int direction) {
-    if (this.direction == direction) return;
+    if (this.direction == direction || gameMode != WAITING_MODE) return;
 
     this.direction = direction;
 
@@ -265,6 +265,16 @@ public class GamePlay implements Renderable {
 
     PlayerBoard playerBoard = playerData.get(GameManager.gamePlayer).getFirst();
     playerBoard.setPosition(xMidPosition - 100, (int) (yMidPosition - playerBoard.getHeight() / 2));
+    if (setUpSprite != null) {
+      float ratio = (float) setUpSprite.getHeight() / setUpSprite.getWidth();
+      if (ratio < 1 && ratio > 0) {
+        ratio = 1 / ratio;
+        setUpSprite.setSize((int) (playerBoard.getCellSize() * ratio), playerBoard.getCellSize());
+
+      } else {
+        setUpSprite.setSize(playerBoard.getCellSize(), (int) (playerBoard.getCellSize() * ratio));
+      }
+    }
     playerBoard.render(g);
 
     for (int i = 0; i < sprites.size(); i++) {

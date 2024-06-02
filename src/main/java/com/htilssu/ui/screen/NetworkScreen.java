@@ -1,25 +1,19 @@
 package com.htilssu.ui.screen;
 
+import static com.htilssu.util.AssetUtils.getAsset;
+import static com.htilssu.util.AssetUtils.loadAsset;
+
 import com.htilssu.BattleShip;
 import com.htilssu.multiplayer.Client;
 import com.htilssu.setting.GameSetting;
 import com.htilssu.ui.component.GameButton;
 import com.htilssu.util.AssetUtils;
-import com.htilssu.util.GameLogger;
-
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
-import java.awt.geom.Rectangle2D;
-import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
-import java.awt.image.ConvolveOp;
-import java.awt.image.Kernel;
 import java.net.InetAddress;
-
-import static com.htilssu.util.AssetUtils.getAsset;
-import static com.htilssu.util.AssetUtils.loadAsset;
+import javax.swing.*;
 
 public class NetworkScreen extends JPanel implements ComponentListener {
   BattleShip battleShip;

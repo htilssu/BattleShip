@@ -96,4 +96,19 @@ public class Ship implements Renderable, Collision {
   public void setBoard(PlayerBoard board) {
     this.playerBoard = board;
   }
+
+  public void update() {
+    float ratio = (float) sprite.getHeight() / sprite.getWidth();
+    sprite.setPosition(
+        playerBoard.getPosition().x + playerBoard.getCellSize() * position.x,
+        playerBoard.getPosition().y + playerBoard.getCellSize() * position.y);
+
+    if (ratio < 1 && ratio > 0) {
+      ratio = 1 / ratio;
+      sprite.setSize((int) (playerBoard.getCellSize() * ratio), playerBoard.getCellSize());
+
+    } else {
+      sprite.setSize(playerBoard.getCellSize(), (int) (playerBoard.getCellSize() * ratio));
+    }
+  }
 }
