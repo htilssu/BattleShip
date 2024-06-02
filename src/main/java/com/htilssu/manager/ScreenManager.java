@@ -1,62 +1,86 @@
 package com.htilssu.manager;
 
 import com.htilssu.BattleShip;
-import com.htilssu.screen.PlayScreen;
-import com.htilssu.screen.MenuScreen;
+import com.htilssu.ui.screen.NetworkScreen;
+import com.htilssu.ui.screen.PlayScreen;
+import com.htilssu.ui.screen.MenuScreen;
+import com.htilssu.ui.screen.SettingScreen;
+import com.htilssu.setting.GameSetting;
 
 import javax.swing.*;
+import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 
 /** Lớp quản lý các màn hình trong game */
 public class ScreenManager {
-    /** Màn hình bắt đầu - màn hình chọn thể loại, setting */
-    public static final int MENU_SCREEN = 1;
+  /** Màn hình bắt đầu - màn hình chọn thể loại, setting */
+  public static final int MENU_SCREEN = 1;
 
-    /** Màn hình chơi game */
-    public static final int GAME_SCREEN = 2;
+  /** Màn hình chơi game */
+  public static final int GAME_SCREEN = 2;
 
-    private final Map<Integer, JPanel> screenMap = new HashMap<>();
+  public static final int SETTING_SCREEN = 3;
+  private static final int NETWORK_SCREEN = 4;
 
-    /***
-     * Màn hình hiện tại
-     */
-    int currentScreen = MENU_SCREEN;
+  private final Map<Integer, JPanel> screenMap = new HashMap<>();
+  private final BattleShip battleShip;
 
-    public ScreenManager(BattleShip battleShip) {
-        screenMap.put(1, new MenuScreen(battleShip));
-        screenMap.put(2, new PlayScreen(battleShip));
+  /***
+   * Màn hình hiện tại
+   */
+  int currentScreen = GAME_SCREEN;
+
+  public ScreenManager(BattleShip battleShip) {
+    this.battleShip = battleShip;
+    screenMap.put(MENU_SCREEN, new MenuScreen(battleShip));
+    screenMap.put(GAME_SCREEN, new PlayScreen(battleShip));
+    screenMap.put(SETTING_SCREEN, new SettingScreen(battleShip));
+    screenMap.put(NETWORK_SCREEN, new NetworkScreen(battleShip));
+
+    updateScreenSize();
+  }
+
+  private void updateScreenSize() {
+    for (JPanel screen : screenMap.values()) {
+      screen.setPreferredSize(new Dimension(GameSetting.WIDTH, GameSetting.HEIGHT));
     }
+  }
 
-    /**
-     * Lấy màn hình theo loại screen
-     *
-     * <p>Nếu tham số {@code update} là {@code true} thì sẽ cập nhật lại màn hình hiện tại được đánh
-     * dấu khi lấy, ngược lại là {@code false}
-     *
-     * @param startScreen số nguyên biểu diễn loại màn hình
-     * @return Màn hình được kế thừa từ {@link JPanel} hoặc {@code null} nếu không tìm thấy
-     */
-    public JPanel getScreen(int screen) {
-        return screenMap.get(screen);
-    }
+  public BattleShip getBattleShip() {
+    return battleShip;
+  }
 
-    /**
-     * Lấy màn hình hiện tại
-     *
-     * @return Màn hình hiện tại
-     */
-    public JPanel getCurrentScreen() {
-        return screenMap.get(currentScreen);
-    }
+  /**
+   * Lấy màn hình theo loại screen
+   *
+   * <p>Nếu tham số {@code update} là {@code true} thì sẽ cập nhật lại màn hình hiện tại được đánh
+   * dấu khi lấy, ngược lại là {@code false}
+   *
+   * @param screen số nguyên biểu diễn loại màn hình
+   * @return Màn hình được kế thừa từ {@link JPanel} hoặc {@code null} nếu không tìm thấy
+   */
+  public JPanel getScreen(int screen) {
+    return screenMap.get(screen);
+  }
 
-    /**
-     * Đặt màn hình hiện tại ex: {@link #GAME_SCREEN} là màn hình chơi game hoặc {@link
-     * #MENU_SCREEN} là màn hình chính
-     *
-     * @param currentScreen số nguyên biểu diễn loại màn hình
-     */
-    public void setCurrentScreen(int currentScreen) {
-        this.currentScreen = currentScreen;
-    }
+  /**
+   * Lấy màn hình hiện tại
+   *
+   * @return Màn hình hiện tại
+   */
+  public JPanel getCurrentScreen() {
+    return screenMap.get(currentScreen);
+  }
+
+  /**
+   * Đặt màn hình hiện tại ex: {@link #GAME_SCREEN} là màn hình chơi game hoặc {@link #MENU_SCREEN}
+   * là màn hình chính
+   *
+   * @param currentScreen số nguyên biểu diễn loại màn hình
+   */
+  public void setCurrentScreen(int currentScreen) {
+    this.currentScreen = currentScreen;
+    getCurrentScreen().requestFocus();
+  }
 }

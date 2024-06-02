@@ -1,17 +1,22 @@
 package com.htilssu;
 
+import com.htilssu.entity.Ship;
+import com.htilssu.entity.game.GamePlay;
+import com.htilssu.listener.GameStartListener;
 import com.htilssu.listener.PlayerListener;
+import com.htilssu.manager.GameManager;
 import com.htilssu.manager.ListenerManager;
 import com.htilssu.manager.ScreenManager;
 import com.htilssu.multiplayer.Client;
 import com.htilssu.multiplayer.Host;
 import com.htilssu.setting.GameSetting;
 import com.htilssu.util.AssetUtils;
+import com.htilssu.util.GameLogger;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import javax.swing.*;
 
 public class BattleShip extends JFrame implements Runnable, KeyListener {
 
@@ -25,10 +30,13 @@ public class BattleShip extends JFrame implements Runnable, KeyListener {
   private final ListenerManager listenerManager = new ListenerManager();
 
   /** Quản lý host */
-  private final Host host = new Host();
+  private final Host host = new Host(this);
 
   /** Quản lý các màn hình trong game */
   ScreenManager screenManager = new ScreenManager(this);
+
+  /** Quản lý game, chứa thông tin về người chơi, trạng thái game, ... */
+  GameManager gameManager = new GameManager(this);
 
   /** Quản lý giao tiếp với server */
   Client client = new Client(this);
@@ -37,7 +45,6 @@ public class BattleShip extends JFrame implements Runnable, KeyListener {
   private boolean running;
 
   private boolean isFullScreen = false;
-  private JPanel currentScreen = screenManager.getCurrentScreen();
 
   private BattleShip() {
 
@@ -45,7 +52,7 @@ public class BattleShip extends JFrame implements Runnable, KeyListener {
 
     pack();
 
-    // Dang ky cac listener
+    // Đăng ký các listener
     registerListener();
   }
 
@@ -63,21 +70,31 @@ public class BattleShip extends JFrame implements Runnable, KeyListener {
     battleShip.start();
   }
 
+  public GameManager getGameManager() {
+    return gameManager;
+  }
+
+  public ListenerManager getListenerManager() {
+    return listenerManager;
+  }
+
   private void setUp() {
     setTitle("BattleShip");
     setSize(GameSetting.WIDTH, GameSetting.HEIGHT);
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     setLocationRelativeTo(null);
-    add(currentScreen);
+    add(screenManager.getCurrentScreen());
     setIconImage(AssetUtils.loadAsset("/game_icon.png"));
     addKeyListener(this);
     setFocusable(true);
     setResizable(false);
+    gameManager.createTestGamePlay();
   }
 
   /** Hàm cài đặt các sự kiện */
   private void registerListener() {
     listenerManager.registerListener(PlayerListener.class);
+    listenerManager.registerListener(GameStartListener.class);
   }
 
   /** Gọi hàm này để bắt đầu chạy app */
@@ -85,15 +102,6 @@ public class BattleShip extends JFrame implements Runnable, KeyListener {
     running = true;
     thread.start();
     host.start();
-
-    client.scanHost();
-    client
-        .getHostList()
-        .forEach(
-            host -> {
-              client.connect(host, GameSetting.DEFAULT_PORT);
-            });
-
     setVisible(true);
   }
 
@@ -140,7 +148,7 @@ public class BattleShip extends JFrame implements Runnable, KeyListener {
   /** Hàm render mỗi frame */
   private void render() {
     setTitle("BattleShip - FPS: " + currentFPS);
-    currentScreen.repaint();
+    screenManager.getCurrentScreen().repaint();
   }
 
   /** Hàm update dữ liệu mỗi tick */
@@ -153,10 +161,12 @@ public class BattleShip extends JFrame implements Runnable, KeyListener {
    */
   public void changeScreen(int screen) {
     JPanel targetScreen = screenManager.getScreen(screen);
+    JPanel currentScreen = screenManager.getCurrentScreen();
     if (targetScreen == currentScreen) return;
     remove(currentScreen);
-    currentScreen = targetScreen;
-    add(currentScreen);
+    screenManager.setCurrentScreen(screen);
+    add(screenManager.getCurrentScreen());
+    screenManager.getCurrentScreen().requestFocusInWindow();
     pack();
     repaint();
   }
@@ -173,6 +183,17 @@ public class BattleShip extends JFrame implements Runnable, KeyListener {
       case KeyEvent.VK_ESCAPE:
         changeScreen(ScreenManager.MENU_SCREEN);
         break;
+      case KeyEvent.VK_R:
+        {
+          GamePlay cP = getGameManager().getCurrentGamePlay();
+          if (cP.getGameMode() == GamePlay.WAITING_MODE) {
+            if (cP.getDirection() == Ship.HORIZONTAL) {
+              cP.setDirection(Ship.VERTICAL);
+            } else {
+              cP.setDirection(Ship.HORIZONTAL);
+            }
+          }
+        }
     }
   }
 
@@ -180,7 +201,9 @@ public class BattleShip extends JFrame implements Runnable, KeyListener {
   public void keyReleased(KeyEvent e) {}
 
   private void updateScreenSize() {
-    currentScreen.setPreferredSize(new Dimension(GameSetting.WIDTH, GameSetting.HEIGHT));
+    screenManager
+        .getCurrentScreen()
+        .setPreferredSize(new Dimension(GameSetting.WIDTH, GameSetting.HEIGHT));
   }
 
   public Client getClient() {
@@ -194,16 +217,24 @@ public class BattleShip extends JFrame implements Runnable, KeyListener {
         GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
     dispose();
     setUndecorated(isFullScreen);
+
     if (isFullScreen) {
       graphicsDevice.setFullScreenWindow(this);
       setExtendedState(JFrame.MAXIMIZED_BOTH);
-      currentScreen.setPreferredSize(new Dimension(getWidth(), getHeight()));
+      screenManager.getCurrentScreen().setPreferredSize(new Dimension(getWidth(), getHeight()));
+      GameSetting.SCALE = ((float) getWidth() / GameSetting.WIDTH);
+
     } else {
       graphicsDevice.setFullScreenWindow(null);
+      GameSetting.SCALE = 1;
       updateScreenSize();
     }
 
     pack();
     setVisible(true);
+  }
+
+  public ScreenManager getScreenManager() {
+    return screenManager;
   }
 }

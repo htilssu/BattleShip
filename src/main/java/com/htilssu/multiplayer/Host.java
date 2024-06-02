@@ -1,20 +1,26 @@
 package com.htilssu.multiplayer;
 
+import com.htilssu.BattleShip;
 import com.htilssu.setting.GameSetting;
 import com.htilssu.util.GameLogger;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Arrays;
 
-public class Host implements Runnable {
+public class Host extends MultiHandler implements Runnable {
+  private static Host instance;
   ServerSocket serverSocket;
   Socket socket;
   Thread hostListenThread = new Thread(this);
   boolean canHost = true;
 
-  public Host() {}
+  public Host(BattleShip battleShip) {
+    super(battleShip);
+    instance = this;
+  }
 
   public void start() {
     try {
@@ -35,21 +41,24 @@ public class Host implements Runnable {
     while (canHost) {
       try {
         socket = serverSocket.accept();
-        InputStream ip = socket.getInputStream();
-        BufferedReader bis = new BufferedReader(new InputStreamReader(ip));
-
-        while (true) {
-          String message = bis.readLine();
-          if (message == null) {
-            break;
-          }
-
-          MultiHandler.handle(message);
-        }
-
+        GameLogger.log(String.valueOf(socket.getInetAddress()));
       } catch (IOException e) {
-        GameLogger.log("Error while connecting to client");
+        GameLogger.error("Có lỗi khi chấp nhận kết nối từ client");
       }
+
+      if (socket != null) {
+        readData(socket);
+      }
+    }
+  }
+
+  public void send(String message) {
+    try {
+      OutputStream os = socket.getOutputStream();
+      PrintWriter pw = new PrintWriter(os, true);
+      pw.println(message);
+    } catch (IOException e) {
+      GameLogger.error("Có lỗi khi gửi dữ liệu tới client");
     }
   }
 
