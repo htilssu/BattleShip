@@ -189,7 +189,8 @@ public class GamePlay implements Renderable {
             return;
           }
 
-          Position mousePos = playerBoard.getBoardRowCol(position);
+          Position mousePos =
+              playerBoard.getBoardRowCol(setUpSprite.getX() + 1, setUpSprite.getY() + 1);
           float ratio = (float) setUpSprite.getHeight() / setUpSprite.getWidth();
           if (ratio < 1 && ratio > 0) {
             ratio = 1 / ratio;

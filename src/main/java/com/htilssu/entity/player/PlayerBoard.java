@@ -130,8 +130,12 @@ public class PlayerBoard extends Dimension implements Renderable, Collision {
   }
 
   public Position getBoardRowCol(Point point) {
-    int row = (point.x - this.position.x) / cellSize;
-    int col = (point.y - this.position.y) / cellSize;
+    return getBoardRowCol(point.x, point.y);
+  }
+
+  public Position getBoardRowCol(int x, int y) {
+    int row = (x - this.position.x) / cellSize;
+    int col = (y - this.position.y) / cellSize;
     if (row >= size) {
       row = size - 1;
     }
