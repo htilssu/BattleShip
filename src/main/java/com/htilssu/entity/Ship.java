@@ -97,8 +97,8 @@ public class Ship extends Collision implements Renderable {
   public void update() {
     float ratio = (float) sprite.getHeight() / sprite.getWidth();
     sprite.setLocation(
-        playerBoard.getPosition().x + playerBoard.getCellSize() * position.x,
-        playerBoard.getPosition().y + playerBoard.getCellSize() * position.y);
+        playerBoard.getX() + playerBoard.getCellSize() * position.x,
+        playerBoard.getY() + playerBoard.getCellSize() * position.y);
 
     if (ratio < 1 && ratio > 0) {
       ratio = 1 / ratio;

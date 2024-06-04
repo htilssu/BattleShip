@@ -132,7 +132,7 @@ public class GamePlay implements Renderable {
         readyButton.setLocation(
             xMidPosition - readyButton.getWidth() / 2,
             currentScreen.getHeight() - readyButton.getHeight() - margin);
-        playerBoard.update();
+        //        playerBoard.update();
         playerBoard.setLocation(
             xMidPosition - 100,
             (int) (yMidPosition - playerBoard.getHeight() / 2f)
@@ -222,7 +222,7 @@ public class GamePlay implements Renderable {
               setUpSprite = sprite;
               int ratio = setUpSprite.getHeight() / setUpSprite.getWidth();
               setUpSprite.setSize(playerBoard.getCellSize(), playerBoard.getCellSize() * ratio);
-              setUpSprite.setLocation(playerBoard.getPosition().x, playerBoard.getPosition().y);
+              setUpSprite.setLocation(playerBoard.getX(), playerBoard.getY());
               sprites.remove(setUpSprite);
               return;
             }
@@ -279,7 +279,7 @@ public class GamePlay implements Renderable {
         if (setUpSprite != null) {
           PlayerBoard playerBoard = playerData.get(GameManager.gamePlayer).getFirst();
           Position pos = playerBoard.getBoardRowCol(point);
-          Point posB = playerBoard.getPosition();
+          Point posB = playerBoard.getLocation();
 
           int x = pos.x * playerBoard.getCellSize() + posB.x,
               y = pos.y * playerBoard.getCellSize() + posB.y;
