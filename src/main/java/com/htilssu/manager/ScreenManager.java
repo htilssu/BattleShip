@@ -14,13 +14,14 @@ import java.util.Map;
 
 /** Lớp quản lý các màn hình trong game */
 public class ScreenManager {
-  /** Màn hình bắt đầu - màn hình chọn thể loại, setting */
-  public static final int MENU_SCREEN = 1;
+    /** Màn hình bắt đầu - màn hình chọn thể loại, setting */
+    public static final int MENU_SCREEN = 1;
 
-  /** Màn hình chơi game */
-  public static final int GAME_SCREEN = 2;
+    /** Màn hình chơi game */
+    public static final int GAME_SCREEN = 2;
+    public static final int SETTING_SCREEN = 3;
+    public static final int PICK_SCREEN = 4;
 
-  public static final int SETTING_SCREEN = 3;
   private static final int NETWORK_SCREEN = 4;
 
   private final Map<Integer, JPanel> screenMap = new HashMap<>();
@@ -37,7 +38,7 @@ public class ScreenManager {
     screenMap.put(GAME_SCREEN, new PlayScreen(battleShip));
     screenMap.put(SETTING_SCREEN, new SettingScreen(battleShip));
     screenMap.put(NETWORK_SCREEN, new NetworkScreen(battleShip));
-
+      screenMap.put(4, new PickScreen(battleShip));
     updateScreenSize();
   }
 
