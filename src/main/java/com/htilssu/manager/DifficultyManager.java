@@ -2,7 +2,7 @@ package com.htilssu.manager;
 
 import java.util.Map;
 
-public static class DifficultyManager {
+public class DifficultyManager {
   private static final int NORMAL = 1;
   private static final int HARD = 2;
   public static final Map<Integer, Integer> difficultyMap =
