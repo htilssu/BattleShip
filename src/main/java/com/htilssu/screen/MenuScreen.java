@@ -20,9 +20,7 @@ import java.util.List;
 
 public class MenuScreen extends JPanel {
     private static MenuScreen instance; // Tham chiếu tĩnh
-    private BufferedImage backgroundImage, menuImage;
-    private CardLayout cardLayout; // card layout quan ly nhieu the card khac nhau trong 1 container
-    private JPanel parentPanel; // tao 1 hieu ung chuyen gia 2 man gamemenu va gamepanel
+    private BufferedImage backgroundImage, menuImage,cursorImage;
     private BattleShip window;
     private Clip backgroundMusicClip;
     private List<CustomButton> buttons;
@@ -30,15 +28,19 @@ public class MenuScreen extends JPanel {
     public MenuScreen(BattleShip battleShip) {
         instance = this; // Gán tham chiếu tĩnh
         window = battleShip;
-        cardLayout = new CardLayout();
-        parentPanel = new JPanel(cardLayout);
+
         setLayout(null); // We will use absolute positioning
         loadBackgroundImage();
         loadMenu();
         setPreferredSize(new Dimension(GameSetting.WIDTH, GameSetting.HEIGHT));
         buttons = new ArrayList<>();
         createButtons();
-        playBackgroundMusic();
+      //  playBackgroundMusic();
+
+
+        loadCursorImage();
+        setCustomCursor(); // Ensure this method is called
+
         // Thêm listener để phát hiện khi cửa sổ thay đổi kích thước
         addComponentListener(
                 new ComponentAdapter() {
@@ -55,11 +57,22 @@ public class MenuScreen extends JPanel {
 
     private void loadBackgroundImage() {
 
-        backgroundImage = AssetUtils.loadAsset("/sea.png"); // Load background image
+        backgroundImage = AssetUtils.loadAsset("/sea1.png"); // Load background image
+    }
+    private void loadCursorImage() {
+        cursorImage = AssetUtils.loadAsset("/Layer2.png"); // Load cursor image
+
+    }
+
+    private void setCustomCursor() {
+
+            Cursor customCursor = Toolkit.getDefaultToolkit().createCustomCursor(
+                    cursorImage, new Point(0, 0), "Custom Cursor");
+                setCursor(customCursor);
     }
 
     private void loadMenu() {
-        menuImage = AssetUtils.loadAsset("/MENU_.png"); // Tải hình ảnh biểu tượng menu
+        menuImage = AssetUtils.loadAsset("/MENU2.png"); // Tải hình ảnh biểu tượng menu
     }
 
     public Clip getBackgroundMusicClip() {
@@ -84,11 +97,11 @@ public class MenuScreen extends JPanel {
 
     private void createButtons() {
 
-        addButton("/btnplay.png", "PLAY");
-        addButton("/MUTIPLAYER.png", "MULTIPLAYER");
-        addButton("/HELP.png", "HELP");
-        addButton("/SETTINGS.png", "SETTING");
-        addButton("/QUIT.png", "QUIT");
+        addButton("/play2.png", "PLAY");
+        addButton("/Multiplayer.png","Multiplayer");
+        addButton("/continue.png", "Continue");
+        addButton("/setting2.png", "SETTING");
+        addButton("/exit.png", "QUIT");
         repositionButtons();
     }
 
@@ -103,11 +116,15 @@ public class MenuScreen extends JPanel {
     private void handleButtonClick(String actionCommand) {
         switch (actionCommand) {
             case "PLAY":
-                window.changeScreen(ScreenManager.GAME_SCREEN);
+                window.changeScreen(ScreenManager.PICK_SCREEN);
                 break;
             case "SETTING":
                 window.changeScreen(ScreenManager.SETTING_SCREEN);
                 break;
+            case "Multiplayer":
+                window.changeScreen(ScreenManager.PICK_SCREEN);
+                break;
+
             case "QUIT":
                 System.exit(0);
                 break;
@@ -116,7 +133,7 @@ public class MenuScreen extends JPanel {
 
     private void repositionButtons() { // định hinh cac nut khi thay doi kich thuoc man hinh
         int buttonWidth = 200;
-        int buttonHeight = 80;
+        int buttonHeight = 60;
         int centerX = (getWidth() - buttonWidth) / 2;
         int totalButtons = buttons.size();
         int spacing = 20;

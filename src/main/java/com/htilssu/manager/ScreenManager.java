@@ -1,6 +1,7 @@
 package com.htilssu.manager;
 
 import com.htilssu.BattleShip;
+import com.htilssu.screen.PickScreen;
 import com.htilssu.screen.PlayScreen;
 import com.htilssu.screen.MenuScreen;
 import com.htilssu.screen.SettingScreen;
@@ -17,6 +18,7 @@ public class ScreenManager {
     /** Màn hình chơi game */
     public static final int GAME_SCREEN = 2;
     public static final int SETTING_SCREEN = 3;
+    public static final int PICK_SCREEN = 4;
 
     private final Map<Integer, JPanel> screenMap = new HashMap<>();
 
@@ -29,6 +31,7 @@ public class ScreenManager {
         screenMap.put(1, new MenuScreen(battleShip));
         screenMap.put(2, new PlayScreen(battleShip));
         screenMap.put(3, new SettingScreen(battleShip));
+        screenMap.put(4, new PickScreen(battleShip));
     }
 
     /**
