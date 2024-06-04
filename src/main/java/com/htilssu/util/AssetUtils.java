@@ -20,6 +20,10 @@ public class AssetUtils {
   public static final int ASSET_SHIP_4 = 6;
   public static final int ASSET_SHIP_5 = 7;
   public static final int ASSET_HOST_LIST_TEXT = 8;
+  public static final int ASSET_READY_BUTTON = 9;
+  public static final Integer ASSET_BACK_SEA = 10;
+  public static final Integer ASSET_BACK_SEA_2 = 11;
+  public static final Integer ASSET_UNREADY_BUTTON = 12;
 
   static Map<Integer, BufferedImage> assetMap = new HashMap<>();
 
@@ -29,6 +33,7 @@ public class AssetUtils {
 
   private static void initAsset() {
     BufferedImage asset_1 = loadAsset("/assets_1.png");
+    BufferedImage button_asset = loadAsset("/button_asset.png");
     if (asset_1 != null) {
       assetMap.put(ASSET_SHOOT_MISS, asset_1.getSubimage(0, 0, 64, 64));
       assetMap.put(ASSET_SHOOT_HIT, asset_1.getSubimage(64, 0, 64, 64));
@@ -38,6 +43,21 @@ public class AssetUtils {
       assetMap.put(ASSET_SHIP_5, asset_1.getSubimage(192, 0, 64, 64 * 5));
       assetMap.put(ASSET_HOST_LIST_TEXT, asset_1.getSubimage(256, 0, 512, 64));
     }
+
+    if (button_asset != null) {
+      assetMap.put(ASSET_READY_BUTTON, button_asset.getSubimage(0, 0, 64 * 6, 64 * 2));
+      assetMap.put(ASSET_UNREADY_BUTTON, button_asset.getSubimage(64 * 6, 0, 64 * 6, 64 * 2));
+    }
+
+    assetMap.put(ASSET_BACK_SEA, loadAsset("/sea.png"));
+    assetMap.put(ASSET_BACK_SEA_2, loadAsset("/sea_of_thief_2.png"));
+
+    assetMap.forEach(
+        (integer, bufferedImage) -> {
+          if (bufferedImage == null) {
+            GameLogger.error("asset: " + integer + " is null");
+          }
+        });
   }
 
   /**

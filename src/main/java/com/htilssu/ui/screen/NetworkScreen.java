@@ -4,6 +4,7 @@ import static com.htilssu.util.AssetUtils.getAsset;
 import static com.htilssu.util.AssetUtils.loadAsset;
 
 import com.htilssu.BattleShip;
+import com.htilssu.entity.Sprite;
 import com.htilssu.multiplayer.Client;
 import com.htilssu.setting.GameSetting;
 import com.htilssu.ui.component.GameButton;
@@ -27,10 +28,11 @@ public class NetworkScreen extends JPanel implements ComponentListener {
     this.battleShip = battleShip;
     setLayout(null);
     setFocusable(true);
-    backGroundAsset = loadAsset("/sea.png");
+    backGroundAsset = loadAsset("/sea_of_thief.png");
     blurHostListArea = new BufferedImage(500, 500, BufferedImage.TYPE_INT_ARGB);
     // TODO: replace refresh image
-    refreshButton = new GameButton(AssetUtils.rotate90(getAsset(AssetUtils.ASSET_SHIP_2)));
+    refreshButton =
+        new GameButton(new Sprite(AssetUtils.rotate90(getAsset(AssetUtils.ASSET_SHIP_2))));
     addComponentListener(this);
     add(refreshButton);
     setComponentZOrder(refreshButton, 0);

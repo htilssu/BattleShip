@@ -54,7 +54,7 @@ public class MenuScreen extends JPanel {
 
   private void loadBackgroundImage() {
 
-    backgroundImage = AssetUtils.loadAsset("/sea.png"); // Load background image
+    backgroundImage = AssetUtils.loadAsset("/sea_of_thief.png"); // Load background image
   }
 
   private void loadMenu() {

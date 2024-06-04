@@ -4,15 +4,12 @@ import com.htilssu.entity.component.Position;
 import com.htilssu.entity.player.PlayerBoard;
 import com.htilssu.render.Collision;
 import com.htilssu.render.Renderable;
-import com.htilssu.util.AssetUtils;
+import java.awt.*;
+import java.lang.reflect.Field;
 import org.jetbrains.annotations.NotNull;
 
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.lang.reflect.Field;
-
 // Lớp Ship đại diện cho một con TÀU
-public class Ship implements Renderable, Collision {
+public class Ship extends Collision implements Renderable {
   public static final int SHIP_2 = 2;
   public static final int SHIP_3 = 3;
   public static final int SHIP_4 = 4;
@@ -99,7 +96,7 @@ public class Ship implements Renderable, Collision {
 
   public void update() {
     float ratio = (float) sprite.getHeight() / sprite.getWidth();
-    sprite.setPosition(
+    sprite.setLocation(
         playerBoard.getPosition().x + playerBoard.getCellSize() * position.x,
         playerBoard.getPosition().y + playerBoard.getCellSize() * position.y);
 
