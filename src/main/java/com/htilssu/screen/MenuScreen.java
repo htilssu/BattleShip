@@ -1,4 +1,4 @@
-package com.htilssu.ui.screen;
+package com.htilssu.screen;
 
 import com.htilssu.BattleShip;
 import com.htilssu.component.CustomButton;
@@ -6,6 +6,9 @@ import com.htilssu.manager.ScreenManager;
 import com.htilssu.setting.GameSetting;
 import com.htilssu.util.AssetUtils;
 import com.htilssu.util.GameLogger;
+
+import javax.sound.sampled.*;
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -14,8 +17,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import javax.sound.sampled.*;
-import javax.swing.*;
 
 public class MenuScreen extends JPanel {
   private static MenuScreen instance; // Tham chiếu tĩnh

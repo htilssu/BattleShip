@@ -7,9 +7,14 @@ import com.htilssu.entity.game.GamePlay;
 import com.htilssu.render.Collision;
 import com.htilssu.render.Renderable;
 import com.htilssu.setting.GameSetting;
+import com.htilssu.util.AssetUtils;
 import java.awt.*;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
+import java.awt.image.ConvolveOp;
+import java.awt.image.Kernel;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
@@ -17,7 +22,7 @@ import org.jetbrains.annotations.NotNull;
  * Lớp chứa thông tin bảng của người chơi Bảng này lưu trữ các ô mà người chơi đã bắn và chứa các
  * tàu của người chơi
  */
-public class PlayerBoard extends Dimension implements Renderable, Collision {
+public class PlayerBoard extends Collision implements Renderable {
 
   List<Ship> ships = new ArrayList<>();
 
@@ -32,7 +37,6 @@ public class PlayerBoard extends Dimension implements Renderable, Collision {
    * @param size Kích thước của bảng
    */
   public PlayerBoard(int size) {
-    super(0, 0);
     this.size = size;
     update();
   }
@@ -44,15 +48,14 @@ public class PlayerBoard extends Dimension implements Renderable, Collision {
   /** Cập nhật kích thước của bảng người chơi */
   public void update() {
     cellSize = (int) Math.ceil(GameSetting.TILE_SIZE * GameSetting.SCALE + 16);
+    setSize(cellSize * size, cellSize * size);
     for (Ship ship : ships) {
       ship.update();
     }
-    setSize(cellSize * size, cellSize * size);
   }
 
   @Override
   public void render(@NotNull Graphics g) {
-    update();
 
     // Vẽ bảng người chơi
     Graphics2D g2d = (Graphics2D) g;
@@ -78,12 +81,33 @@ public class PlayerBoard extends Dimension implements Renderable, Collision {
       }
     }
 
+    AlphaComposite aC = AlphaComposite.getInstance(AlphaComposite.SRC_OUT, 0.7f);
+    BufferedImage bg = AssetUtils.getAsset(AssetUtils.ASSET_BACK_SEA);
+    BufferedImage opaBg =
+        new BufferedImage(bg.getWidth(), bg.getHeight(), BufferedImage.TYPE_INT_ARGB);
+
+    float[] a = new float[3 * 3];
+    Arrays.fill(a, 0.1111f);
+    Kernel kernel = new Kernel(3, 3, a);
+
+    ConvolveOp cOP = new ConvolveOp(kernel, ConvolveOp.EDGE_NO_OP, null);
+
+    Graphics2D g2dd = opaBg.createGraphics();
+
+    g2dd.setComposite(aC);
+    g2dd.drawImage(bg, 0, 0, opaBg.getWidth(), opaBg.getHeight(), null);
+    g2dd.dispose();
+    opaBg = cOP.filter(opaBg, null);
+
+    g2d.drawImage(opaBg, position.x, position.y, (int) getWidth(), (int) getHeight(), null);
+
     for (Ship ship : ships) {
       ship.render(g);
     }
 
     for (int i = 0; i <= size; i++) {
       g2d.setColor(Color.black);
+
       g2d.drawLine(
           position.x,
           position.y + i * cellSize,
@@ -94,10 +118,6 @@ public class PlayerBoard extends Dimension implements Renderable, Collision {
           position.y,
           position.x + i * cellSize,
           position.y + size * cellSize);
-      g2d.drawString(
-          (position.x + size * cellSize) + ", " + (position.y + i * cellSize),
-          position.x + size * cellSize + 32,
-          position.y + i * cellSize);
     }
   }
 
@@ -110,28 +130,13 @@ public class PlayerBoard extends Dimension implements Renderable, Collision {
     return position;
   }
 
-  /**
-   * Check xem vị trí của chuột có nằm trong bảng hay không, Vị trí của chuột phải là vị trí tương
-   * đối (relative) so với panel chứa bảng
-   *
-   * @param position Vị trí của chuột
-   * @return {@code true} nếu vị trí của chuột nằm trong bảng, ngược lại trả về {@code false}
-   * @see MouseEvent#getX()
-   * @see MouseEvent#getY()
-   */
-  public boolean isInsideBoard(Point position) {
-    int maxX = this.position.x + width;
-    int maxY = this.position.y + height;
-
-    return position.x >= this.position.x
-        && position.y >= this.position.y
-        && position.x <= maxX
-        && position.y <= maxY;
+  public Position getBoardRowCol(Point point) {
+    return getBoardRowCol(point.x, point.y);
   }
 
-  public Position getBoardRowCol(Point point) {
-    int row = (point.x - this.position.x) / cellSize;
-    int col = (point.y - this.position.y) / cellSize;
+  public Position getBoardRowCol(int x, int y) {
+    int row = (x - this.position.x) / cellSize;
+    int col = (y - this.position.y) / cellSize;
     if (row >= size) {
       row = size - 1;
     }
@@ -145,15 +150,6 @@ public class PlayerBoard extends Dimension implements Renderable, Collision {
       col = 0;
     }
     return new Position(row, col);
-  }
-
-  public void setPosition(int x, int y) {
-    position.setLocation(x, y);
-  }
-
-  @Override
-  public boolean isInside(int x, int y) {
-    return isInsideBoard(new Point(x, y));
   }
 
   public void addShip(Ship ship) {

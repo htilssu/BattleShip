@@ -8,18 +8,13 @@ import org.jetbrains.annotations.NotNull;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
-public class Sprite implements Renderable, Collision {
-  int x;
-  int y;
-  int width;
-  int height;
+public class Sprite extends Collision implements Renderable {
   BufferedImage asset;
 
   public Sprite(int x, int y, int width, int height, BufferedImage asset) {
-    this.x = x;
-    this.y = y;
-    this.width = width;
-    this.height = height;
+    location.x = x;
+    location.y = y;
+    setSize(width, height);
     this.asset = asset;
   }
 
@@ -32,39 +27,7 @@ public class Sprite implements Renderable, Collision {
   }
 
   public Sprite(Sprite sprite) {
-    this(sprite.x, sprite.y, sprite.width, sprite.height, sprite.asset);
-  }
-
-  public int getX() {
-    return x;
-  }
-
-  public void setX(int x) {
-    this.x = x;
-  }
-
-  public int getY() {
-    return y;
-  }
-
-  public void setY(int y) {
-    this.y = y;
-  }
-
-  public int getWidth() {
-    return width;
-  }
-
-  public void setWidth(int width) {
-    this.width = width;
-  }
-
-  public int getHeight() {
-    return height;
-  }
-
-  public void setHeight(int height) {
-    this.height = height;
+    this(sprite.getX(), sprite.getY(), sprite.getWidth(), sprite.getHeight(), sprite.asset);
   }
 
   public BufferedImage getAsset() {
@@ -77,24 +40,9 @@ public class Sprite implements Renderable, Collision {
     setHeight(asset.getHeight());
   }
 
-  public void setSize(int width, int height) {
-    setWidth(width);
-    setHeight(height);
-  }
-
-  public void setPosition(int x, int y) {
-    setX(x);
-    setY(y);
-  }
-
   @Override
   public void render(@NotNull Graphics g) {
-    g.drawImage(asset, x, y, width, height, null);
-  }
-
-  @Override
-  public boolean isInside(int x, int y) {
-    return x >= this.x && x <= this.x + width && y >= this.y && y <= this.y + height;
+    g.drawImage(asset, getX(), getY(), getWidth(), getHeight(), null);
   }
 
   public boolean isInside(Point point) {

@@ -14,11 +14,13 @@ import com.htilssu.util.AssetUtils;
 import com.htilssu.util.GameLogger;
 
 import java.awt.*;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import javax.swing.*;
 
-public class BattleShip extends JFrame implements Runnable, KeyListener {
+public class BattleShip extends JFrame implements Runnable, KeyListener, ComponentListener {
 
   /** Số frame mỗi giây hiện tại */
   static int currentFPS = 0;
@@ -78,6 +80,7 @@ public class BattleShip extends JFrame implements Runnable, KeyListener {
     return listenerManager;
   }
 
+  /** Cài đặt các sự kiện cho frame */
   private void setUp() {
     setTitle("BattleShip");
     setSize(GameSetting.WIDTH, GameSetting.HEIGHT);
@@ -88,6 +91,7 @@ public class BattleShip extends JFrame implements Runnable, KeyListener {
     addKeyListener(this);
     setFocusable(true);
     setResizable(false);
+    addComponentListener(this);
     gameManager.createTestGamePlay();
   }
 
@@ -219,17 +223,16 @@ public class BattleShip extends JFrame implements Runnable, KeyListener {
     setUndecorated(isFullScreen);
 
     if (isFullScreen) {
-      graphicsDevice.setFullScreenWindow(this);
+      //      graphicsDevice.setFullScreenWindow(this);
       setExtendedState(JFrame.MAXIMIZED_BOTH);
-      screenManager.getCurrentScreen().setPreferredSize(new Dimension(getWidth(), getHeight()));
-      GameSetting.SCALE = ((float) getWidth() / GameSetting.WIDTH);
+      screenManager.getCurrentScreen().setPreferredSize(getSize());
 
     } else {
-      graphicsDevice.setFullScreenWindow(null);
+      setExtendedState(JFrame.NORMAL);
       GameSetting.SCALE = 1;
       updateScreenSize();
     }
-
+    setLocationRelativeTo(null);
     pack();
     setVisible(true);
   }
@@ -237,4 +240,18 @@ public class BattleShip extends JFrame implements Runnable, KeyListener {
   public ScreenManager getScreenManager() {
     return screenManager;
   }
+
+  @Override
+  public void componentResized(ComponentEvent e) {
+    GameSetting.SCALE = getWidth() / (float) GameSetting.WIDTH;
+  }
+
+  @Override
+  public void componentMoved(ComponentEvent e) {}
+
+  @Override
+  public void componentShown(ComponentEvent e) {}
+
+  @Override
+  public void componentHidden(ComponentEvent e) {}
 }

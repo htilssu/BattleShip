@@ -4,6 +4,7 @@ import com.htilssu.BattleShip;
 import com.htilssu.entity.Ship;
 import com.htilssu.entity.game.GamePlay;
 import com.htilssu.setting.GameSetting;
+import com.htilssu.util.AssetUtils;
 import com.htilssu.util.GameLogger;
 
 import javax.swing.*;
@@ -31,6 +32,8 @@ public class PlayScreen extends JPanel
   protected void paintComponent(Graphics g) {
     super.paintComponent(g);
     Graphics2D g2d = (Graphics2D) g;
+    g.drawImage(
+        AssetUtils.getAsset(AssetUtils.ASSET_BACK_SEA_2), 0, 0, getWidth(), getHeight(), null);
     window.getGameManager().getCurrentGamePlay().render(g2d);
     g2d.setColor(Color.BLACK);
   }
@@ -41,20 +44,6 @@ public class PlayScreen extends JPanel
 
     // handle click on gameBoard (shoot)
     window.getGameManager().getCurrentGamePlay().handleClick(position);
-  }
-
-  /**
-   * Thêm sự kiện lắng nghe di chuột vào màn hình chơi game, để xử lý các sự kiện di chuột Thêm sự
-   * kiện này khi cần xử lý đặt tàu vào bảng chơi {@link GamePlay#WAITING_MODE} là đang bật chế độ
-   * đặt tàu
-   */
-  public void setMouseMotion() {
-    addMouseMotionListener(this);
-  }
-
-  /** Xóa sự kiện lắng nghe di chuột khỏi màn hình chơi game, để tránh xử lý không cần thiết */
-  public void removeMouseMotion() {
-    removeMouseMotionListener(this);
   }
 
   @Override
@@ -71,7 +60,7 @@ public class PlayScreen extends JPanel
 
   @Override
   public void componentResized(ComponentEvent e) {
-    window.getGameManager().getCurrentGamePlay().getCurrentPlayer().getBoard().update();
+    window.getGameManager().getCurrentGamePlay().update();
   }
 
   @Override

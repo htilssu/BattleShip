@@ -1,17 +1,18 @@
 package com.htilssu.ui.component;
 
-import com.htilssu.util.GameLogger;
+import com.htilssu.entity.Sprite;
 
-import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
+import javax.swing.*;
 
 public class GameButton extends JButton {
-  BufferedImage asset;
 
-  public GameButton(BufferedImage asset) throws HeadlessException {
-    this.asset = asset;
+  Sprite sprite;
+
+  public GameButton(Sprite sprite) throws HeadlessException {
+    this.sprite = sprite;
+    this.sprite.setLocation(this.getLocation());
     setBorder(null);
     setBackground(Color.BLACK);
   }
@@ -19,6 +20,6 @@ public class GameButton extends JButton {
   @Override
   protected void paintComponent(Graphics g) {
     Graphics2D g2d = (Graphics2D) g;
-    g2d.drawImage(asset, 0, 0, getWidth(), getHeight(), null);
+    sprite.render(g);
   }
 }
