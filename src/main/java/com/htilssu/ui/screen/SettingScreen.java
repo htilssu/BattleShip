@@ -1,24 +1,24 @@
 package com.htilssu.ui.screen;
 
 import com.htilssu.BattleShip;
+import com.htilssu.component.CustomSliderUI;
 import com.htilssu.manager.ScreenManager;
 import com.htilssu.util.AssetUtils;
-
-import javax.sound.sampled.Clip;
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.Objects;
+import java.awt.image.BufferedImage;
+import javax.sound.sampled.Clip;
+import javax.swing.*;
 
 public class SettingScreen extends JPanel {
   private BattleShip window;
   private JLabel volumeIconLabel;
   private JSlider volumeSlider;
-  private JButton muteButton;
   private JLabel volumePercentageLabel;
   private boolean isMuted = false;
-  private int currentVolume = 0; // Giả định giá trị ban đầu của âm lượng
+  private int currentVolume = 100; // Giả định giá trị ban đầu của âm lượng
+  private BufferedImage cursorImage, backgroundImage;
 
   public SettingScreen(BattleShip battleShip) {
     this.window = battleShip;
@@ -26,6 +26,9 @@ public class SettingScreen extends JPanel {
     setPreferredSize(
         new Dimension(800, 600)); // Assuming 800x600 as GameSetting.WIDTH, GameSetting.HEIGHT
     initializeComponents();
+    loadCursorImage();
+    setCustomCursor();
+    loadBackgroundImage();
   }
 
   private void backToMenu() {
@@ -33,10 +36,15 @@ public class SettingScreen extends JPanel {
     window.changeScreen(ScreenManager.MENU_SCREEN);
   }
 
+  private void loadBackgroundImage() {
+
+    backgroundImage = AssetUtils.loadAsset("/sea2.png"); // Load background image
+  }
+
   private void initializeComponents() {
     // Tạo JLabel cho biểu tượng cái loa
-    volumeIconLabel = new JLabel(new ImageIcon(AssetUtils.loadAsset("/MusicOn.png")));
-    volumeIconLabel.setBounds(100, 100, 100, 100);
+    volumeIconLabel = new JLabel(new ImageIcon(AssetUtils.loadAsset("/soundon.png")));
+    volumeIconLabel.setBounds(100, 100, 100, 80);
     volumeIconLabel.addMouseListener(
         new MouseAdapter() {
           @Override
@@ -46,13 +54,22 @@ public class SettingScreen extends JPanel {
         });
     add(volumeIconLabel);
 
+    // Calculate positions dynamically
+    int iconWidth = volumeIconLabel.getWidth();
+    int iconHeight = volumeIconLabel.getHeight();
+    int sliderWidth = 300;
+    int sliderHeight = 50;
+    int spacing = 20;
+    int sliderX = volumeIconLabel.getX() + iconWidth + spacing;
+    int sliderY =
+        volumeIconLabel.getY()
+            + (iconHeight - 30) / 2; // Center the slider vertically relative to the icon
+
     // Tạo JSlider để điều chỉnh âm lượng
     volumeSlider = new JSlider(0, 100, currentVolume);
-    volumeSlider.setBounds(
-        volumeIconLabel.getX() + volumeIconLabel.getWidth() + 10,
-        volumeIconLabel.getY() + 25,
-        200,
-        30);
+    volumeSlider.setBounds(sliderX, sliderY, sliderWidth, 50);
+    volumeSlider.setBackground(new Color(0, 0, 0, 0));
+    volumeSlider.setUI(new CustomSliderUI(volumeSlider));
     volumeSlider.addChangeListener(
         e -> {
           int value = volumeSlider.getValue();
@@ -63,24 +80,17 @@ public class SettingScreen extends JPanel {
 
     // Tạo JLabel cho phần trăm âm lượng
     volumePercentageLabel = new JLabel(currentVolume + "%"); // Khởi tạo biến thành viên
-    volumePercentageLabel.setBounds(
-        volumeSlider.getX() + volumeSlider.getWidth() + 10, volumeSlider.getY(), 50, 30);
+    volumePercentageLabel.setBounds(sliderX + sliderWidth + spacing, sliderY, 50, 50);
     add(volumePercentageLabel);
 
     // Tạo nút "Back" để quay lại màn hình menu
-    JButton backButton = new JButton("Back");
-    backButton.setBounds(100, 200, 100, 30); // Điều chỉnh vị trí và kích thước theo nhu cầu của bạn
+    JButton backButton = new JButton(new ImageIcon(AssetUtils.loadAsset("/back.png")));
+    backButton.setBounds(100, 300, 200, 52); // Điều chỉnh vị trí và kích thước theo nhu cầu của bạn
+    backButton.setContentAreaFilled(false);
+    backButton.setBorderPainted(false);
+    backButton.setOpaque(false);
     backButton.addActionListener(e -> backToMenu());
     add(backButton);
-  }
-
-  private JButton createButton(String imagePath, int x, int y, int width, int height) {
-    JButton button = new JButton(new ImageIcon(AssetUtils.loadAsset(imagePath)));
-    button.setBounds(x, y, width, height);
-    button.setContentAreaFilled(false);
-    button.setBorderPainted(false);
-    button.setFocusPainted(false);
-    return button;
   }
 
   private void adjustVolume(int volume) {
@@ -104,19 +114,33 @@ public class SettingScreen extends JPanel {
           backgroundMusicClip.stop();
           volumeIconLabel.setIcon(
               new ImageIcon(
-                  Objects.requireNonNull(
-                      AssetUtils.loadAsset("/MusicOff.png")))); // Thay đổi hình ảnh khi
-          // tắt âm
-          // thanh
+                  AssetUtils.loadAsset("/soundoff.png"))); // Thay đổi hình ảnh khi tắt âm thanh
         } else {
           backgroundMusicClip.start();
           volumeIconLabel.setIcon(
               new ImageIcon(
-                  Objects.requireNonNull(
-                      AssetUtils.loadAsset("/MusicOn.png")))); // Thay đổi hình ảnh khi mở
-          // âm thanh
+                  AssetUtils.loadAsset("/soundon.png"))); // Thay đổi hình ảnh khi mở âm thanh
         }
       }
+    }
+  }
+
+  private void loadCursorImage() {
+    cursorImage = AssetUtils.loadAsset("/Layer2.png"); // Load cursor image
+  }
+
+  private void setCustomCursor() {
+    Cursor customCursor =
+        Toolkit.getDefaultToolkit()
+            .createCustomCursor(cursorImage, new Point(0, 0), "Custom Cursor");
+    setCursor(customCursor);
+  }
+
+  @Override
+  protected void paintComponent(Graphics g) {
+    super.paintComponent(g);
+    if (backgroundImage != null) {
+      g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
     }
   }
 }
