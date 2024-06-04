@@ -9,7 +9,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 
-public class ListenerManager {
+public final class ListenerManager {
   HashMap<Class<?>, List<Method>> eventHandler = new HashMap<>();
 
   /**

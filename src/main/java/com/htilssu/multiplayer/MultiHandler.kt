@@ -15,19 +15,8 @@ open class MultiHandler(var battleShip: BattleShip) {
 
 
     companion object {
-        private var instance: MultiHandler? = null
         const val PING = -1;
         const val PONG = -2;
-
-        @JvmStatic
-        fun getInstance(): MultiHandler {
-            return instance!!
-        }
-
-        @JvmStatic
-        fun createInstance(battleShip: BattleShip) {
-            instance = MultiHandler(battleShip)
-        }
     }
 
     private fun handle(message: String) {

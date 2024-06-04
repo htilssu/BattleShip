@@ -4,6 +4,7 @@ import com.htilssu.BattleShip;
 import com.htilssu.setting.GameSetting;
 import com.htilssu.util.GameLogger;
 import com.htilssu.util.NetworkUtils;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 import java.net.InetAddress;
@@ -13,7 +14,7 @@ import java.util.List;
 
 /** Lớp quản lý kết nối giữa client với server */
 public class Client extends MultiHandler implements Runnable {
-  private static Client instance;
+ static Client instance;
   Socket socket;
   private List<InetAddress> hostList = new ArrayList<>();
   private String status;
@@ -21,6 +22,10 @@ public class Client extends MultiHandler implements Runnable {
   public Client(BattleShip battleShip) {
     super(battleShip);
     instance = this;
+  }
+
+  public static Client getInstance() {
+    return instance;
   }
 
   public String getStatus() {

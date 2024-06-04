@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /** Lớp quản lý các màn hình trong game */
-public class ScreenManager {
+public final class ScreenManager {
   /** Màn hình bắt đầu - màn hình chọn thể loại, setting */
   public static final int MENU_SCREEN = 1;
 
@@ -56,9 +56,6 @@ public class ScreenManager {
 
   /**
    * Lấy màn hình theo loại screen
-   *
-   * <p>Nếu tham số {@code update} là {@code true} thì sẽ cập nhật lại màn hình hiện tại được đánh
-   * dấu khi lấy, ngược lại là {@code false}
    *
    * @param screen số nguyên biểu diễn loại màn hình
    * @return Màn hình được kế thừa từ {@link JPanel} hoặc {@code null} nếu không tìm thấy

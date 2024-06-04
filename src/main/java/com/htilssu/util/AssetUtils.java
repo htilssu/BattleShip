@@ -1,15 +1,13 @@
 package com.htilssu.util;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+import javax.imageio.ImageIO;
 
 public class AssetUtils {
   public static final int ASSET_BOARD_FRAME = 1;
@@ -32,21 +30,21 @@ public class AssetUtils {
   }
 
   private static void initAsset() {
-    BufferedImage asset_1 = loadAsset("/assets_1.png");
-    BufferedImage button_asset = loadAsset("/button_asset.png");
-    if (asset_1 != null) {
-      assetMap.put(ASSET_SHOOT_MISS, asset_1.getSubimage(0, 0, 64, 64));
-      assetMap.put(ASSET_SHOOT_HIT, asset_1.getSubimage(64, 0, 64, 64));
-      assetMap.put(ASSET_SHIP_2, asset_1.getSubimage(0, 64, 64, 64 * 2));
-      assetMap.put(ASSET_SHIP_3, asset_1.getSubimage(64, 64, 64, 64 * 3));
-      assetMap.put(ASSET_SHIP_4, asset_1.getSubimage(128, 0, 64, 64 * 4));
-      assetMap.put(ASSET_SHIP_5, asset_1.getSubimage(192, 0, 64, 64 * 5));
-      assetMap.put(ASSET_HOST_LIST_TEXT, asset_1.getSubimage(256, 0, 512, 64));
+    BufferedImage asset1 = loadAsset("/assets_1.png");
+    BufferedImage buttonAsset = loadAsset("/button_asset.png");
+    if (asset1 != null) {
+      assetMap.put(ASSET_SHOOT_MISS, asset1.getSubimage(0, 0, 64, 64));
+      assetMap.put(ASSET_SHOOT_HIT, asset1.getSubimage(64, 0, 64, 64));
+      assetMap.put(ASSET_SHIP_2, asset1.getSubimage(0, 64, 64, 64 * 2));
+      assetMap.put(ASSET_SHIP_3, asset1.getSubimage(64, 64, 64, 64 * 3));
+      assetMap.put(ASSET_SHIP_4, asset1.getSubimage(128, 0, 64, 64 * 4));
+      assetMap.put(ASSET_SHIP_5, asset1.getSubimage(192, 0, 64, 64 * 5));
+      assetMap.put(ASSET_HOST_LIST_TEXT, asset1.getSubimage(256, 0, 512, 64));
     }
 
-    if (button_asset != null) {
-      assetMap.put(ASSET_READY_BUTTON, button_asset.getSubimage(0, 0, 64 * 6, 64 * 2));
-      assetMap.put(ASSET_UNREADY_BUTTON, button_asset.getSubimage(64 * 6, 0, 64 * 6, 64 * 2));
+    if (buttonAsset != null) {
+      assetMap.put(ASSET_READY_BUTTON, buttonAsset.getSubimage(0, 0, 64 * 6, 64 * 2));
+      assetMap.put(ASSET_UNREADY_BUTTON, buttonAsset.getSubimage(64 * 6, 0, 64 * 6, 64 * 2));
     }
 
     assetMap.put(ASSET_BACK_SEA, loadAsset("/sea.png"));
@@ -73,6 +71,7 @@ public class AssetUtils {
         return ImageIO.read(ip);
       }
     } catch (Exception ignored) {
+      GameLogger.log("Asset not found: " + path);
     }
     return null;
   }

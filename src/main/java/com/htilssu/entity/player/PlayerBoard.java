@@ -106,8 +106,8 @@ public class PlayerBoard extends Collision implements Renderable {
     for (int i = 0; i < size; i++) {
       g2d.setColor(Color.black);
 
-      g2d.drawLine(getX(), getY() + i * cellSize, getX() + size * cellSize, getY() + i * cellSize);
-      g2d.drawLine(getX() + i * cellSize, getY(), getX() + i * cellSize, getY() + size * cellSize);
+      g2d.drawLine(getX(), getY() + i * cellSize, getX() + getWidth(), getY() + i * cellSize);
+      g2d.drawLine(getX() + i * cellSize, getY(), getX() + i * cellSize, getY() + getHeight());
     }
   }
 

@@ -12,7 +12,7 @@ import javax.sound.sampled.Clip;
 import javax.swing.*;
 
 public class SettingScreen extends JPanel {
-  private BattleShip window;
+  private final BattleShip window;
   private JLabel volumeIconLabel;
   private JSlider volumeSlider;
   private JLabel volumePercentageLabel;
