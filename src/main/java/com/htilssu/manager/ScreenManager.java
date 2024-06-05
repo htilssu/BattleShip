@@ -1,17 +1,12 @@
 package com.htilssu.manager;
 
 import com.htilssu.BattleShip;
-import com.htilssu.screen.PickScreen;
-import com.htilssu.ui.screen.NetworkScreen;
-import com.htilssu.ui.screen.PlayScreen;
-import com.htilssu.ui.screen.MenuScreen;
-import com.htilssu.ui.screen.SettingScreen;
 import com.htilssu.setting.GameSetting;
-
-import javax.swing.*;
+import com.htilssu.ui.screen.*;
 import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
+import javax.swing.*;
 
 /** Lớp quản lý các màn hình trong game */
 public final class ScreenManager {
@@ -44,9 +39,9 @@ public final class ScreenManager {
     updateScreenSize();
   }
 
-  private void updateScreenSize() {
+  public void updateScreenSize() {
     for (JPanel screen : screenMap.values()) {
-      screen.setPreferredSize(new Dimension(GameSetting.WIDTH, GameSetting.HEIGHT));
+      screen.setPreferredSize(new Dimension(battleShip.getWidth(), battleShip.getHeight()));
     }
   }
 

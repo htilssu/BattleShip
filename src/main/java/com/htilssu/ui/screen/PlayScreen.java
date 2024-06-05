@@ -107,15 +107,18 @@ public class PlayScreen extends JPanel
 
   @Override
   public void keyReleased(KeyEvent e) {
-    if (e.getKeyCode() == KeyEvent.VK_R) {
-      GamePlay cP = window.getGameManager().getCurrentGamePlay();
-      if (cP.getGameMode() == GamePlay.WAITING_MODE) {
-        if (cP.getDirection() == Ship.HORIZONTAL) {
-          cP.setDirection(Ship.VERTICAL);
-        } else {
-          cP.setDirection(Ship.HORIZONTAL);
+    switch (e.getKeyCode()) {
+      case KeyEvent.VK_R -> {
+        GamePlay cP = window.getGameManager().getCurrentGamePlay();
+        if (cP.getGameMode() == GamePlay.WAITING_MODE) {
+          if (cP.getDirection() == Ship.HORIZONTAL) {
+            cP.setDirection(Ship.VERTICAL);
+          } else {
+            cP.setDirection(Ship.HORIZONTAL);
+          }
         }
       }
+      case KeyEvent.VK_F11 -> window.toggleFullScreen();
     }
   }
 }

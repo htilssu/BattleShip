@@ -3,7 +3,7 @@ package com.htilssu.multiplayer
 import com.htilssu.BattleShip
 import com.htilssu.entity.component.Position
 import com.htilssu.entity.player.Player
-import com.htilssu.event.player.PlayerAction
+import com.htilssu.event.game.GameAction
 import com.htilssu.event.player.PlayerJoinEvent
 import com.htilssu.util.GameLogger
 import java.io.BufferedReader
@@ -22,7 +22,7 @@ open class MultiHandler(var battleShip: BattleShip) {
     private fun handle(message: String) {
         val messageParts = message.split("|")
         when (messageParts[0].toIntOrNull()) {
-            PlayerAction.JOIN -> {
+            GameAction.JOIN -> {
                 if (messageParts.count() < 3) {
                     GameLogger.error("Message không hợp lệ (Player Join): $message")
                     return
@@ -33,7 +33,7 @@ open class MultiHandler(var battleShip: BattleShip) {
                 battleShip.listenerManager.callEvent(PlayerJoinEvent(player), battleShip.gameManager)
             }
 
-            PlayerAction.SHOOT -> {
+            GameAction.SHOOT -> {
                 if (messageParts.count() < 3) {
                     GameLogger.error("Message không hợp lệ (Player Shoot): $message")
                     return
@@ -50,6 +50,18 @@ open class MultiHandler(var battleShip: BattleShip) {
                 }
             }
 
+            GameAction.READY -> {
+                if (this is Host) {
+                    this.ready()
+                }
+            }
+
+            GameAction.UNREADY -> {
+                if (this is Host) {
+                    this.unReady()
+                }
+            }
+
             else -> {
                 GameLogger.log("Unknown message: $message")
             }
@@ -61,11 +73,12 @@ open class MultiHandler(var battleShip: BattleShip) {
             val ip = socket.getInputStream()
             val bis = BufferedReader(InputStreamReader(ip))
 
-            while (true) {
-                val message = bis.readLine() ?: break
+            while (socket.isConnected) {
+                val message = bis.readLine() ?: break;
                 handle(message)
             }
         } catch (_: IOException) {
+            //empty
         }
     }
 

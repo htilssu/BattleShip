@@ -14,7 +14,7 @@ import java.util.List;
 
 /** Lớp quản lý kết nối giữa client với server */
 public class Client extends MultiHandler implements Runnable {
- static Client instance;
+  static Client instance;
   Socket socket;
   private List<InetAddress> hostList = new ArrayList<>();
   private String status;
@@ -57,11 +57,15 @@ public class Client extends MultiHandler implements Runnable {
     return (int) (System.currentTimeMillis() - time);
   }
 
-  public void sendData(String s) {
+  public void sendData(Object... obj) {
     try {
       OutputStream os = socket.getOutputStream();
       PrintWriter pw = new PrintWriter(os, true);
-      pw.println(s);
+      StringBuilder data = new StringBuilder();
+      for (Object o : obj) {
+        data.append(o.toString()).append("|");
+      }
+      pw.println(data);
     } catch (IOException e) {
       GameLogger.error("Có lỗi khi gửi dữ liệu");
     }

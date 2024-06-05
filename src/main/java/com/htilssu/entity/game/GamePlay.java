@@ -5,8 +5,10 @@ import com.htilssu.entity.Sprite;
 import com.htilssu.entity.component.Position;
 import com.htilssu.entity.player.Player;
 import com.htilssu.entity.player.PlayerBoard;
+import com.htilssu.event.game.GameAction;
 import com.htilssu.event.player.PlayerShootEvent;
 import com.htilssu.manager.GameManager;
+import com.htilssu.multiplayer.Client;
 import com.htilssu.render.Renderable;
 import com.htilssu.setting.GameSetting;
 import com.htilssu.util.AssetUtils;
@@ -16,6 +18,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import javax.swing.*;
 import kotlin.Pair;
 import org.jetbrains.annotations.NotNull;
@@ -131,6 +134,9 @@ public class GamePlay implements Renderable {
       readyButton.setLocation(
           xMidPosition - readyButton.getWidth() / 2,
           currentScreen.getHeight() - readyButton.getHeight() - shipSpriteMargin);
+      playerBoard.setSize(
+          currentScreen.getWidth() / 2,
+          currentScreen.getHeight() - readyButton.getHeight() - shipSpriteMargin * 2);
       playerBoard.update();
       playerBoard.setLocation(
           xMidPosition - 100,
@@ -211,6 +217,8 @@ public class GamePlay implements Renderable {
       case WAITING_MODE -> {
         PlayerBoard playerBoard = playerData.get(GameManager.gamePlayer).getFirst();
 
+        handleReadyButtonOnClick(position);
+
         // handle click on ship
         if (!playerBoard.isInside(position)) {
           handleGetShipSpriteClick(position, playerBoard);
@@ -227,6 +235,24 @@ public class GamePlay implements Renderable {
       }
       default -> throw new IllegalStateException("Unexpected value: " + gameMode);
     }
+  }
+
+  private void handleReadyButtonOnClick(Point position) {
+    if (readyButton.isInside(position)) {
+      if (isReady) {
+        unReady();
+      } else if (outOfShip()) {
+        ready();
+      }
+    }
+  }
+
+  private boolean outOfShip() {
+    AtomicInteger count = new AtomicInteger();
+
+    shipInBoard.forEach((integer, integer2) -> count.addAndGet(integer2));
+
+    return count.get() == 0;
   }
 
   private void handleAddShipToBoard(PlayerBoard playerBoard) {
@@ -345,11 +371,18 @@ public class GamePlay implements Renderable {
 
   private void ready() {
     isReady = true;
-    readyButton = new Sprite(AssetUtils.getAsset(AssetUtils.ASSET_UNREADY_BUTTON));
+    readyButton.setAsset(AssetUtils.getAsset(AssetUtils.ASSET_UNREADY_BUTTON), null);
+    Client.getInstance().sendData(GameAction.READY);
   }
 
   private void unReady() {
     isReady = false;
-    readyButton = new Sprite(AssetUtils.getAsset(AssetUtils.ASSET_READY_BUTTON));
+    readyButton.setAsset(AssetUtils.getAsset(AssetUtils.ASSET_READY_BUTTON), null);
+    Client.getInstance().sendData(GameAction.UNREADY);
+  }
+
+  public void changeDirection() {
+    if (gameMode != WAITING_MODE) return;
+    setDirection((direction + 1) % 2);
   }
 }

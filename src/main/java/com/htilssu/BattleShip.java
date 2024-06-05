@@ -1,6 +1,5 @@
 package com.htilssu;
 
-import com.htilssu.entity.Ship;
 import com.htilssu.entity.game.GamePlay;
 import com.htilssu.listener.GameStartListener;
 import com.htilssu.listener.PlayerListener;
@@ -11,19 +10,16 @@ import com.htilssu.multiplayer.Client;
 import com.htilssu.multiplayer.Host;
 import com.htilssu.setting.GameSetting;
 import com.htilssu.util.AssetUtils;
-import com.htilssu.util.GameLogger;
-
 import java.awt.*;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.net.InetAddress;
+import java.util.List;
 import javax.swing.*;
 
 public class BattleShip extends JFrame implements Runnable, KeyListener, ComponentListener {
-
-  /** Số frame mỗi giây hiện tại */
-  static int currentFPS = 0;
 
   /** Luồng render và update game */
   private final Thread thread = new Thread(this);
@@ -33,6 +29,9 @@ public class BattleShip extends JFrame implements Runnable, KeyListener, Compone
 
   /** Quản lý host */
   private final Host host = new Host(this);
+
+  /** Số frame mỗi giây hiện tại */
+  int currentFPS = 0;
 
   /** Quản lý các màn hình trong game */
   ScreenManager screenManager = new ScreenManager(this);
@@ -58,15 +57,6 @@ public class BattleShip extends JFrame implements Runnable, KeyListener, Compone
     registerListener();
   }
 
-  /**
-   * Lấy FPS hiện tại
-   *
-   * @return trả về số frame mỗi giây hiện tại
-   */
-  public static int getCurrentFPS() {
-    return currentFPS;
-  }
-
   public static void main(String[] args) {
     BattleShip battleShip = new BattleShip();
     battleShip.start();
@@ -84,8 +74,9 @@ public class BattleShip extends JFrame implements Runnable, KeyListener, Compone
   private void setUp() {
     setTitle("BattleShip");
     setSize(GameSetting.WIDTH, GameSetting.HEIGHT);
-    setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     setLocationRelativeTo(null);
+    screenManager.updateScreenSize();
     add(screenManager.getCurrentScreen());
     setIconImage(AssetUtils.loadAsset("/game_icon.png"));
     addKeyListener(this);
@@ -107,6 +98,12 @@ public class BattleShip extends JFrame implements Runnable, KeyListener, Compone
     thread.start();
     host.start();
     setVisible(true);
+
+    client.scanHost();
+    List<InetAddress> it = client.getHostList();
+    for (InetAddress inetAddress : it) {
+      client.connect(inetAddress, GameSetting.DEFAULT_PORT);
+    }
   }
 
   /** Gọi hàm này để dừng app */
@@ -156,7 +153,9 @@ public class BattleShip extends JFrame implements Runnable, KeyListener, Compone
   }
 
   /** Hàm update dữ liệu mỗi tick */
-  private void updateData() {}
+  private void updateData() {
+    // empty
+  }
 
   /**
    * Thay đổi màn hình hiện tại
@@ -188,50 +187,35 @@ public class BattleShip extends JFrame implements Runnable, KeyListener, Compone
         changeScreen(ScreenManager.MENU_SCREEN);
         break;
       case KeyEvent.VK_R:
-        {
-          GamePlay cP = getGameManager().getCurrentGamePlay();
-          if (cP.getGameMode() == GamePlay.WAITING_MODE) {
-            if (cP.getDirection() == Ship.HORIZONTAL) {
-              cP.setDirection(Ship.VERTICAL);
-            } else {
-              cP.setDirection(Ship.HORIZONTAL);
-            }
-          }
-        }
+        GamePlay cP = gameManager.getCurrentGamePlay();
+        cP.changeDirection();
+        break;
+      default:
+        return;
     }
   }
 
   @Override
   public void keyReleased(KeyEvent e) {}
 
-  private void updateScreenSize() {
-    screenManager
-        .getCurrentScreen()
-        .setPreferredSize(new Dimension(GameSetting.WIDTH, GameSetting.HEIGHT));
-  }
-
   public Client getClient() {
     return client;
   }
 
   /** Hàm chuyển đổi giữa chế độ full screen và window */
-  private void toggleFullScreen() {
+  public void toggleFullScreen() {
     isFullScreen = !isFullScreen;
-    GraphicsDevice graphicsDevice =
-        GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
     dispose();
     setUndecorated(isFullScreen);
 
     if (isFullScreen) {
-      //      graphicsDevice.setFullScreenWindow(this);
-      setExtendedState(JFrame.MAXIMIZED_BOTH);
-      screenManager.getCurrentScreen().setPreferredSize(getSize());
-
+      setExtendedState(Frame.MAXIMIZED_BOTH);
     } else {
-      setExtendedState(JFrame.NORMAL);
+      setExtendedState(Frame.NORMAL);
+      setSize(GameSetting.WIDTH, GameSetting.HEIGHT);
       GameSetting.SCALE = 1;
-      updateScreenSize();
     }
+    screenManager.updateScreenSize();
     setLocationRelativeTo(null);
     pack();
     setVisible(true);

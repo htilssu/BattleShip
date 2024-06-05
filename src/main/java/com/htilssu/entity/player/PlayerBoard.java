@@ -45,11 +45,16 @@ public class PlayerBoard extends Collision implements Renderable {
 
   /** Cập nhật kích thước của bảng người chơi */
   public void update() {
-    cellSize = (int) Math.ceil(GameSetting.TILE_SIZE * GameSetting.SCALE + 16);
-    setSize(cellSize * size, cellSize * size);
+    cellSize = getHeight() / size;
     for (Ship ship : ships) {
       ship.update();
     }
+  }
+
+  @Override
+  public void setSize(int width, int height) {
+    //noinspection SuspiciousNameCombination
+    super.setSize(height, height);
   }
 
   @Override

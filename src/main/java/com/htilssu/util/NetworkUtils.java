@@ -31,7 +31,10 @@ public class NetworkUtils {
             InetAddress subnetMask = getSubnetMask(address.getNetworkPrefixLength());
             if (subnetMask != null) {
               inetAddresses.addAll(
-                  checkPort(getDefaultGateway(inetAddress, subnetMask), subnetMask, port));
+                  checkPort(
+                      Objects.requireNonNull(getDefaultGateway(inetAddress, subnetMask)),
+                      subnetMask,
+                      port));
             }
           }
         }
@@ -91,10 +94,9 @@ public class NetworkUtils {
                 socket.connect(
                     new InetSocketAddress(InetAddress.getByAddress(currentAddress), port),
                     SOCKET_TIMEOUT);
-                socket.close();
                 inetAddresses.add(socket.getInetAddress());
               } catch (IOException e) {
-                System.out.println(e.getMessage());
+                // Ignore
               }
             });
 
@@ -123,8 +125,10 @@ public class NetworkUtils {
         }
       } catch (InterruptedException e) {
         executorService.shutdownNow();
+        Thread.currentThread().interrupt();
       }
     } catch (Exception ignored) {
+      // Ignore
     }
 
     return new ArrayList<>(inetAddresses);

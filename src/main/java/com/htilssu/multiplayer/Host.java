@@ -1,6 +1,8 @@
 package com.htilssu.multiplayer;
 
 import com.htilssu.BattleShip;
+import com.htilssu.entity.game.GamePlay;
+import com.htilssu.event.game.GameStartEvent;
 import com.htilssu.setting.GameSetting;
 import com.htilssu.util.GameLogger;
 import java.io.*;
@@ -13,6 +15,8 @@ public class Host extends MultiHandler implements Runnable {
   Socket socket;
   Thread hostListenThread = new Thread(this);
   boolean canHost = true;
+  int ready = 0;
+
   public Host(BattleShip battleShip) {
     super(battleShip);
     instance = this;
@@ -41,7 +45,7 @@ public class Host extends MultiHandler implements Runnable {
     while (canHost) {
       try {
         socket = serverSocket.accept();
-        GameLogger.log(String.valueOf(socket.getInetAddress()));
+        GameLogger.log("Ket noi voi client: " + socket.getInetAddress());
       } catch (IOException e) {
         GameLogger.error("Có lỗi khi chấp nhận kết nối từ client");
       }
@@ -52,13 +56,37 @@ public class Host extends MultiHandler implements Runnable {
     }
   }
 
-  public void send(String message) {
+  public void send(Object... obj) {
     try {
       OutputStream os = socket.getOutputStream();
       PrintWriter pw = new PrintWriter(os, true);
-      pw.println(message);
+      StringBuilder sb = new StringBuilder();
+      for (Object o : obj) {
+        sb.append(o).append("|");
+      }
+      pw.println(sb);
     } catch (IOException e) {
       GameLogger.error("Có lỗi khi gửi dữ liệu tới client");
+    }
+  }
+
+  public void unReady() {
+    ready -= 1;
+    if (ready < 0) {
+      ready = 0;
+    }
+  }
+
+  public void ready() {
+    ready += 1;
+    if (ready > 2) {
+      ready = 2;
+    }
+
+    if (ready == 2) {
+      BattleShip battleShip = getBattleShip();
+      GamePlay gamePlay = battleShip.getGameManager().getCurrentGamePlay();
+      battleShip.getListenerManager().callEvent(new GameStartEvent(gamePlay, battleShip));
     }
   }
 

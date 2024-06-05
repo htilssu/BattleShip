@@ -11,6 +11,15 @@ import java.awt.image.BufferedImage;
 public class Sprite extends Collision implements Renderable {
   BufferedImage asset;
 
+  /**
+   * Khởi tạo {@code Sprite} với vị trí, kích thước và asset cho trước
+   *
+   * @param x vị trí x
+   * @param y vị trí y
+   * @param width kích thước chiều rộng
+   * @param height kích thước chiều cao
+   * @param asset asset
+   */
   public Sprite(int x, int y, int width, int height, BufferedImage asset) {
     location.x = x;
     location.y = y;
@@ -34,6 +43,11 @@ public class Sprite extends Collision implements Renderable {
     return asset;
   }
 
+  /**
+   * Set lại asset cho {@code Sprite} nhưng thay đổi kích thước theo kích thước của {@code asset}
+   *
+   * @param asset asset mới
+   */
   public void setAsset(BufferedImage asset) {
     this.asset = asset;
     setWidth(asset.getWidth());
@@ -43,5 +57,15 @@ public class Sprite extends Collision implements Renderable {
   @Override
   public void render(@NotNull Graphics g) {
     g.drawImage(asset, getX(), getY(), getWidth(), getHeight(), null);
+  }
+
+  /**
+   * Set lại asset cho {@code Sprite} nhưng giữ nguyên kích thước cũ và vị trí cũ
+   *
+   * @param asset asset mới
+   * @param o null
+   */
+  public void setAsset(BufferedImage asset, Object o) {
+    this.asset = asset;
   }
 }
