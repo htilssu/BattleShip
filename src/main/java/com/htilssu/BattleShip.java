@@ -10,6 +10,8 @@ import com.htilssu.multiplayer.Client;
 import com.htilssu.multiplayer.Host;
 import com.htilssu.setting.GameSetting;
 import com.htilssu.util.AssetUtils;
+
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
@@ -17,225 +19,263 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.net.InetAddress;
 import java.util.List;
-import javax.swing.*;
 
 public class BattleShip extends JFrame implements Runnable, KeyListener, ComponentListener {
 
-  /** Luồng render và update game */
-  private final Thread thread = new Thread(this);
 
-  /** Quản lý sự kiện */
-  private final ListenerManager listenerManager = new ListenerManager();
+    /**
+     * Luồng render và update game
+     */
+    private final Thread thread = new Thread(this);
 
-  /** Quản lý host */
-  private final Host host = new Host(this);
+    /**
+     * Quản lý sự kiện
+     */
+    private final ListenerManager listenerManager = new ListenerManager();
 
-  /** Số frame mỗi giây hiện tại */
-  int currentFPS = 0;
+    /**
+     * Quản lý host
+     */
+    private final Host host = new Host(this);
 
-  /** Quản lý các màn hình trong game */
-  ScreenManager screenManager = new ScreenManager(this);
+    /**
+     * Số frame mỗi giây hiện tại
+     */
+    int currentFPS = 0;
 
-  /** Quản lý game, chứa thông tin về người chơi, trạng thái game, ... */
-  GameManager gameManager = new GameManager(this);
+    /**
+     * Quản lý các màn hình trong game
+     */
+    ScreenManager screenManager = new ScreenManager(this);
 
-  /** Quản lý giao tiếp với server */
-  Client client = new Client(this);
+    /**
+     * Quản lý game, chứa thông tin về người chơi, trạng thái game, ...
+     */
+    GameManager gameManager = new GameManager(this);
 
-  /** Biến đánh dấu có đang chạy thread render hay không */
-  private boolean running;
+    /**
+     * Quản lý giao tiếp với server
+     */
+    Client client = new Client(this);
 
-  private boolean isFullScreen = false;
+    /**
+     * Biến đánh dấu có đang chạy thread render hay không
+     */
+    private boolean running;
 
-  private BattleShip() {
+    private boolean isFullScreen = false;
 
-    setUp();
+    private BattleShip() {
 
-    pack();
+        setUp();
 
-    // Đăng ký các listener
-    registerListener();
-  }
 
-  public static void main(String[] args) {
-    BattleShip battleShip = new BattleShip();
-    battleShip.start();
-  }
-
-  public GameManager getGameManager() {
-    return gameManager;
-  }
-
-  public ListenerManager getListenerManager() {
-    return listenerManager;
-  }
-
-  /** Cài đặt các sự kiện cho frame */
-  private void setUp() {
-    setTitle("BattleShip");
-    setSize(GameSetting.WIDTH, GameSetting.HEIGHT);
-    setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-    setLocationRelativeTo(null);
-    screenManager.updateScreenSize();
-    add(screenManager.getCurrentScreen());
-    setIconImage(AssetUtils.loadAsset("/game_icon.png"));
-    addKeyListener(this);
-    setFocusable(true);
-    setResizable(false);
-    addComponentListener(this);
-    gameManager.createTestGamePlay();
-  }
-
-  /** Hàm cài đặt các sự kiện */
-  private void registerListener() {
-    listenerManager.registerListener(PlayerListener.class);
-    listenerManager.registerListener(GameStartListener.class);
-  }
-
-  /** Gọi hàm này để bắt đầu chạy app */
-  public void start() {
-    running = true;
-    thread.start();
-    host.start();
-    setVisible(true);
-
-    client.scanHost();
-    List<InetAddress> it = client.getHostList();
-    for (InetAddress inetAddress : it) {
-      client.connect(inetAddress, GameSetting.DEFAULT_PORT);
+        // Đăng ký các listener
+        registerListener();
     }
-  }
 
-  /** Gọi hàm này để dừng app */
-  public void stop() {
-    running = false;
-    host.stop();
-  }
-
-  @Override
-  public void run() {
-    long lastFrameTime = System.nanoTime();
-    long lastTickTime = System.nanoTime();
-    float nsPerTick = 1e9f / GameSetting.TPS;
-    float nsPerFrame = 1e9f / GameSetting.FPS;
-    int frame = 0;
-    long lastTime = System.currentTimeMillis();
-
-    while (running) {
-      long now = System.nanoTime();
-
-      if (now - lastTickTime > nsPerTick) {
-        updateData();
-        checkEvent();
-        lastTickTime = now;
-      }
-
-      if (now - lastFrameTime > nsPerFrame) {
-        render();
-        frame++;
-        lastFrameTime = now;
-      }
-      if (System.currentTimeMillis() - lastTime > 1000) {
-        currentFPS = frame;
-        frame = 0;
-        lastTime = System.currentTimeMillis();
-      }
+    public static void main(String[] args) {
+        BattleShip battleShip = new BattleShip();
+        battleShip.start();
     }
-  }
 
-  /** Hàm check event */
-  private void checkEvent() {}
-
-  /** Hàm render mỗi frame */
-  private void render() {
-    setTitle("BattleShip - FPS: " + currentFPS);
-    screenManager.getCurrentScreen().repaint();
-  }
-
-  /** Hàm update dữ liệu mỗi tick */
-  private void updateData() {
-    // empty
-  }
-
-  /**
-   * Thay đổi màn hình hiện tại
-   *
-   * @param screen màn hình cần chuyển đến
-   */
-  public void changeScreen(int screen) {
-    JPanel targetScreen = screenManager.getScreen(screen);
-    JPanel currentScreen = screenManager.getCurrentScreen();
-    if (targetScreen == currentScreen) return;
-    remove(currentScreen);
-    screenManager.setCurrentScreen(screen);
-    add(screenManager.getCurrentScreen());
-    screenManager.getCurrentScreen().requestFocusInWindow();
-    pack();
-    repaint();
-  }
-
-  @Override
-  public void keyTyped(KeyEvent e) {}
-
-  @Override
-  public void keyPressed(KeyEvent e) {
-    switch (e.getKeyCode()) {
-      case KeyEvent.VK_F11:
-        toggleFullScreen();
-        break;
-      case KeyEvent.VK_ESCAPE:
-        changeScreen(ScreenManager.MENU_SCREEN);
-        break;
-      case KeyEvent.VK_R:
-        GamePlay cP = gameManager.getCurrentGamePlay();
-        cP.changeDirection();
-        break;
-      default:
-        return;
+    public GameManager getGameManager() {
+        return gameManager;
     }
-  }
 
-  @Override
-  public void keyReleased(KeyEvent e) {}
-
-  public Client getClient() {
-    return client;
-  }
-
-  /** Hàm chuyển đổi giữa chế độ full screen và window */
-  public void toggleFullScreen() {
-    isFullScreen = !isFullScreen;
-    dispose();
-    setUndecorated(isFullScreen);
-
-    if (isFullScreen) {
-      setExtendedState(Frame.MAXIMIZED_BOTH);
-    } else {
-      setExtendedState(Frame.NORMAL);
-      setSize(GameSetting.WIDTH, GameSetting.HEIGHT);
-      GameSetting.SCALE = 1;
+    public ListenerManager getListenerManager() {
+        return listenerManager;
     }
-    screenManager.updateScreenSize();
-    setLocationRelativeTo(null);
-    pack();
-    setVisible(true);
-  }
 
-  public ScreenManager getScreenManager() {
-    return screenManager;
-  }
+    /**
+     * Cài đặt các sự kiện cho frame
+     */
+    private void setUp() {
+        setTitle("BattleShip");
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        setUndecorated(true);
+        setLocationRelativeTo(null);
+        screenManager.updateScreenSize();
+        add(screenManager.getCurrentScreen());
+        setIconImage(AssetUtils.loadAsset("/game_icon.png"));
+        addKeyListener(this);
+        setFocusable(true);
+        setResizable(false);
+        addComponentListener(this);
+        setExtendedState(Frame.MAXIMIZED_BOTH);
 
-  @Override
-  public void componentResized(ComponentEvent e) {
-    GameSetting.SCALE = getWidth() / (float) GameSetting.WIDTH;
-  }
+        gameManager.createTestGamePlay();
+    }
 
-  @Override
-  public void componentMoved(ComponentEvent e) {}
+    /**
+     * Hàm cài đặt các sự kiện
+     */
+    private void registerListener() {
+        listenerManager.registerListener(PlayerListener.class);
+        listenerManager.registerListener(GameStartListener.class);
+    }
 
-  @Override
-  public void componentShown(ComponentEvent e) {}
+    /**
+     * Gọi hàm này để bắt đầu chạy app
+     */
+    public void start() {
+        running = true;
+        thread.start();
+        host.start();
+        setVisible(true);
 
-  @Override
-  public void componentHidden(ComponentEvent e) {}
+        client.scanHost();
+        List<InetAddress> it = client.getHostList();
+        for (InetAddress inetAddress : it) {
+            client.connect(inetAddress, GameSetting.DEFAULT_PORT);
+        }
+    }
+
+    /**
+     * Gọi hàm này để dừng app
+     */
+    public void stop() {
+        running = false;
+        host.stop();
+    }
+
+    @Override
+    public void run() {
+        long lastFrameTime = System.nanoTime();
+        long lastTickTime = System.nanoTime();
+        float nsPerTick = 1e9f / GameSetting.TPS;
+        float nsPerFrame = 1e9f / GameSetting.FPS;
+        int frame = 0;
+        long lastTime = System.currentTimeMillis();
+
+        while (running) {
+            long now = System.nanoTime();
+
+            if (now - lastTickTime > nsPerTick) {
+                updateData();
+                checkEvent();
+                lastTickTime = now;
+            }
+
+            if (now - lastFrameTime > nsPerFrame) {
+                render();
+                frame++;
+                lastFrameTime = now;
+            }
+            if (System.currentTimeMillis() - lastTime > 1000) {
+                currentFPS = frame;
+                frame = 0;
+                lastTime = System.currentTimeMillis();
+            }
+        }
+    }
+
+    /**
+     * Hàm check event
+     */
+    private void checkEvent() {
+    }
+
+    /**
+     * Hàm render mỗi frame
+     */
+    private void render() {
+        setTitle("BattleShip - FPS: " + currentFPS);
+        screenManager.getCurrentScreen().repaint();
+    }
+
+    /**
+     * Hàm update dữ liệu mỗi tick
+     */
+    private void updateData() {
+        // empty
+    }
+
+    /**
+     * Thay đổi màn hình hiện tại
+     *
+     * @param screen màn hình cần chuyển đến
+     */
+    public void changeScreen(int screen) {
+        JPanel targetScreen = screenManager.getScreen(screen);
+        JPanel currentScreen = screenManager.getCurrentScreen();
+        if (targetScreen == currentScreen) return;
+        remove(currentScreen);
+        screenManager.setCurrentScreen(screen);
+        add(screenManager.getCurrentScreen());
+        screenManager.getCurrentScreen().requestFocusInWindow();
+        pack();
+        repaint();
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+        switch (e.getKeyCode()) {
+            case KeyEvent.VK_F11:
+//                toggleFullScreen();
+                break;
+            case KeyEvent.VK_ESCAPE:
+                changeScreen(ScreenManager.MENU_SCREEN);
+                break;
+            case KeyEvent.VK_R:
+                GamePlay cP = gameManager.getCurrentGamePlay();
+                cP.changeDirection();
+                break;
+            default:
+        }
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+    }
+
+    public Client getClient() {
+        return client;
+    }
+
+    /**
+     * Hàm chuyển đổi giữa chế độ full screen và window
+     */
+    public void toggleFullScreen() {
+        isFullScreen = !isFullScreen;
+        dispose();
+        setUndecorated(isFullScreen);
+
+        if (isFullScreen) {
+            setExtendedState(Frame.MAXIMIZED_BOTH);
+        } else {
+            setExtendedState(Frame.NORMAL);
+            setSize(GameSetting.WIDTH, GameSetting.HEIGHT);
+            GameSetting.SCALE = 1;
+        }
+        screenManager.updateScreenSize();
+        setLocationRelativeTo(null);
+        pack();
+        setVisible(true);
+    }
+
+    public ScreenManager getScreenManager() {
+        return screenManager;
+    }
+
+    @Override
+    public void componentResized(ComponentEvent e) {
+        GameSetting.SCALE = getWidth() / (float) GameSetting.WIDTH;
+    }
+
+    @Override
+    public void componentMoved(ComponentEvent e) {
+    }
+
+    @Override
+    public void componentShown(ComponentEvent e) {
+    }
+
+    @Override
+    public void componentHidden(ComponentEvent e) {
+    }
 }

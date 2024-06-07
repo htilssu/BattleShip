@@ -1,4 +1,4 @@
-package com.htilssu.component;
+package com.htilssu.ui.component;
 
 import com.htilssu.util.AssetUtils;
 
@@ -8,11 +8,11 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 
 public class CustomSliderUI extends BasicSliderUI {
-    private BufferedImage thumbImage;
-    private BufferedImage trackImage;
     private static final int THUMB_WIDTH = 8; // Chiều rộng của thumb
     private static final int THUMB_HEIGHT = 16; // Chiều cao của thumb
     private static final int TRACK_HEIGHT = 12; // Chiều cao của track
+    private BufferedImage thumbImage;
+    private BufferedImage trackImage;
 
     public CustomSliderUI(JSlider b) {
         super(b);

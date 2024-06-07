@@ -11,8 +11,16 @@ import java.io.IOException
 import java.io.InputStreamReader
 import java.net.Socket
 
-open class MultiHandler(var battleShip: BattleShip) {
+open class MultiHandler {
+    lateinit var battleShip: BattleShip
 
+    constructor(battleShip: BattleShip) {
+        this.battleShip = battleShip
+    }
+
+    constructor() {
+        //empty
+    }
 
     companion object {
         const val PING = -1;

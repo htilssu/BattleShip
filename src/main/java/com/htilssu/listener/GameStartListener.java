@@ -7,7 +7,6 @@ import com.htilssu.manager.ScreenManager;
 public class GameStartListener implements Listener {
     @EventHandler
     public void onGameStart(GameStartEvent e) {
-        e.getBattleShip().changeScreen(ScreenManager.GAME_SCREEN);
         e.getBattleShip().getGameManager().createNewGamePlay();
     }
 }
