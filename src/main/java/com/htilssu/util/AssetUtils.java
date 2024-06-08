@@ -24,9 +24,10 @@ public class AssetUtils {
     public static final int ASSET_SHIP_5 = 7;
     public static final int ASSET_HOST_LIST_TEXT = 8;
     public static final int ASSET_READY_BUTTON = 9;
-    public static final Integer ASSET_BACK_SEA = 10;
-    public static final Integer ASSET_BACK_SEA_2 = 11;
-    public static final Integer ASSET_UNREADY_BUTTON = 12;
+    public static final int ASSET_BACK_SEA = 10;
+    public static final int ASSET_BACK_SEA_2 = 11;
+    public static final int ASSET_UNREADY_BUTTON = 12;
+    public static final int ASSET_REFRESH_BUTTON = 13;
 
     static Map<Integer, BufferedImage> assetMap = new HashMap<>();
 
@@ -50,6 +51,7 @@ public class AssetUtils {
         if (buttonAsset != null) {
             assetMap.put(ASSET_READY_BUTTON, buttonAsset.getSubimage(0, 0, 64 * 6, 64 * 2));
             assetMap.put(ASSET_UNREADY_BUTTON, buttonAsset.getSubimage(64 * 6, 0, 64 * 6, 64 * 2));
+            assetMap.put(ASSET_REFRESH_BUTTON, buttonAsset.getSubimage(64 * 12, 0, 64 * 2, 64 * 2));
         }
 
         assetMap.put(ASSET_BACK_SEA, blur(loadAsset("/sea.png")));

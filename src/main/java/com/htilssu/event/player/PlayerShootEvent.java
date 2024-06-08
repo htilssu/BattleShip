@@ -2,6 +2,9 @@ package com.htilssu.event.player;
 
 import com.htilssu.entity.component.Position;
 import com.htilssu.entity.player.Player;
+import com.htilssu.entity.player.PlayerBoard;
+import com.htilssu.manager.GameManager;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Sự kiện người chơi thực hiện hành động bắn tàu đối phương, chứa thông tin của người chơi ({@link
@@ -9,37 +12,28 @@ import com.htilssu.entity.player.Player;
  */
 public class PlayerShootEvent extends PlayerEvent {
 
-  boolean isEnemy;
-  Position position;
-  Player targetPlayer;
+    Position position;
+    PlayerBoard board;
 
-  /**
-   * Khởi tạo sự kiện bắn của người chơi
-   *
-   * @param player Người chơi thực hiện hành động bắn
-   * @param position Vị trí bắn
-   */
-  public PlayerShootEvent(Player playerShoot, Player targetPlayer, Position position) {
-    super(playerShoot);
-    this.targetPlayer = targetPlayer;
-    this.position = position;
-  }
+    /**
+     * Khởi tạo sự kiện bắn của người chơi
+     *
+     * @param player   Người chơi thực hiện hành động bắn
+     * @param position Vị trí bắn
+     */
+    public PlayerShootEvent(Player player, PlayerBoard playerBoard, Position position) {
+        super(player);
+        this.position = position;
+        board = playerBoard;
 
-  public PlayerShootEvent(
-      Player playerShoot, Player targetPlayer, Position position, boolean isEnemy) {
-    this(playerShoot, targetPlayer, position);
-    this.isEnemy = isEnemy;
-  }
+    }
 
-  public boolean isEnemy() {
-    return isEnemy;
-  }
 
-  public Player getTargetPlayer() {
-    return targetPlayer;
-  }
+    public PlayerBoard getBoard() {
+        return board;
+    }
 
-  public Position getPosition() {
-    return position;
-  }
+    public Position getPosition() {
+        return position;
+    }
 }

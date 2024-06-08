@@ -5,6 +5,7 @@ import com.htilssu.entity.game.GamePlay;
 import com.htilssu.event.game.GameStartEvent;
 import com.htilssu.setting.GameSetting;
 import com.htilssu.util.GameLogger;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -87,7 +88,6 @@ public class Host extends MultiHandler implements Runnable {
         }
 
         if (ready == 2) {
-            BattleShip battleShip = getBattleShip();
             GamePlay gamePlay = battleShip.getGameManager().getCurrentGamePlay();
             battleShip.getListenerManager().callEvent(new GameStartEvent(gamePlay, battleShip));
         }
@@ -96,4 +96,5 @@ public class Host extends MultiHandler implements Runnable {
     public void stop() {
         canHost = false;
     }
+
 }

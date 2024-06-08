@@ -99,7 +99,7 @@ public class MenuScreen extends JPanel {
     private void createButtons() {
 
         addButton("/play2.png", "PLAY");
-        addButton("/Multiplayer.png", "Multiplayer");
+        addButton("/MultiPlayer.png", "Multiplayer");
         addButton("/continue.png", "Continue");
         addButton("/setting2.png", "SETTING");
         addButton("/exit.png", "QUIT");
@@ -116,8 +116,11 @@ public class MenuScreen extends JPanel {
 
     private void handleButtonClick(String actionCommand) {
         switch (actionCommand) {
-            case "PLAY", "Multiplayer":
+            case "PLAY":
                 window.changeScreen(ScreenManager.PICK_SCREEN);
+                break;
+            case "Multiplayer":
+                window.changeScreen(ScreenManager.NETWORK_SCREEN);
                 break;
             case "SETTING":
                 window.changeScreen(ScreenManager.SETTING_SCREEN);

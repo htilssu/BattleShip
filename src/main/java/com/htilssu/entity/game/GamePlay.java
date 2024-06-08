@@ -6,24 +6,21 @@ import com.htilssu.entity.component.Position;
 import com.htilssu.entity.player.Player;
 import com.htilssu.entity.player.PlayerBoard;
 import com.htilssu.event.game.GameAction;
-import com.htilssu.event.player.PlayerShootEvent;
 import com.htilssu.manager.GameManager;
 import com.htilssu.multiplayer.Client;
 import com.htilssu.render.Renderable;
 import com.htilssu.setting.GameSetting;
 import com.htilssu.util.AssetUtils;
 import com.htilssu.util.GameLogger;
+import org.jetbrains.annotations.NotNull;
 
+import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
-import javax.swing.*;
-
-import kotlin.Pair;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * Mỗi {@link GamePlay} là 1 trận đấu giữa 2 người chơi
@@ -33,11 +30,10 @@ public class GamePlay implements Renderable {
     public static final int PLAY_MODE = 1;
     private static final int MARGIN = 30;
     boolean isReady = false;
-    int gameMode = WAITING_MODE;
+    int gameMode = PLAY_MODE;
     Map<Integer, Integer> shipInBoard = new HashMap<>();
     List<Sprite> sprites = new ArrayList<>();
     List<Player> playerList;
-    Map<Player, Pair<PlayerBoard, byte[][]>> playerData = new HashMap<>();
     int turn;
     int size;
     int direction = Ship.HORIZONTAL;
@@ -62,9 +58,8 @@ public class GamePlay implements Renderable {
         this.playerList = playerList;
         this.turn = turn;
         this.size = size;
-        PlayerBoard playerBoard = new PlayerBoard(size);
+        PlayerBoard playerBoard = new PlayerBoard(size, GameManager.gamePlayer);
         playerBoard.setGamePlay(this);
-        playerData.put(GameManager.gamePlayer, new Pair<>(playerBoard, new byte[getBoardSize()][getBoardSize()]));
         initBoard();
     }
 
@@ -83,7 +78,7 @@ public class GamePlay implements Renderable {
         this.direction = direction;
 
         if (setUpSprite != null) {
-            PlayerBoard playerBoard = playerData.get(GameManager.gamePlayer).getFirst();
+            PlayerBoard playerBoard = GameManager.gamePlayer.getBoard();
             if (direction == Ship.VERTICAL) {
                 setUpSprite.setAsset(AssetUtils.rotate90(setUpSprite.getAsset()));
             } else {
@@ -104,13 +99,13 @@ public class GamePlay implements Renderable {
     }
 
     public void renderShootBoard(Graphics g) {
-        playerData.get(getCurrentPlayer()).getFirst().render(g);
+        getCurrentPlayer().getBoard().render(g);
     }
 
     private void initBoard() {
         int boardSize = getBoardSize();
         for (Player player : playerList) {
-            player.setPlayerBoard(new PlayerBoard(boardSize));
+            player.setPlayerBoard(new PlayerBoard(boardSize, player));
             player.setShot(new byte[boardSize][boardSize]);
             player.setGamePlay(this);
         }
@@ -123,7 +118,7 @@ public class GamePlay implements Renderable {
     public void update() {
 
         if (gameMode == WAITING_MODE) {
-            PlayerBoard playerBoard = playerData.get(GameManager.gamePlayer).getFirst();
+            PlayerBoard playerBoard = GameManager.gamePlayer.getBoard();
             int shipSpriteMargin = MARGIN * Math.round(GameSetting.SCALE);
 
             JPanel currentScreen = gameManager.getBattleShip().getScreenManager().getCurrentScreen();
@@ -154,9 +149,7 @@ public class GamePlay implements Renderable {
             }
         }
 
-        playerData.forEach((player, playerBoardPair) -> {
-            playerBoardPair.getFirst().update();
-        });
+        playerList.forEach(player -> player.getBoard().update());
     }
 
     /**
@@ -184,12 +177,6 @@ public class GamePlay implements Renderable {
         turn = (turn + 1) % playerList.size();
     }
 
-    /**
-     * Lấy vị trí của hàng và cột trên bảng mà chuột của người chơi hiện tại đang trỏ tới ví dụ: nếu
-     * chuột đang trỏ tới hàng 2 cột 3 thì trả về (2, 3)
-     *
-     * @param position vị trí của chuột hiện tại
-     */
     public void handleClick(Point position) {
         switch (gameMode) {
             case PLAY_MODE -> {
@@ -201,10 +188,10 @@ public class GamePlay implements Renderable {
                 GameLogger.log("Player " + getCurrentPlayer().getName() + " shoot at " + pos);
 
                 // Call shot listener
-                getGameManager().getBattleShip().getListenerManager().callEvent(new PlayerShootEvent(getCurrentPlayer(), getOpponent(), pos, false));
+
             }
             case WAITING_MODE -> {
-                PlayerBoard playerBoard = playerData.get(GameManager.gamePlayer).getFirst();
+                PlayerBoard playerBoard = GameManager.gamePlayer.getBoard();
 
                 handleReadyButtonOnClick(position);
 
@@ -235,6 +222,11 @@ public class GamePlay implements Renderable {
         }
     }
 
+    /**
+     * Kiểm tra xem người chơi đã đặt hết tàu lên bảng chưa
+     *
+     * @return {@code true} nếu đã đặt hết tàu, ngược lại {@code false}
+     */
     private boolean outOfShip() {
         AtomicInteger count = new AtomicInteger();
 
@@ -299,7 +291,7 @@ public class GamePlay implements Renderable {
             case WAITING_MODE -> {
                 handleReadyButtonOnHover(point);
                 if (setUpSprite == null) return;
-                PlayerBoard playerBoard = playerData.get(GameManager.gamePlayer).getFirst();
+                PlayerBoard playerBoard = GameManager.gamePlayer.getBoard();
                 Position pos = playerBoard.getBoardRowCol(point);
                 Point posB = playerBoard.getLocation();
 
@@ -341,7 +333,7 @@ public class GamePlay implements Renderable {
 
     private void renderWaitingMode(Graphics g) {
 
-        PlayerBoard playerBoard = playerData.get(GameManager.gamePlayer).getFirst();
+        PlayerBoard playerBoard = GameManager.gamePlayer.getBoard();
 
         for (Sprite sprite : sprites) {
             sprite.render(g);
@@ -364,13 +356,13 @@ public class GamePlay implements Renderable {
     private void ready() {
         isReady = true;
         readyButton.setAsset(AssetUtils.getAsset(AssetUtils.ASSET_UNREADY_BUTTON), null);
-        Client.getInstance().sendData(GameAction.READY);
+        Client.getInstance().send(GameAction.READY);
     }
 
     private void unReady() {
         isReady = false;
         readyButton.setAsset(AssetUtils.getAsset(AssetUtils.ASSET_READY_BUTTON), null);
-        Client.getInstance().sendData(GameAction.UNREADY);
+        Client.getInstance().send(GameAction.UNREADY);
     }
 
     public void changeDirection() {

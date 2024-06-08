@@ -41,6 +41,9 @@ public class Sprite extends Collision implements Renderable {
 
     public Sprite(Sprite sprite) {
         this(sprite.getX(), sprite.getY(), sprite.getWidth(), sprite.getHeight(), sprite.asset);
+        this.isHover = sprite.isHover;
+        this.hoverHeight = sprite.hoverHeight;
+        this.hoverWidth = sprite.hoverWidth;
     }
 
     @Override
@@ -66,7 +69,7 @@ public class Sprite extends Collision implements Renderable {
     }
 
     @Override
-    public void render(@NotNull Graphics g) {
+    public void render(Graphics g) {
         if (isHover) {
             g.drawImage(asset, getX() + hoverOffset / 2, getY() + hoverOffset / 2, hoverWidth, hoverHeight, null);
         } else {
@@ -87,4 +90,5 @@ public class Sprite extends Collision implements Renderable {
     public void handleHover(int x, int y) {
         isHover = isInside(x, y);
     }
+
 }

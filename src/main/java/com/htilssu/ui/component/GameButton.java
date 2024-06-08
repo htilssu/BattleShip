@@ -8,18 +8,22 @@ import javax.swing.*;
 
 public class GameButton extends JButton {
 
-  Sprite sprite;
+    Sprite sprite;
 
-  public GameButton(Sprite sprite) throws HeadlessException {
-    this.sprite = sprite;
-    this.sprite.setLocation(this.getLocation());
-    setBorder(null);
-    setBackground(Color.BLACK);
-  }
+    public GameButton(Sprite sprite) throws HeadlessException {
+        this.sprite = sprite;
+        this.sprite.setDimension(this.getSize());
+        this.sprite.setLocation(this.getLocation());
+        setBorderPainted(false);
+        setContentAreaFilled(false);
+        setFocusPainted(false);
+        setOpaque(false);
+    }
 
-  @Override
-  protected void paintComponent(Graphics g) {
-    Graphics2D g2d = (Graphics2D) g;
-    sprite.render(g);
-  }
+    @Override
+    protected void paintComponent(Graphics g) {
+        sprite.render(g);
+    }
+
+
 }

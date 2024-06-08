@@ -34,6 +34,7 @@ public abstract class Collision {
         dimension.setSize(width, height);
     }
 
+
     public Point getLocation() {
         return location;
     }

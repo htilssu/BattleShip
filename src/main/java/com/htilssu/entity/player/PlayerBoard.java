@@ -6,16 +6,11 @@ import com.htilssu.entity.component.Position;
 import com.htilssu.entity.game.GamePlay;
 import com.htilssu.render.Collision;
 import com.htilssu.render.Renderable;
-import com.htilssu.setting.GameSetting;
 import com.htilssu.util.AssetUtils;
 
 import java.awt.*;
-import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import java.awt.image.ConvolveOp;
-import java.awt.image.Kernel;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.jetbrains.annotations.NotNull;
@@ -26,9 +21,12 @@ import org.jetbrains.annotations.NotNull;
  */
 public class PlayerBoard extends Collision implements Renderable {
 
+    public static final int SHOOT_MISS = 1;
+    public static final int SHOOT_HIT = 2;
     private final BufferedImage bg;
+    private final byte[][] shotBoard;
+    Player player;
     List<Ship> ships = new ArrayList<>();
-
     int size;
     int cellSize;
     private GamePlay gamePlay;
@@ -38,10 +36,28 @@ public class PlayerBoard extends Collision implements Renderable {
      *
      * @param size Kích thước của bảng
      */
-    public PlayerBoard(int size) {
+    public PlayerBoard(int size, Player player) {
         this.size = size;
+        shotBoard = new byte[size][size];
         update();
         this.bg = AssetUtils.getAsset(AssetUtils.ASSET_BACK_SEA);
+    }
+
+    public void shoot(Position position, int status) {
+        if (canShoot(position)) {
+            shotBoard[position.x][position.y] = (byte) status;
+        }
+    }
+
+    /**
+     * Kiểm tra xem người chơi có thể bắn vào ô này không
+     * vị trí sẽ là hai số nguyên {@code x}, {@code y} đại diện cho hàng và cột
+     *
+     * @param position vị trí cần bắn
+     * @return {@code true} nếu có thể bắn, {@code false} nếu không thể bắn
+     */
+    public boolean canShoot(Position position) {
+        return canShoot(position.x, position.y);
     }
 
     public int getCellSize() {
@@ -72,39 +88,56 @@ public class PlayerBoard extends Collision implements Renderable {
         g2d.setColor(Color.white);
         Rectangle rect = new Rectangle(getX(), getY(), getWidth(), getHeight());
 
+        //vẽ ô
         for (int i = 0; i <= Math.pow(size, 2); i++) {
             if (i < Math.pow(size, 2)) {
-                rect.setLocation(getX() + i % size * cellSize,
-                        (getY() + cellSize * (i / size)));
+
+                //vẽ ô đã bắn
+                renderShot(g, i % size, i / size);
+
+                rect.setLocation(getX() + i % size * cellSize, (getY() + cellSize * (i / size)));
                 rect.setSize(cellSize, cellSize);
                 g2d.fill(rect);
-
-                
-                // TODO: Vẽ tàu khi ở chế độ MODE_SETUP
-
-                //        g2d.drawImage(
-                //            asset_shoot_miss,
-                //            position.x + i % size * cellSize,
-                //            position.y + cellSize * (i / size),
-                //            cellSize,
-                //            cellSize,
-                //            null);
             }
         }
 
 
         g2d.drawImage(bg, getX(), getY(), getWidth(), getHeight(), null);
 
+        //vẽ tàu
         for (Ship ship : ships) {
             ship.render(g);
         }
 
+        //vẽ đường kẻ
         g2d.setColor(Color.black);
         for (int i = 0; i < size; i++) {
 
             g2d.drawLine(getX(), getY() + i * cellSize, getX() + getWidth(), getY() + i * cellSize);
             g2d.drawLine(getX() + i * cellSize, getY(), getX() + i * cellSize, getY() + getHeight());
         }
+
+    }
+
+    private void renderShot(Graphics g, int row, int col) {
+        if (canShoot(row, col)) return;
+
+        int x = getX() + row * cellSize;
+        int y = getY() + col * cellSize;
+
+        switch (shotBoard[row][col]) {
+            case (byte) SHOOT_MISS:
+                g.drawImage(AssetUtils.getAsset(AssetUtils.ASSET_SHOOT_MISS), x, y, cellSize, cellSize, null);
+                break;
+            case (byte) SHOOT_HIT:
+                g.drawImage(AssetUtils.getAsset(AssetUtils.ASSET_SHOOT_HIT), x, y, cellSize, cellSize, null);
+                break;
+        }
+
+    }
+
+    public boolean canShoot(int row, int col) {
+        return shotBoard[row][col] != 0;
     }
 
     /**
@@ -135,11 +168,7 @@ public class PlayerBoard extends Collision implements Renderable {
     }
 
     public void addShip(Ship ship) {
-        if (canAddShip(
-                ship.getSprite().getX(),
-                ship.getSprite().getY(),
-                ship.getSprite().getWidth(),
-                ship.getSprite().getHeight())) {
+        if (canAddShip(ship.getSprite().getX(), ship.getSprite().getY(), ship.getSprite().getWidth(), ship.getSprite().getHeight())) {
             ships.add(ship);
             ship.setBoard(this);
         }
@@ -150,10 +179,7 @@ public class PlayerBoard extends Collision implements Renderable {
         int yMax = y + height;
         for (Ship s : ships) {
             Sprite sp = s.getSprite();
-            if (xMax > sp.getX()
-                    && sp.getX() + sp.getWidth() > x
-                    && yMax > sp.getY()
-                    && y < sp.getY() + sp.getHeight()) {
+            if (xMax > sp.getX() && sp.getX() + sp.getWidth() > x && yMax > sp.getY() && y < sp.getY() + sp.getHeight()) {
                 return false;
             }
         }
@@ -181,10 +207,37 @@ public class PlayerBoard extends Collision implements Renderable {
     }
 
     public boolean canAddShip(Ship ship) {
-        return canAddShip(
-                ship.getSprite().getX(),
-                ship.getSprite().getY(),
-                ship.getSprite().getWidth(),
-                ship.getSprite().getHeight());
+        return canAddShip(ship.getSprite().getX(), ship.getSprite().getY(), ship.getSprite().getWidth(), ship.getSprite().getHeight());
+    }
+
+    public byte shoot(Position position) {
+
+        for (Ship ship : ships) {
+            Position pos = ship.getPosition();
+            switch (ship.getDirection()) {
+                case Ship.HORIZONTAL -> {
+                    if (position.x == pos.x && position.y >= pos.y && position.y < pos.y + ship.getShipType()) {
+                        shoot(position, SHOOT_HIT);
+                        return SHOOT_HIT;
+                    } else {
+                        shoot(position, SHOOT_MISS);
+                        return SHOOT_MISS;
+
+                    }
+                }
+                case Ship.VERTICAL -> {
+                    if (position.y == pos.y && position.x >= pos.x && position.x < pos.x + ship.getShipType()) {
+                        shoot(position, SHOOT_HIT);
+                        return SHOOT_HIT;
+                    } else {
+                        shoot(position, SHOOT_MISS);
+                        return SHOOT_MISS;
+                    }
+                }
+            }
+        }
+        return SHOOT_MISS;
     }
 }
+
+

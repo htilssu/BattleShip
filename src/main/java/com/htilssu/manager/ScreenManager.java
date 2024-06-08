@@ -26,7 +26,7 @@ public final class ScreenManager {
     public static final int SETTING_SCREEN = 3;
     public static final int PICK_SCREEN = 4;
 
-    private static final int NETWORK_SCREEN = 5;
+    public static final int NETWORK_SCREEN = 5;
 
     private final Map<Integer, JPanel> screenMap = new HashMap<>();
     private final BattleShip battleShip;
