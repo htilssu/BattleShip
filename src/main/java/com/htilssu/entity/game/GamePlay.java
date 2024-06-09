@@ -8,6 +8,7 @@ import com.htilssu.entity.player.PlayerBoard;
 import com.htilssu.event.game.GameAction;
 import com.htilssu.manager.GameManager;
 import com.htilssu.multiplayer.Client;
+import com.htilssu.multiplayer.Host;
 import com.htilssu.render.Renderable;
 import com.htilssu.setting.GameSetting;
 import com.htilssu.util.AssetUtils;
@@ -22,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
+
 /**
  * Mỗi {@link GamePlay} là 1 trận đấu giữa 2 người chơi
  */
@@ -30,7 +32,7 @@ public class GamePlay implements Renderable {
     public static final int PLAY_MODE = 1;
     private static final int MARGIN = 30;
     boolean isReady = false;
-    int gameMode = PLAY_MODE;
+    int gameMode = WAITING_MODE;
     Map<Integer, Integer> shipInBoard = new HashMap<>();
     List<Sprite> sprites = new ArrayList<>();
     List<Player> playerList;
@@ -58,6 +60,7 @@ public class GamePlay implements Renderable {
         this.playerList = playerList;
         this.turn = turn;
         this.size = size;
+
         PlayerBoard playerBoard = new PlayerBoard(size, GameManager.gamePlayer);
         playerBoard.setGamePlay(this);
         initBoard();
@@ -74,8 +77,8 @@ public class GamePlay implements Renderable {
 
     public void setDirection(int direction) {
         if (this.direction == direction || gameMode != WAITING_MODE) return;
-
         this.direction = direction;
+
 
         if (setUpSprite != null) {
             PlayerBoard playerBoard = GameManager.gamePlayer.getBoard();
@@ -104,6 +107,7 @@ public class GamePlay implements Renderable {
 
     private void initBoard() {
         int boardSize = getBoardSize();
+
         for (Player player : playerList) {
             player.setPlayerBoard(new PlayerBoard(boardSize, player));
             player.setShot(new byte[boardSize][boardSize]);
@@ -119,9 +123,9 @@ public class GamePlay implements Renderable {
 
         if (gameMode == WAITING_MODE) {
             PlayerBoard playerBoard = GameManager.gamePlayer.getBoard();
-            int shipSpriteMargin = MARGIN * Math.round(GameSetting.SCALE);
-
             JPanel currentScreen = gameManager.getBattleShip().getScreenManager().getCurrentScreen();
+
+            int shipSpriteMargin = MARGIN * Math.round(GameSetting.SCALE);
             int yMidPosition = currentScreen.getHeight() / 2;
             int xMidPosition = currentScreen.getWidth() / 2;
 
@@ -356,7 +360,11 @@ public class GamePlay implements Renderable {
     private void ready() {
         isReady = true;
         readyButton.setAsset(AssetUtils.getAsset(AssetUtils.ASSET_UNREADY_BUTTON), null);
-        Client.getInstance().send(GameAction.READY);
+        if (Host.getInstance().isHost()) {
+            Host.getInstance().ready();
+        } else {
+            Client.getInstance().send(GameAction.READY);
+        }
     }
 
     private void unReady() {

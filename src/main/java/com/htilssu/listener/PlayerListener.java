@@ -21,11 +21,6 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e, Object object) {
         Player player = e.getPlayer();
-        if ((object instanceof GameManager gameManager)) {
-            gameManager.addPlayer(player);
-            gameManager.setMultiPlayer(true);
-            gameManager.createNewGamePlay();
-        }
 
     }
 }

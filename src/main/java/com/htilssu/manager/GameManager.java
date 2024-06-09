@@ -38,12 +38,12 @@ public final class GameManager {
         }
     }
 
-    public void createNewGamePlay() {
+    public synchronized void createNewGamePlay() {
         if (players.isEmpty()) {
             return;
         }
 
-        GamePlay newGamePlay = new GamePlay(players, turn, DifficultyManager.difficulty, multiPlayer);
+        GamePlay newGamePlay = new GamePlay(players, turn, DifficultyManager.getGameBoardSize(DifficultyManager.difficulty), multiPlayer);
         newGamePlay.setGameManager(this);
 
         initPlayerList();
@@ -68,6 +68,7 @@ public final class GameManager {
         List<Player> testPlayers = new ArrayList<>();
         testPlayers.add(GameManager.gamePlayer);
         testPlayers.add(new Player());
+
         setCurrentGamePlay(
                 new GamePlay(
                         testPlayers, 0, DifficultyManager.getGameBoardSize(DifficultyManager.difficulty)));

@@ -7,7 +7,9 @@ import com.htilssu.entity.player.Player;
 import com.htilssu.event.game.GameAction;
 import com.htilssu.event.player.PlayerJoinEvent;
 import com.htilssu.event.player.PlayerShootEvent;
+import com.htilssu.manager.DifficultyManager;
 import com.htilssu.manager.GameManager;
+import com.htilssu.manager.ScreenManager;
 import com.htilssu.util.GameLogger;
 
 import java.io.BufferedReader;
@@ -21,6 +23,7 @@ public abstract class MultiHandler {
     public static final int PING = -1;
     public static final int PONG = -2;
     protected BattleShip battleShip;
+    boolean isHost = false;
 
     public MultiHandler(BattleShip battleShip) {
         this.battleShip = battleShip;
@@ -28,6 +31,14 @@ public abstract class MultiHandler {
 
     public MultiHandler() {
         //empty
+    }
+
+    public boolean isHost() {
+        return isHost;
+    }
+
+    public void setHost(boolean host) {
+        isHost = host;
     }
 
     private void handle(String message) {
@@ -49,9 +60,21 @@ public abstract class MultiHandler {
                     String playerId = messageParts.get(1);
                     String playerName = messageParts.get(2);
                     Player player = new Player(playerId, playerName);
-                    battleShip.getListenerManager().callEvent(new PlayerJoinEvent(player), battleShip.getGameManager());
+
+
+                    if (messageParts.size() == 4) {
+                        try {
+                            DifficultyManager.difficulty = Integer.parseInt(messageParts.get(3));
+                        } catch (NumberFormatException e) {
+                            GameLogger.error("Invalid difficulty: " + messageParts.get(3));
+                        }
+                    }
+                    battleShip.getGameManager().addPlayer(player);
+                    battleShip.getGameManager().createNewGamePlay();
+                    battleShip.getListenerManager().callEvent(new PlayerJoinEvent(player, battleShip.getGameManager().getCurrentGamePlay()), battleShip.getGameManager());
+                    battleShip.changeScreen(ScreenManager.GAME_SCREEN);
                     if (this instanceof Host) {
-                        this.send(GameAction.JOIN, GameManager.gamePlayer.getId(), GameManager.gamePlayer.getName());
+                        this.send(GameAction.JOIN, GameManager.gamePlayer.getId(), GameManager.gamePlayer.getName(), DifficultyManager.difficulty);
                     }
                     break;
 
@@ -77,9 +100,14 @@ public abstract class MultiHandler {
 
                 case PING:
                     if (this instanceof Host) {
-                        ((Host) this).send(Integer.toString(PONG));
+                        this.send(Integer.toString(PONG));
                     }
                     break;
+
+                case GameAction.START_GAME:
+                    if (this instanceof Client) {
+                        battleShip.getGameManager().getCurrentGamePlay().setGameMode(GamePlay.PLAY_MODE);
+                    }
 
                 case GameAction.READY:
                     if (this instanceof Host) {

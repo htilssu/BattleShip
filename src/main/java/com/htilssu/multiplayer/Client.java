@@ -72,7 +72,7 @@ public class Client extends MultiHandler implements Runnable {
         }
     }
 
-    public void scanHost() {
+    public synchronized void scanHost() {
         hostList = NetworkUtils.find(GameSetting.DEFAULT_PORT);
     }
 
@@ -85,5 +85,18 @@ public class Client extends MultiHandler implements Runnable {
         while (socket.isConnected()) {
             readData(socket);
         }
+    }
+
+    public boolean isConnected() {
+        return socket != null;
+    }
+
+    public void disconnect() {
+        try {
+            socket.close();
+        } catch (IOException e) {
+            GameLogger.log("Không thể ngắt kết nối");
+        }
+        socket = null;
     }
 }

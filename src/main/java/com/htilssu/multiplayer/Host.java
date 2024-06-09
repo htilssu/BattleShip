@@ -2,6 +2,7 @@ package com.htilssu.multiplayer;
 
 import com.htilssu.BattleShip;
 import com.htilssu.entity.game.GamePlay;
+import com.htilssu.event.game.GameAction;
 import com.htilssu.event.game.GameStartEvent;
 import com.htilssu.setting.GameSetting;
 import com.htilssu.util.GameLogger;
@@ -49,7 +50,7 @@ public class Host extends MultiHandler implements Runnable {
         while (canHost) {
             try {
                 socket = serverSocket.accept();
-                GameLogger.log("Ket noi voi client: " + socket.getInetAddress());
+                setHost(true);
             } catch (IOException e) {
                 GameLogger.error("Có lỗi khi chấp nhận kết nối từ client");
             }
@@ -57,6 +58,7 @@ public class Host extends MultiHandler implements Runnable {
             if (socket != null) {
                 readData(socket);
             }
+            setHost(false);
         }
     }
 
@@ -90,6 +92,8 @@ public class Host extends MultiHandler implements Runnable {
         if (ready == 2) {
             GamePlay gamePlay = battleShip.getGameManager().getCurrentGamePlay();
             battleShip.getListenerManager().callEvent(new GameStartEvent(gamePlay, battleShip));
+            gamePlay.setGameMode(GamePlay.PLAY_MODE);
+            send(GameAction.START_GAME);
         }
     }
 

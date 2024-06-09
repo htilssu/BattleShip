@@ -46,6 +46,12 @@ public class Sprite extends Collision implements Renderable {
         this.hoverWidth = sprite.hoverWidth;
     }
 
+    public Sprite(int i, int i1, BufferedImage bufferedImage) {
+        setLocation(i, i1);
+        setSize(bufferedImage.getWidth(), bufferedImage.getHeight());
+        this.asset = bufferedImage;
+    }
+
     @Override
     public void setSize(int width, int height) {
         super.setSize(width, height);

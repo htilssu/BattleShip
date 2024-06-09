@@ -17,8 +17,6 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.net.InetAddress;
-import java.util.List;
 
 public class BattleShip extends JFrame implements Runnable, KeyListener, ComponentListener {
 
@@ -95,7 +93,6 @@ public class BattleShip extends JFrame implements Runnable, KeyListener, Compone
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setUndecorated(true);
         setLocationRelativeTo(null);
-        screenManager.updateScreenSize();
         add(screenManager.getCurrentScreen());
         setIconImage(AssetUtils.loadAsset("/game_icon.png"));
         addKeyListener(this);
@@ -104,6 +101,7 @@ public class BattleShip extends JFrame implements Runnable, KeyListener, Compone
         addComponentListener(this);
         setExtendedState(Frame.MAXIMIZED_BOTH);
 
+        screenManager.updateScreenSize();
         gameManager.createTestGamePlay();
     }
 
@@ -119,16 +117,11 @@ public class BattleShip extends JFrame implements Runnable, KeyListener, Compone
      * Gọi hàm này để bắt đầu chạy app
      */
     public void start() {
-        running = true;
-        thread.start();
-        host.start();
         setVisible(true);
 
-        client.scanHost();
-        List<InetAddress> it = client.getHostList();
-        for (InetAddress inetAddress : it) {
-            client.connect(inetAddress, GameSetting.DEFAULT_PORT);
-        }
+        running = true;
+        //        thread.start();
+        host.start();
     }
 
     /**
@@ -196,14 +189,16 @@ public class BattleShip extends JFrame implements Runnable, KeyListener, Compone
      *
      * @param screen màn hình cần chuyển đến
      */
-    public void changeScreen(int screen) {
+    public synchronized void changeScreen(int screen) {
         JPanel targetScreen = screenManager.getScreen(screen);
         JPanel currentScreen = screenManager.getCurrentScreen();
         if (targetScreen == currentScreen) return;
         remove(currentScreen);
+
         screenManager.setCurrentScreen(screen);
         add(screenManager.getCurrentScreen());
         screenManager.getCurrentScreen().requestFocusInWindow();
+
         pack();
         repaint();
     }
@@ -216,7 +211,7 @@ public class BattleShip extends JFrame implements Runnable, KeyListener, Compone
     public void keyPressed(KeyEvent e) {
         switch (e.getKeyCode()) {
             case KeyEvent.VK_F11:
-//                toggleFullScreen();
+                //                toggleFullScreen();
                 break;
             case KeyEvent.VK_ESCAPE:
                 changeScreen(ScreenManager.MENU_SCREEN);
@@ -252,6 +247,7 @@ public class BattleShip extends JFrame implements Runnable, KeyListener, Compone
             setSize(GameSetting.WIDTH, GameSetting.HEIGHT);
             GameSetting.SCALE = 1;
         }
+
         screenManager.updateScreenSize();
         setLocationRelativeTo(null);
         pack();

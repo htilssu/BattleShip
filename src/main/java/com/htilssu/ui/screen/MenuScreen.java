@@ -32,7 +32,6 @@ public class MenuScreen extends JPanel {
         setLayout(null); // We will use absolute positioning
         loadBackgroundImage();
         loadMenu();
-        setPreferredSize(new Dimension(GameSetting.WIDTH, GameSetting.HEIGHT));
         buttons = new ArrayList<>();
         createButtons();
         //  playBackgroundMusic();

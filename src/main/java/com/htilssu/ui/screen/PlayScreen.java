@@ -43,6 +43,8 @@ public class PlayScreen extends JPanel
 
         // handle click on gameBoard (shoot)
         window.getGameManager().getCurrentGamePlay().handleClick(position);
+
+        repaint();
     }
 
     @Override
@@ -94,6 +96,7 @@ public class PlayScreen extends JPanel
     public void mouseMoved(MouseEvent e) {
         Point pos = new Point(e.getX(), e.getY());
         window.getGameManager().getCurrentGamePlay().handleMouseMoved(pos);
+        repaint();
     }
 
 }
