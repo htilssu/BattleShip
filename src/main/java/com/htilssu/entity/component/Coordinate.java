@@ -1,44 +1,44 @@
 package com.htilssu.entity.component;
 
-/*
- * Đối tượng Coordinate chứa hai giá trị nguyên x và y, tương ứng với các tọa độ trên lưới.*/
 public class Coordinate {
   int x;
   int y;
 
-  // Toa do(x,y)
-  public Coordinate(int x, int y) {
-    this.x = x;
-    this.y = y;
+  public Coordinate(int x, int y){
+    this.x=x;
+    this.y=y;
   }
 
-  public int getX() {
+  public int getX(){
     return x;
   }
 
-  public int getY() {
+  public int getY(){
     return y;
   }
 
-  // Phương thức này so sánh tọa độ hiện tại với một đối tượng Coordinate khác.
-  public boolean compareCoord(Coordinate coordinate) {
-    if (coordinate.getX() == this.x && coordinate.getY() == this.y) {
+
+  //compare coordinate objects
+  public boolean compareCoord(Coordinate coordinate){
+    if(coordinate.getX() == this.x && coordinate.getY() == this.y){
       return true;
     }
     return false;
   }
 
+  public String toString(){
+    return "\nX=" + x + " and Y=" + y;
+  }
   @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-
-    Coordinate that = (Coordinate) o;
+  public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (obj == null || getClass() != obj.getClass()) return false;
+    Coordinate that = (Coordinate) obj;
     return x == that.x && y == that.y;
   }
 
-  // De tim bug
-  public String toString() {
-    return "\nX=" + x + " and Y=" + y;
+  @Override
+  public int hashCode() {
+    return 31 * x + y;
   }
 }

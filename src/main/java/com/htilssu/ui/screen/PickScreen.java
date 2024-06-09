@@ -1,4 +1,4 @@
-package com.htilssu.screen;
+package com.htilssu.ui.screen;
 
 import com.htilssu.BattleShip;
 import com.htilssu.manager.ScreenManager;
@@ -146,7 +146,7 @@ public class PickScreen extends JPanel {
     }
 
     private void transitionToGameScreen() {
-        window.changeScreen(ScreenManager.GAME_SCREEN);
+        window.changeScreen(ScreenManager.START2_PLAYER_SCREEN);
     }
 
     private void loadBackgroundImage() {
