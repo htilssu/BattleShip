@@ -3,9 +3,6 @@ package com.htilssu.multiplayer;
 import com.htilssu.BattleShip;
 import com.htilssu.setting.GameSetting;
 import com.htilssu.util.GameLogger;
-
-import org.jetbrains.annotations.NotNull;
-
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -16,10 +13,13 @@ public class Host extends MultiHandler implements Runnable {
   Socket socket;
   Thread hostListenThread = new Thread(this);
   boolean canHost = true;
-
   public Host(BattleShip battleShip) {
     super(battleShip);
     instance = this;
+  }
+
+  public static Host getInstance() {
+    return instance;
   }
 
   public void start() {

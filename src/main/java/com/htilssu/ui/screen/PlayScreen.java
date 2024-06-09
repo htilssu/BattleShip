@@ -5,11 +5,9 @@ import com.htilssu.entity.Ship;
 import com.htilssu.entity.game.GamePlay;
 import com.htilssu.setting.GameSetting;
 import com.htilssu.util.AssetUtils;
-import com.htilssu.util.GameLogger;
-
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import javax.swing.*;
 
 /** Màn hình chơi game */
 public class PlayScreen extends JPanel
@@ -47,16 +45,24 @@ public class PlayScreen extends JPanel
   }
 
   @Override
-  public void mousePressed(MouseEvent e) {}
+  public void mousePressed(MouseEvent e) {
+    // empty
+  }
 
   @Override
-  public void mouseReleased(MouseEvent e) {}
+  public void mouseReleased(MouseEvent e) {
+    // empty
+  }
 
   @Override
-  public void mouseEntered(MouseEvent e) {}
+  public void mouseEntered(MouseEvent e) {
+    // empty
+  }
 
   @Override
-  public void mouseExited(MouseEvent e) {}
+  public void mouseExited(MouseEvent e) {
+    // empty
+  }
 
   @Override
   public void componentResized(ComponentEvent e) {
@@ -64,16 +70,24 @@ public class PlayScreen extends JPanel
   }
 
   @Override
-  public void componentMoved(ComponentEvent e) {}
+  public void componentMoved(ComponentEvent e) {
+    // empty
+  }
 
   @Override
-  public void componentShown(ComponentEvent e) {}
+  public void componentShown(ComponentEvent e) {
+    // empty
+  }
 
   @Override
-  public void componentHidden(ComponentEvent e) {}
+  public void componentHidden(ComponentEvent e) {
+    // empty
+  }
 
   @Override
-  public void mouseDragged(MouseEvent e) {}
+  public void mouseDragged(MouseEvent e) {
+    // empty
+  }
 
   @Override
   public void mouseMoved(MouseEvent e) {
@@ -82,22 +96,24 @@ public class PlayScreen extends JPanel
   }
 
   @Override
-  public void keyTyped(KeyEvent e) {}
+  public void keyTyped(KeyEvent e) {
+    // empty
+  }
 
   @Override
-  public void keyPressed(KeyEvent e) {}
+  public void keyPressed(KeyEvent e) {
+    // empty
+  }
 
   @Override
   public void keyReleased(KeyEvent e) {
-    switch (e.getKeyCode()) {
-      case KeyEvent.VK_R -> {
-        GamePlay cP = window.getGameManager().getCurrentGamePlay();
-        if (cP.getGameMode() == GamePlay.WAITING_MODE) {
-          if (cP.getDirection() == Ship.HORIZONTAL) {
-            cP.setDirection(Ship.VERTICAL);
-          } else {
-            cP.setDirection(Ship.HORIZONTAL);
-          }
+    if (e.getKeyCode() == KeyEvent.VK_R) {
+      GamePlay cP = window.getGameManager().getCurrentGamePlay();
+      if (cP.getGameMode() == GamePlay.WAITING_MODE) {
+        if (cP.getDirection() == Ship.HORIZONTAL) {
+          cP.setDirection(Ship.VERTICAL);
+        } else {
+          cP.setDirection(Ship.HORIZONTAL);
         }
       }
     }

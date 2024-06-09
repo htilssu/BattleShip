@@ -44,8 +44,4 @@ public class Sprite extends Collision implements Renderable {
   public void render(@NotNull Graphics g) {
     g.drawImage(asset, getX(), getY(), getWidth(), getHeight(), null);
   }
-
-  public boolean isInside(Point point) {
-    return isInside(point.x, point.y);
-  }
 }

@@ -9,15 +9,15 @@ public class DifficultyManager {
       Map.of(
           NORMAL, 10,
           HARD, 15);
-  public static int DIFFICULTY = DifficultyManager.NORMAL;
+  public static int difficulty = DifficultyManager.NORMAL;
 
   /**
-   * Lấy kích thước bảng hiện tại của game dựa vào {@link #DIFFICULTY}
+   * Lấy kích thước bảng hiện tại của game dựa vào {@link #difficulty}
    *
    * @return kích thước bảng game
    */
   public static int getGameBoardSize() {
-    return difficultyMap.get(DIFFICULTY);
+    return difficultyMap.get(difficulty);
   }
 
   /**

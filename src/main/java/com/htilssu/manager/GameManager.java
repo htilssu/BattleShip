@@ -1,10 +1,8 @@
 package com.htilssu.manager;
 
 import com.htilssu.BattleShip;
-import com.htilssu.entity.Sprite;
 import com.htilssu.entity.game.GamePlay;
 import com.htilssu.entity.player.Player;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,12 +18,9 @@ public final class GameManager {
   int turn = 0;
   private boolean multiPlayer;
 
-  {
-    initPlayerList();
-  }
-
   public GameManager(BattleShip battleShip) {
     this.battleShip = battleShip;
+    initPlayerList();
   }
 
   public BattleShip getBattleShip() {
@@ -43,11 +38,11 @@ public final class GameManager {
   }
 
   public GamePlay createNewGamePlay() {
-    if (players.size() < MIN_PLAYER) {
+    if (players.isEmpty()) {
       return null;
     }
 
-    GamePlay newGamePlay = new GamePlay(players, turn, DifficultyManager.DIFFICULTY, multiPlayer);
+    GamePlay newGamePlay = new GamePlay(players, turn, DifficultyManager.difficulty, multiPlayer);
     newGamePlay.setGameManager(this);
 
     initPlayerList();
@@ -75,7 +70,7 @@ public final class GameManager {
     testPlayers.add(new Player());
     setCurrentGamePlay(
         new GamePlay(
-            testPlayers, 0, DifficultyManager.getGameBoardSize(DifficultyManager.DIFFICULTY)));
+            testPlayers, 0, DifficultyManager.getGameBoardSize(DifficultyManager.difficulty)));
   }
 
   public void setMultiPlayer(boolean multiPlayer) {

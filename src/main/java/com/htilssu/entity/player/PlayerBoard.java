@@ -9,7 +9,6 @@ import com.htilssu.render.Renderable;
 import com.htilssu.setting.GameSetting;
 import com.htilssu.util.AssetUtils;
 import java.awt.*;
-import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.awt.image.ConvolveOp;
 import java.awt.image.Kernel;
@@ -28,7 +27,6 @@ public class PlayerBoard extends Collision implements Renderable {
 
   int size;
   int cellSize;
-  Point position = new Point(64, 64);
   private GamePlay gamePlay;
 
   /**
@@ -65,8 +63,8 @@ public class PlayerBoard extends Collision implements Renderable {
       if (i < Math.pow(size, 2)) {
         g2d.fill(
             new Rectangle(
-                position.x + i % size * cellSize,
-                (position.y + cellSize * (i / size)),
+                getX() + i % size * cellSize,
+                (getY() + cellSize * (i / size)),
                 cellSize,
                 cellSize));
         // TODO: Vẽ tàu khi ở chế độ MODE_SETUP
@@ -99,25 +97,17 @@ public class PlayerBoard extends Collision implements Renderable {
     g2dd.dispose();
     opaBg = cOP.filter(opaBg, null);
 
-    g2d.drawImage(opaBg, position.x, position.y, (int) getWidth(), (int) getHeight(), null);
+    g2d.drawImage(opaBg, getX(), getY(), getWidth(), getHeight(), null);
 
     for (Ship ship : ships) {
       ship.render(g);
     }
 
-    for (int i = 0; i <= size; i++) {
+    for (int i = 0; i < size; i++) {
       g2d.setColor(Color.black);
 
-      g2d.drawLine(
-          position.x,
-          position.y + i * cellSize,
-          position.x + size * cellSize,
-          position.y + i * cellSize);
-      g2d.drawLine(
-          position.x + i * cellSize,
-          position.y,
-          position.x + i * cellSize,
-          position.y + size * cellSize);
+      g2d.drawLine(getX(), getY() + i * cellSize, getX() + getWidth(), getY() + i * cellSize);
+      g2d.drawLine(getX() + i * cellSize, getY(), getX() + i * cellSize, getY() + getHeight());
     }
   }
 
@@ -126,17 +116,13 @@ public class PlayerBoard extends Collision implements Renderable {
    *
    * @return vị trí của bảng
    */
-  public Point getPosition() {
-    return position;
-  }
-
   public Position getBoardRowCol(Point point) {
     return getBoardRowCol(point.x, point.y);
   }
 
   public Position getBoardRowCol(int x, int y) {
-    int row = (x - this.position.x) / cellSize;
-    int col = (y - this.position.y) / cellSize;
+    int row = (x - getX()) / cellSize;
+    int col = (y - getY()) / cellSize;
     if (row >= size) {
       row = size - 1;
     }

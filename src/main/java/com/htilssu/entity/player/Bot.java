@@ -2,8 +2,6 @@ package com.htilssu.entity.player;
 
 import com.htilssu.entity.component.Position;
 
-import java.util.Random;
-
 public class Bot extends Player {
 
   public static final int INTEL = 2;
@@ -28,7 +26,7 @@ public class Bot extends Player {
   private Position randomShoot() {
     int x = 0;
     int y = 0;
-    Random random = new Random();
+    x = (int) (Math.random() * getBoard().getCellSize());
     Position pos = new Position(x, y);
 
     /* while (canShoot(pos)) {

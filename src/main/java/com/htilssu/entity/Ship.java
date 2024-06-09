@@ -6,6 +6,8 @@ import com.htilssu.render.Collision;
 import com.htilssu.render.Renderable;
 import java.awt.*;
 import java.lang.reflect.Field;
+
+import com.htilssu.util.GameLogger;
 import org.jetbrains.annotations.NotNull;
 
 // Lớp Ship đại diện cho một con TÀU
@@ -37,7 +39,8 @@ public class Ship extends Collision implements Renderable {
     for (Field field : classField) {
       try {
         field.set(this, field.get(ship));
-      } catch (IllegalAccessException ignored) {
+      } catch (IllegalAccessException e) {
+        GameLogger.log(e.getMessage());
       }
     }
   }
@@ -97,8 +100,8 @@ public class Ship extends Collision implements Renderable {
   public void update() {
     float ratio = (float) sprite.getHeight() / sprite.getWidth();
     sprite.setLocation(
-        playerBoard.getPosition().x + playerBoard.getCellSize() * position.x,
-        playerBoard.getPosition().y + playerBoard.getCellSize() * position.y);
+        playerBoard.getX() + playerBoard.getCellSize() * position.x,
+        playerBoard.getY() + playerBoard.getCellSize() * position.y);
 
     if (ratio < 1 && ratio > 0) {
       ratio = 1 / ratio;
