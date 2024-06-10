@@ -1,9 +1,9 @@
 package com.htilssu.manager;
 
 import com.htilssu.BattleShip;
-import com.htilssu.screen.Start2Player;
+import com.htilssu.ui.screen.Start2Player;
 import com.htilssu.ui.screen.*;
-import com.htilssu.setting.GameSetting;
+
 import javax.swing.*;
 import java.awt.*;
 import java.util.HashMap;
@@ -13,41 +13,44 @@ import java.util.Map;
  * Lớp quản lý các màn hình trong game
  */
 public final class ScreenManager {
-  /** Màn hình bắt đầu - màn hình chọn thể loại, setting */
-  public static final int MENU_SCREEN = 1;
+    /**
+     * Màn hình bắt đầu - màn hình chọn thể loại, setting
+     */
+    public static final int MENU_SCREEN = 1;
 
-  /** Màn hình chơi game */
-  public static final int GAME_SCREEN = 2;
+    /**
+     * Màn hình chơi game
+     */
+    public static final int GAME_SCREEN = 2;
 
-  public static final int SETTING_SCREEN = 3;
-  public static final int PICK_SCREEN = 4;
+    public static final int SETTING_SCREEN = 3;
+    public static final int PICK_SCREEN = 4;
+    public static final int NETWORK_SCREEN = 5;
 
-  private static final int NETWORK_SCREEN = 5;
+    public static final int START2_PLAYER_SCREEN = 6;   ///Game Tuan
 
-  public static final int START2_PLAYER_SCREEN = 6;   ///Game Tuan
-
-  private final Map<Integer, JPanel> screenMap = new HashMap<>();
-  private final BattleShip battleShip;
+    private final Map<Integer, JPanel> screenMap = new HashMap<>();
+    private final BattleShip battleShip;
 
     /***
      * Màn hình hiện tại
      */
-    int currentScreen = MENU_SCREEN;
+    int currentScreen = GAME_SCREEN;
 
-  public ScreenManager(BattleShip battleShip) {
-    this.battleShip = battleShip;
-    screenMap.put(MENU_SCREEN, new MenuScreen(battleShip));
-    screenMap.put(GAME_SCREEN, new PlayScreen(battleShip));
-    screenMap.put(SETTING_SCREEN, new SettingScreen(battleShip));
-    screenMap.put(NETWORK_SCREEN, new NetworkScreen(battleShip));
-    screenMap.put(PICK_SCREEN, new PickScreen(battleShip));
-    screenMap.put(START2_PLAYER_SCREEN, new Start2Player(battleShip));   ///test
-    updateScreenSize();
-  }
+    public ScreenManager(BattleShip battleShip) {
+        this.battleShip = battleShip;
+        screenMap.put(MENU_SCREEN, new MenuScreen(battleShip));
+        screenMap.put(GAME_SCREEN, new PlayScreen(battleShip));
+        screenMap.put(SETTING_SCREEN, new SettingScreen(battleShip));
+        screenMap.put(NETWORK_SCREEN, new NetworkScreen(battleShip));
+        screenMap.put(PICK_SCREEN, new PickScreen(battleShip));
+        screenMap.put(START2_PLAYER_SCREEN, new Start2Player(battleShip));   ///test
+        updateScreenSize();
+    }
 
     public void updateScreenSize() {
         for (JPanel screen : screenMap.values()) {
-//      screen.setPreferredSize(new Dimension(battleShip.getWidth(), battleShip.getHeight()));
+            //            //      screen.setPreferredSize(new Dimension(battleShip.getWidth(), battleShip.getHeight()));
         }
     }
 

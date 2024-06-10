@@ -122,6 +122,7 @@ public class BattleShip extends JFrame implements Runnable, KeyListener, Compone
         running = true;
         //        thread.start();
         host.start();
+        client.scanHost();
     }
 
     /**

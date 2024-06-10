@@ -69,6 +69,7 @@ public class PlayerBoard extends Collision implements Renderable {
      */
     public void update() {
         cellSize = getHeight() / size;
+        setSize(cellSize*size, cellSize*size);
         for (Ship ship : ships) {
             ship.update();
         }
@@ -103,7 +104,6 @@ public class PlayerBoard extends Collision implements Renderable {
 
 
         g2d.drawImage(bg, getX(), getY(), getWidth(), getHeight(), null);
-
         //vẽ tàu
         for (Ship ship : ships) {
             ship.render(g);
@@ -113,7 +113,7 @@ public class PlayerBoard extends Collision implements Renderable {
         g2d.setColor(Color.black);
         for (int i = 0; i < size; i++) {
 
-            g2d.drawLine(getX(), getY() + i * cellSize, getX() + getWidth(), getY() + i * cellSize);
+            g2d.drawLine(getX(), getY() + i * cellSize, getX() + getWidth() , getY() + i * cellSize);
             g2d.drawLine(getX() + i * cellSize, getY(), getX() + i * cellSize, getY() + getHeight());
         }
 

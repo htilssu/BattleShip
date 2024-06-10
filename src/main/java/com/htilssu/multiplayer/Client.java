@@ -73,7 +73,8 @@ public class Client extends MultiHandler implements Runnable {
     }
 
     public synchronized void scanHost() {
-        hostList = NetworkUtils.find(GameSetting.DEFAULT_PORT);
+        hostList.clear();
+        hostList.addAll(NetworkUtils.find(GameSetting.DEFAULT_PORT));
     }
 
     public List<InetAddress> getHostList() {

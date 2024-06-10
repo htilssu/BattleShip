@@ -1,6 +1,6 @@
 package com.htilssu.listener;
 
-import com.htilssu.screen.Start2Player;
+import com.htilssu.ui.screen.Start2Player;
 import com.htilssu.ui.screen.Player2Screen;
 
 import java.awt.event.ActionEvent;

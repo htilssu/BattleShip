@@ -1,7 +1,6 @@
 package com.htilssu.ui.screen;
 
 import com.htilssu.listener.ButtonClickListener;
-import com.htilssu.screen.Start2Player;
 import com.htilssu.entity.component.AttackGrid;
 import com.htilssu.entity.component.SelfGrid;
 import com.htilssu.setting.GameSetting;
@@ -12,13 +11,13 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 
 public class Player2Screen extends JFrame {
+    public JLabel ownShipSunk;
+    public JLabel enemyShipSunk;
     int size;
     boolean isbeginningOfTheGameOfPlayer1 = true;
     boolean isbeginningOfTheGameOfPlayer2 = true;
     Start2Player battleShip;
-    public JLabel ownShipSunk;
     JLabel shipBeginning;
-    public JLabel enemyShipSunk;
     private BufferedImage backgroundImage;
 
     public Player2Screen(String name, boolean show, Start2Player startScreen) {

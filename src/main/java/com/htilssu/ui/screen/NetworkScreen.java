@@ -15,10 +15,7 @@ import com.htilssu.ui.component.GameButton;
 import com.htilssu.util.AssetUtils;
 
 import java.awt.*;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -27,7 +24,7 @@ import java.util.List;
 import java.util.concurrent.ThreadPoolExecutor;
 import javax.swing.*;
 
-public class NetworkScreen extends JPanel implements ComponentListener, MouseListener {
+public class NetworkScreen extends JPanel implements ComponentListener, MouseListener, FocusListener {
     private final BufferedImage hostListText;
     BattleShip battleShip;
     int selectedIndex = -1;
@@ -44,6 +41,7 @@ public class NetworkScreen extends JPanel implements ComponentListener, MouseLis
         setFocusable(true);
         addComponentListener(this);
         addMouseListener(this);
+        addFocusListener(this);
 
         this.battleShip = battleShip;
         backGroundAsset = loadAsset("/sea_of_thief.png");
@@ -51,8 +49,6 @@ public class NetworkScreen extends JPanel implements ComponentListener, MouseLis
         refreshButton = new GameButton(new Sprite(getAsset(AssetUtils.ASSET_REFRESH_BUTTON)));
         hostListText = getAsset(AssetUtils.ASSET_HOST_LIST_TEXT);
         refreshButton.setBounds(0, 0, 300, 300);
-
-
     }
 
     private BufferedImage genListHostBackground() {
@@ -70,13 +66,22 @@ public class NetworkScreen extends JPanel implements ComponentListener, MouseLis
         Client client = battleShip.getClient();
         SwingUtilities.invokeLater(() -> {
             client.scanHost();
-
-            for (InetAddress address : client.getHostList()) {
-                hostListItems.add(new HostListItem("Host 1", address, "20ms"));
-            }
-
+            updateListHost(client.getHostList());
             repaint();
         });
+    }
+
+    private void updateListHost(List<InetAddress> hostList) {
+        hostListItems.clear();
+        for (int i = 0, hostListSize = hostList.size(); i < hostListSize; i++) {
+            InetAddress inetAddress = hostList.get(i);
+            hostListItems.add(
+                    new HostListItem("Host",
+                            inetAddress,
+                            "Ready",
+                            new Point((getWidth() - listHostBackground.getWidth()) / 2 + margin,
+                                    (getHeight() - listHostBackground.getHeight()) / 2 + margin + 50 + 60 * i)));
+        }
     }
 
     @Override
@@ -123,7 +128,6 @@ public class NetworkScreen extends JPanel implements ComponentListener, MouseLis
         BufferedImage list = genListHostBackground();
         listHostBackground = new Sprite((getWidth() - list.getWidth()) / 2, (getHeight() - list.getHeight()) / 2, list);
 
-        refreshNetwork();
     }
 
     @Override
@@ -185,18 +189,28 @@ public class NetworkScreen extends JPanel implements ComponentListener, MouseLis
 
     }
 
+    @Override
+    public void focusGained(FocusEvent e) {
+        refreshNetwork();
+    }
+
+    @Override
+    public void focusLost(FocusEvent e) {
+
+    }
+
     class HostListItem extends Collision implements Renderable {
         String hostName;
         InetAddress ipAddress;
         String status;
         private boolean isSelected;
 
-        public HostListItem(String hostName, InetAddress ipAddress, String status) {
+        public HostListItem(String hostName, InetAddress ipAddress, String status, Point point) {
             this.hostName = hostName;
             this.ipAddress = ipAddress;
             this.status = status;
             setSize(listHostBackground.getWidth() - margin * 2, 50);
-            setLocation(listHostBackground.getX() + margin, listHostBackground.getY() + margin * 2);
+            setLocation(point);
         }
 
 
@@ -210,12 +224,12 @@ public class NetworkScreen extends JPanel implements ComponentListener, MouseLis
 
             if (isSelected) {
                 g.setColor(Color.RED);
-                g.fillRect(getX(), getY(), getWidth(), getHeight());
+                g.drawRoundRect(getX(), getY(), getWidth(), getHeight(), 20, 20);
+                g.setColor(Color.WHITE);
             } else {
                 g.drawRoundRect(getX(), getY(), getWidth(), getHeight(), 20, 20);
             }
 
-            g.setColor(Color.WHITE);
             g.drawString(hostName, getX(), getY() + (getHeight() + allHeight / 2) / 2);
             g.drawString(ipAddress.getHostAddress(), getX() + (getWidth() - ipWidth) / 2, getY() + (getHeight() + allHeight / 2) / 2);
             g.drawString(status, getX() + getWidth() - statusWidth, getY() + (getHeight() + allHeight / 2) / 2);

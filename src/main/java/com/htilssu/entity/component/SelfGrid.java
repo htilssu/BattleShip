@@ -1,7 +1,7 @@
 package com.htilssu.entity.component;
 
 import com.htilssu.dataPlayer.PlayerData;
-import com.htilssu.screen.Start2Player;
+import com.htilssu.ui.screen.Start2Player;
 
 import javax.swing.*;
 import java.awt.*;
@@ -163,12 +163,12 @@ public class SelfGrid extends BattleGrid {
     return (s - 1) * 25;
   }
 
-  public void setSelfGridListener(boolean selfGridListener) {
-    this.isSelfGridListener = selfGridListener;
-  }
-
   public boolean getSelfGridListener() {
     return isSelfGridListener;
+  }
+
+  public void setSelfGridListener(boolean selfGridListener) {
+    this.isSelfGridListener = selfGridListener;
   }
 
   public String getGridType() {
