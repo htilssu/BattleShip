@@ -1,6 +1,7 @@
 package com.htilssu.entity.component;
 
 import com.htilssu.screen.Start2Player;
+import com.htilssu.setting.SoundPlayer;
 import com.htilssu.ui.screen.Player2Screen;
 
 import javax.swing.*;
@@ -17,6 +18,7 @@ public class AttackGrid extends BattleGrid {
     private Start2Player battleShip;
     private Player2Screen player;
     private JPanel thePanel = null;
+    SoundPlayer soundPlayer = new SoundPlayer();
 
     public AttackGrid(String name,Start2Player startScreen,Player2Screen player) {
         super();
@@ -55,10 +57,14 @@ public class AttackGrid extends BattleGrid {
 
                             boolean success = battleShip.getPlayer2Data().isHit(hit);
                             if (success) {
+                                soundPlayer.playSound_Boom();
                                 battleShip.getPlayer1Data().setAttackData(x, y, "success");
+                                soundPlayer.wait_Giay(250);
                                 draw();
                             } else {
+                                soundPlayer.playSound_Duck();
                                 battleShip.getPlayer1Data().setAttackData(x, y, "failure");
+                                soundPlayer.wait_Giay(250);
                                 draw();
                             }
 
@@ -66,7 +72,7 @@ public class AttackGrid extends BattleGrid {
                             if (isSunk) {
                                 enemyShipSunkPlayer1++;
                                 battleShip.getPlayer1().enemyShipSunk.setText(Integer.toString(enemyShipSunkPlayer1));
-                                JOptionPane.showMessageDialog(panel, "Player's 2 ship was sunk! Congratulations!\nclick OK will transition to player 2 screen");
+                                JOptionPane.showMessageDialog(panel, "Chuc mung! Thuyen da duoc danh chim!\nnhan OK chuyen sang man hinh player2");
                                 player.hideScreen();
                                 battleShip.getPlayer2().showScreen();
                                 String ownShipSunkPlayer2 = Integer.toString(battleShip.getPlayer2Data().getNumberOfOwnShipSunk());
@@ -89,11 +95,15 @@ public class AttackGrid extends BattleGrid {
 
                             boolean success = battleShip.getPlayer1Data().isHit(hit);
                             if (success) {
+                                soundPlayer.playSound_Boom();
                                 System.out.print("player2 attack");
                                 battleShip.getPlayer2Data().setAttackData(x, y, "success");
+                                soundPlayer.wait_Giay(250);
                                 draw();
                             } else {
+                                soundPlayer.playSound_Duck();
                                 battleShip.getPlayer2Data().setAttackData(x, y, "failure");
+                                soundPlayer.wait_Giay(250);
                                 draw();
                             }
 
@@ -101,7 +111,7 @@ public class AttackGrid extends BattleGrid {
                             if (isSunk) {
                                 enemyShipSunkPlayer2++;
                                 battleShip.getPlayer2().enemyShipSunk.setText(Integer.toString(enemyShipSunkPlayer2));
-                                JOptionPane.showMessageDialog(panel, "Player's 1 ship was sunk! Congratulations!\nclick OK will transition to player 1 screen");
+                                JOptionPane.showMessageDialog(panel, "Chuc mung! Thuyen da duoc danh chim!\nnhan OK chuyen sang man hinh player1");
                                 player.hideScreen();
                                 battleShip.getPlayer1().showScreen();
                                 String ownShipSunkPlayer1 = Integer.toString(battleShip.getPlayer1Data().getNumberOfOwnShipSunk());

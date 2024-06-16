@@ -2,6 +2,7 @@ package com.htilssu.dataPlayer;
 
 import com.htilssu.entity.component.Coordinate;
 import com.htilssu.entity.component.Ship2;
+import com.htilssu.setting.SoundPlayer;
 import com.htilssu.ui.screen.Player2Screen;
 
 import java.awt.*;
@@ -16,6 +17,7 @@ public class PlayerData {
     private int numberOfShipSunk = 0;
     private ArrayList<Ship2> fleet = new ArrayList<>();
     private static final int MAX_SHIPS = 4;
+    SoundPlayer soundPlayer = new SoundPlayer();
 
     public PlayerData(Player2Screen player) {
         this.player = player;
@@ -28,6 +30,7 @@ public class PlayerData {
             System.out.println("DAT TAU KHONG HOP LE! DAT LAI.");
             return;
         } else {
+            soundPlayer.playSound_PutShip();
             // Nếu không có tàu nào chồng lên nhau và danh sách tàu chưa đầy, thêm tàu mới
             fleet.add(new Ship2(coords));
             setSelfData(coords);
@@ -58,34 +61,6 @@ public class PlayerData {
         return false;
     }
 
-    //Thêm dữ liệu tàu vào lưới tự bảo vệ
-    public void addShipInSelfGrid(ArrayList<Coordinate> coords) {
-        for (Coordinate coord : coords) {
-            int x = coord.getX();
-            int y = coord.getY();
-            selfData[x][y] = 1;
-        }
-    }
-
-    //Xóa tàu khỏi danh sách tàu
-    public void deleteShip(ArrayList<Coordinate> coords) {
-        for (int i = 0; i < fleet.size(); i++) {
-            Ship2 ship = fleet.get(i);
-            if (ship.getCoordinates().containsAll(coords)) {
-                fleet.remove(i);
-                break;
-            }
-        }
-    }
-
-    //Xóa tàu khỏi lưới tự bảo vệ
-    public void deleteShipInSelfGrid(ArrayList<Coordinate> coords) {
-        for (Coordinate coord : coords) {
-            int x = coord.getX();
-            int y = coord.getY();
-            selfData[x][y] = 0;
-        }
-    }
 
     //Cập nhật dữ liệu tàu vào lưới tự bảo vệ
     public void setSelfData(ArrayList<Coordinate> coords) {
@@ -190,31 +165,5 @@ public class PlayerData {
             }
         }
         return false;
-    }
-
-    //Xóa tàu khỏi lưới tự bảo vệ
-    public void deleteShipInSelfGrid(Coordinate a, Coordinate b, Coordinate c) {
-        selfData[a.getX()][a.getY()]=0;
-        selfData[b.getX()][b.getY()]=0;
-        selfData[c.getX()][c.getY()]=0;
-    }
-
-    //In ma trận tự bảo vệ
-    public void printSelfData(){
-        for (int i = 1; i < selfData.length; i++) {
-            for (int j = 1; j < selfData[i].length; j++) {
-                System.out.print(selfData[j][i] + " ");
-            }
-            System.out.println();
-        }
-    }
-    //In ma trận tấn công
-    public void printAttackData(){
-        for (int i = 1; i < attackData.length; i++) {
-            for (int j = 1; j < attackData[i].length; j++) {
-                System.out.print(attackData[j][i] + " ");
-            }
-            System.out.println();
-        }
     }
 }

@@ -2,6 +2,7 @@ package com.htilssu.screen;
 
 import com.htilssu.BattleShip;
 import com.htilssu.dataPlayer.PlayerData;
+import com.htilssu.setting.SoundPlayer;
 import com.htilssu.state.BeginGame2;
 import com.htilssu.state.EndGame2;
 import com.htilssu.state.GameState;
@@ -29,9 +30,11 @@ public class Start2Player extends JPanel implements GameState {
 
     private BattleShip battleShip;
     private BufferedImage backgroundImage;
+    SoundPlayer soundPlayer = new SoundPlayer();
 
     public Start2Player(BattleShip battleShip) {
         this.battleShip = battleShip;
+
         setLayout(new GridBagLayout());
         loadBackground();
 
@@ -47,26 +50,16 @@ public class Start2Player extends JPanel implements GameState {
         playButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                //Dang bi loi am thanh cho nay
+                soundPlayer.playSound_Start();
                 // Đóng màn hình hiện tại
                 SwingUtilities.getWindowAncestor(Start2Player.this).dispose();
-
                 SetNew();
-
+                soundPlayer.wait_Giay(150);
                 player1Turn();
                 player2turn();
             }
         });
-    }
-    private void loadBackground(){
-        backgroundImage = AssetUtils.loadAsset("/player2game.png");
-    }
-
-    @Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        if (backgroundImage != null) {
-            g.drawImage(backgroundImage, 0, 0, this.getWidth(), this.getHeight(), this);
-        }
     }
 
     public void SetNew()
@@ -79,6 +72,18 @@ public class Start2Player extends JPanel implements GameState {
         middleOfTheGame = new MidGame2(this, player1,player2);
         endOfTheGame = new EndGame2(this, player1,player2);
         state = beginningOfTheGame; //set the state of the game to be the beginning of the game
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        if (backgroundImage != null) {
+            g.drawImage(backgroundImage, 0, 0, this.getWidth(), this.getHeight(), this);
+        }
+    }
+
+    private void loadBackground(){
+        backgroundImage = AssetUtils.loadAsset("/player2game.png");
     }
 
     @Override

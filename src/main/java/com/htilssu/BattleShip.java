@@ -30,7 +30,6 @@ public class BattleShip extends JFrame implements Runnable, KeyListener, Compone
 
   /** Quản lý sự kiện */
   private final ListenerManager listenerManager = new ListenerManager();
-
   /** Quản lý host */
   private final Host host = new Host(this);
 
