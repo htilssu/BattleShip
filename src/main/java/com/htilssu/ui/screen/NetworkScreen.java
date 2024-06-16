@@ -1,7 +1,7 @@
 package com.htilssu.ui.screen;
 
-import static com.htilssu.util.AssetUtils.getAsset;
-import static com.htilssu.util.AssetUtils.loadAsset;
+import static com.htilssu.util.AssetUtils.getImage;
+import static com.htilssu.util.AssetUtils.loadImage;
 
 import com.htilssu.BattleShip;
 import com.htilssu.entity.Sprite;
@@ -44,7 +44,7 @@ public class NetworkScreen extends JPanel implements ComponentListener, MouseLis
         addFocusListener(this);
 
         this.battleShip = battleShip;
-        backGroundAsset = loadAsset("/sea_of_thief.png");
+        backGroundAsset = loadImage("/sea_of_thief.png");
         blurHostListArea = new BufferedImage(500, 500, BufferedImage.TYPE_INT_ARGB);
         refreshButton = new GameButton(new Sprite(getAsset(AssetUtils.ASSET_REFRESH_BUTTON)));
         hostListText = getAsset(AssetUtils.ASSET_HOST_LIST_TEXT);

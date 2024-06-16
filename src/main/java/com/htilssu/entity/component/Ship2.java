@@ -38,16 +38,4 @@ public class Ship2 {
         return true;
     }
 
-    // Phương thức trả về kích thước của tàu
-    public int getSize() {
-        return coordinates.size();
-    }
-
-    // Phương thức dùng để in ra tọa độ của tàu
-    public void printShip() {
-        for (Coordinate coordinate : coordinates) {
-            System.out.print("(" + coordinate.getX() + ", " + coordinate.getY() + ") ");
-        }
-        System.out.println();
-    }
 }

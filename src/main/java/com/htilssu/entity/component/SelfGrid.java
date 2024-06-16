@@ -13,15 +13,15 @@ public class SelfGrid extends BattleGrid {
   private String gridType = "selfGrid";  // Chuỗi xác định loại lưới (ở đây là "selfGrid").
   private boolean isSelfGridListener;  // Biến boolean để kiểm tra xem listener của lưới có đang hoạt động hay không.
   private String name;  // Tên người chơi
-  //private Point firstPoint = new Point(0, 0);  // Đây là tọa độ của ô đầu tiên được nhấp chuột khi người chơi đặt tàu.
   private Point secondNextPoint = new Point(0, 0);  // Tọa độ của ô liền kề thứ hai từ firstPoint.
   private JPanel secondNextCell = null;  // Biến JPanel lưu trữ ô liền kề thứ hai này.
   private Point thirdNextPoint = new Point(0, 0);  // Tọa độ của ô liền kề thứ ba từ firstPoint.
   private JPanel thirdNextCell = null;  // Biến JPanel lưu trữ ô liền kề thứ ba này.
   private Start2Player battleShip;  // Tham chiếu đến đối tượng BattleShip.
   private JPanel thePanel = new JPanel();  // Biến JPanel được sử dụng để tạm thời lưu trữ ô hiện tại.
-  private int shipSize = 2; // Khởi tạo kích thước tàu là 2
   private boolean isHorizontal = true; // Biến để xác định hướng của tàu
+  public static final int MAXIMIZED_BOTH = JFrame.MAXIMIZED_BOTH / 6;   //lay kich thuoc full man hinh
+//  SoundPlayer soundPlayer = new SoundPlayer();
 
   public SelfGrid(String name, Start2Player battleShip) {
     super();
@@ -91,16 +91,15 @@ public class SelfGrid extends BattleGrid {
 
           if (name.equals("Player1")) {
             battleShip.getPlayer1Data().addShip(coords);
+            // Tạo một khoảng thời gian chờ
+            //soundPlayer.wait_Giay(200);
             draw();
 
           } else if (name.equals("Player2")) {
             battleShip.getPlayer2Data().addShip(coords);
+            // Tạo một khoảng thời gian chờ
+            //soundPlayer.wait_Giay(200);
             draw();
-          }
-
-          // Đặt lại kích thước tàu nếu vượt quá 5 để Người chơi 2 đặt tàu mới
-          if (name.equals("Player2") && shipSize > 5) {
-            shipSize = 2;
           }
 
           // Get components at secondNextPoint and thirdNextPoint
@@ -113,7 +112,7 @@ public class SelfGrid extends BattleGrid {
   }
   // Phương thức để xoay tàu
   public void rotateShip() {
-    isHorizontal = !isHorizontal; // Đảo ngược trạng thái hướng của tàu
+    isHorizontal = !isHorizontal; //Đảo ngược trạng thái hướng của tàu
   }
 
   // Phương thức này vẽ lại lưới sau khi các tàu đã được đặt.

@@ -39,8 +39,8 @@ public class SettingScreen extends JPanel {
 
     private void loadBackgroundImage() {
 
-        backgroundImage = AssetUtils.loadAsset("/sea2.png"); // Load background image
-    }
+    backgroundImage = AssetUtils.loadImage("/sea2.png"); // Load background image
+  }
 
     private void initializeComponents() {
         // Tạo JLabel cho biểu tượng cái loa
@@ -84,15 +84,15 @@ public class SettingScreen extends JPanel {
         volumePercentageLabel.setBounds(sliderX + sliderWidth + spacing, sliderY, 50, 50);
         add(volumePercentageLabel);
 
-        // Tạo nút "Back" để quay lại màn hình menu
-        JButton backButton = new JButton(new ImageIcon(AssetUtils.loadAsset("/back.png")));
-        backButton.setBounds(100, 300, 200, 52); // Điều chỉnh vị trí và kích thước theo nhu cầu của bạn
-        backButton.setContentAreaFilled(false);
-        backButton.setBorderPainted(false);
-        backButton.setOpaque(false);
-        backButton.addActionListener(e -> backToMenu());
-        add(backButton);
-    }
+    // Tạo nút "Back" để quay lại màn hình menu
+    JButton backButton = new JButton(new ImageIcon(AssetUtils.loadImage("/back.png")));
+    backButton.setBounds(100, 300, 200, 52); // Điều chỉnh vị trí và kích thước theo nhu cầu của bạn
+    backButton.setContentAreaFilled(false);
+    backButton.setBorderPainted(false);
+    backButton.setOpaque(false);
+    backButton.addActionListener(e -> backToMenu());
+    add(backButton);
+  }
 
     private void adjustVolume(int volume) {
         if (volume < 0) volume = 0;
@@ -105,30 +105,30 @@ public class SettingScreen extends JPanel {
         }
     }
 
-    private void toggleMute() {
-        isMuted = !isMuted;
-        MenuScreen menuScreen = MenuScreen.getInstance();
-        if (menuScreen != null) {
-            Clip backgroundMusicClip = menuScreen.getBackgroundMusicClip();
-            if (backgroundMusicClip != null) {
-                if (isMuted) {
-                    backgroundMusicClip.stop();
-                    volumeIconLabel.setIcon(
-                            new ImageIcon(
-                                    AssetUtils.loadAsset("/soundoff.png"))); // Thay đổi hình ảnh khi tắt âm thanh
-                } else {
-                    backgroundMusicClip.start();
-                    volumeIconLabel.setIcon(
-                            new ImageIcon(
-                                    AssetUtils.loadAsset("/soundon.png"))); // Thay đổi hình ảnh khi mở âm thanh
-                }
-            }
+  private void toggleMute() {
+    isMuted = !isMuted;
+    MenuScreen menuScreen = MenuScreen.getInstance();
+    if (menuScreen != null) {
+      Clip backgroundMusicClip = menuScreen.getBackgroundMusicClip();
+      if (backgroundMusicClip != null) {
+        if (isMuted) {
+          backgroundMusicClip.stop();
+          volumeIconLabel.setIcon(
+              new ImageIcon(
+                  AssetUtils.loadImage("/soundoff.png"))); // Thay đổi hình ảnh khi tắt âm thanh
+        } else {
+          backgroundMusicClip.start();
+          volumeIconLabel.setIcon(
+              new ImageIcon(
+                  AssetUtils.loadImage("/soundon.png"))); // Thay đổi hình ảnh khi mở âm thanh
         }
+      }
     }
+  }
 
-    private void loadCursorImage() {
-        cursorImage = AssetUtils.loadAsset("/Layer2.png"); // Load cursor image
-    }
+  private void loadCursorImage() {
+    cursorImage = AssetUtils.loadImage("/Layer2.png"); // Load cursor image
+  }
 
     private void setCustomCursor() {
         Cursor customCursor =

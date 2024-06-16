@@ -2,6 +2,7 @@ package com.htilssu.ui.screen;
 
 import com.htilssu.BattleShip;
 import com.htilssu.dataPlayer.PlayerData;
+import com.htilssu.manager.SoundManager;
 import com.htilssu.state.BeginGame2;
 import com.htilssu.state.EndGame2;
 import com.htilssu.state.GameState;
@@ -31,8 +32,10 @@ public class Start2Player extends JPanel implements GameState {
 
     public Start2Player(BattleShip battleShip) {
         this.battleShip = battleShip;
+
         setLayout(new GridBagLayout());
         loadBackground();
+        SoundManager.playBackGround(SoundManager.BACKGROUND_TEST);
 
         JButton playButton = new JButton("Bắt Đầu");
         playButton.setPreferredSize(new Dimension(100, 50)); // Kích thước cụ thể cho JButton
@@ -46,9 +49,10 @@ public class Start2Player extends JPanel implements GameState {
         playButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                //Dang bi loi am thanh cho nay
+                //soundPlayer.playSound_Start();
                 // Đóng màn hình hiện tại
                 SwingUtilities.getWindowAncestor(Start2Player.this).dispose();
-
                 SetNew();
 
                 player1Turn();
@@ -56,8 +60,18 @@ public class Start2Player extends JPanel implements GameState {
             }
         });
     }
-    private void loadBackground(){
-        backgroundImage = AssetUtils.loadAsset("/player2game.png");
+
+    public void SetNew()
+    {
+
+        player1 = new Player2Screen("Player1", true,this);
+        player2 = new Player2Screen("Player2", false,this);
+        player1Data = new PlayerData(player1);
+        player2Data = new PlayerData(player2);
+        beginningOfTheGame = new BeginGame2(this, player1,player2);
+        middleOfTheGame = new MidGame2(this, player1,player2);
+        endOfTheGame = new EndGame2(this, player1,player2);
+        state = beginningOfTheGame; //set the state of the game to be the beginning of the game
     }
 
     @Override
@@ -68,16 +82,8 @@ public class Start2Player extends JPanel implements GameState {
         }
     }
 
-    public void SetNew()
-    {
-        player1 = new Player2Screen("Player1", true,this);
-        player2 = new Player2Screen("Player2", false,this);
-        player1Data = new PlayerData(player1);
-        player2Data = new PlayerData(player2);
-        beginningOfTheGame = new BeginGame2(this, player1,player2);
-        middleOfTheGame = new MidGame2(this, player1,player2);
-        endOfTheGame = new EndGame2(this, player1,player2);
-        state = beginningOfTheGame; //set the state of the game to be the beginning of the game
+    private void loadBackground(){
+        backgroundImage = AssetUtils.loadImage("/player2game.png");
     }
 
     @Override

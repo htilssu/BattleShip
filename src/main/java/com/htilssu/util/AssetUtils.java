@@ -8,11 +8,15 @@ import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.awt.image.ConvolveOp;
 import java.awt.image.Kernel;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import javax.imageio.ImageIO;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.UnsupportedAudioFileException;
 
 public class AssetUtils {
     public static final int ASSET_BOARD_FRAME = 1;
@@ -29,11 +33,11 @@ public class AssetUtils {
     public static final int ASSET_UNREADY_BUTTON = 12;
     public static final int ASSET_REFRESH_BUTTON = 13;
 
-    static Map<Integer, BufferedImage> assetMap = new HashMap<>();
+  static Map<Integer, BufferedImage> assetMap = new HashMap<>();
 
-    static {
-        initAsset();
-    }
+  static {
+    initAsset();
+  }
 
     private static void initAsset() {
         BufferedImage asset1 = loadAsset("/assets_1.png");
@@ -138,4 +142,18 @@ public class AssetUtils {
         g2dd.dispose();
         return cOP.filter(opaBg, null);
     }
+    public static AudioInputStream loadSound(String path)  {
+        //read sound file
+        InputStream ip = AssetUtils.class.getResourceAsStream(path);
+        if (ip != null){
+            try {
+                return AudioSystem.getAudioInputStream(ip);
+            } catch (UnsupportedAudioFileException | IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        return null;
+    }
+}
 }
