@@ -64,6 +64,9 @@ public class Start2Player extends JPanel implements GameState {
 
     public void SetNew()
     {
+        SoundPlayer soundPlayer = new SoundPlayer();
+        //am thanh nen
+        soundPlayer.playSound_Nen();
         player1 = new Player2Screen("Player1", true,this);
         player2 = new Player2Screen("Player2", false,this);
         player1Data = new PlayerData(player1);

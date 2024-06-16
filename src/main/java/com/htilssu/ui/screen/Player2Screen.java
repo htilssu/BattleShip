@@ -26,9 +26,6 @@ public class Player2Screen extends JFrame {
     public Player2Screen(String name, boolean show, Start2Player startScreen) {
         super(name);
         this.battleShip = startScreen;
-        SoundPlayer soundPlayer = new SoundPlayer();
-        //am thanh nen
-        soundPlayer.playSound_Nen();
 
         loadBackgroundImage();
 
