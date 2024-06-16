@@ -13,7 +13,7 @@ public class CustomButton extends JButton {
   private boolean isHovered; // tao check xem da hover chua
 
   public CustomButton(String imagePath) {
-    normalImage = AssetUtils.loadAsset(imagePath);
+    normalImage = AssetUtils.loadImage(imagePath);
 
     setBorderPainted(false);
     setContentAreaFilled(false);

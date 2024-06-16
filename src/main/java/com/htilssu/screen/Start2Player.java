@@ -2,7 +2,7 @@ package com.htilssu.screen;
 
 import com.htilssu.BattleShip;
 import com.htilssu.dataPlayer.PlayerData;
-import com.htilssu.setting.SoundPlayer;
+import com.htilssu.manager.SoundManager;
 import com.htilssu.state.BeginGame2;
 import com.htilssu.state.EndGame2;
 import com.htilssu.state.GameState;
@@ -30,13 +30,13 @@ public class Start2Player extends JPanel implements GameState {
 
     private BattleShip battleShip;
     private BufferedImage backgroundImage;
-    SoundPlayer soundPlayer = new SoundPlayer();
 
     public Start2Player(BattleShip battleShip) {
         this.battleShip = battleShip;
 
         setLayout(new GridBagLayout());
         loadBackground();
+        SoundManager.playBackGround(SoundManager.BACKGROUND_TEST);
 
         JButton playButton = new JButton("Bắt Đầu");
         playButton.setPreferredSize(new Dimension(100, 50)); // Kích thước cụ thể cho JButton
@@ -51,11 +51,11 @@ public class Start2Player extends JPanel implements GameState {
             @Override
             public void actionPerformed(ActionEvent e) {
                 //Dang bi loi am thanh cho nay
-                soundPlayer.playSound_Start();
+                //soundPlayer.playSound_Start();
                 // Đóng màn hình hiện tại
                 SwingUtilities.getWindowAncestor(Start2Player.this).dispose();
                 SetNew();
-                soundPlayer.wait_Giay(150);
+
                 player1Turn();
                 player2turn();
             }
@@ -64,9 +64,7 @@ public class Start2Player extends JPanel implements GameState {
 
     public void SetNew()
     {
-        SoundPlayer soundPlayer = new SoundPlayer();
-        //am thanh nen
-        soundPlayer.playSound_Nen();
+
         player1 = new Player2Screen("Player1", true,this);
         player2 = new Player2Screen("Player2", false,this);
         player1Data = new PlayerData(player1);
@@ -86,7 +84,7 @@ public class Start2Player extends JPanel implements GameState {
     }
 
     private void loadBackground(){
-        backgroundImage = AssetUtils.loadAsset("/player2game.png");
+        backgroundImage = AssetUtils.loadImage("/player2game.png");
     }
 
     @Override

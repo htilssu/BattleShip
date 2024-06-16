@@ -11,7 +11,6 @@ import com.htilssu.multiplayer.Client;
 import com.htilssu.multiplayer.Host;
 import com.htilssu.setting.GameSetting;
 import com.htilssu.util.AssetUtils;
-import com.htilssu.util.GameLogger;
 
 import java.awt.*;
 import java.awt.event.ComponentEvent;
@@ -86,7 +85,7 @@ public class BattleShip extends JFrame implements Runnable, KeyListener, Compone
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     setLocationRelativeTo(null);
     add(screenManager.getCurrentScreen());
-    setIconImage(AssetUtils.loadAsset("/game_icon.png"));
+    setIconImage(AssetUtils.loadImage("/game_icon.png"));
     addKeyListener(this);
     setFocusable(true);
     setResizable(false);

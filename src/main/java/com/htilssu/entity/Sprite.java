@@ -23,7 +23,7 @@ public class Sprite extends Collision implements Renderable {
   }
 
   public Sprite(String filePath) {
-    this(0, 0, 0, 0, AssetUtils.loadAsset(filePath));
+    this(0, 0, 0, 0, AssetUtils.loadImage(filePath));
   }
 
   public Sprite(Sprite sprite) {

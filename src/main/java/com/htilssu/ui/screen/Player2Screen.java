@@ -5,7 +5,6 @@ import com.htilssu.screen.Start2Player;
 import com.htilssu.entity.component.AttackGrid;
 import com.htilssu.entity.component.SelfGrid;
 import com.htilssu.setting.GameSetting;
-import com.htilssu.setting.SoundPlayer;
 import com.htilssu.util.AssetUtils;
 import javax.swing.*;
 import java.awt.*;
@@ -104,7 +103,7 @@ public class Player2Screen extends JFrame {
     //am thanh
 
     private void loadBackgroundImage() {
-        backgroundImage = AssetUtils.loadAsset("/sea1.png");
+        backgroundImage = AssetUtils.loadImage("/sea1.png");
     }
 
     private void setInforBox(JPanel contentPane, String name) {

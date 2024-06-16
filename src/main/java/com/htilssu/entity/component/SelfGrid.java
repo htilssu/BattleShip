@@ -2,7 +2,6 @@ package com.htilssu.entity.component;
 
 import com.htilssu.dataPlayer.PlayerData;
 import com.htilssu.screen.Start2Player;
-import com.htilssu.setting.SoundPlayer;
 
 import javax.swing.*;
 import java.awt.*;
@@ -22,7 +21,7 @@ public class SelfGrid extends BattleGrid {
   private JPanel thePanel = new JPanel();  // Biến JPanel được sử dụng để tạm thời lưu trữ ô hiện tại.
   private boolean isHorizontal = true; // Biến để xác định hướng của tàu
   public static final int MAXIMIZED_BOTH = JFrame.MAXIMIZED_BOTH / 6;   //lay kich thuoc full man hinh
-  SoundPlayer soundPlayer = new SoundPlayer();
+//  SoundPlayer soundPlayer = new SoundPlayer();
 
   public SelfGrid(String name, Start2Player battleShip) {
     super();
@@ -93,13 +92,13 @@ public class SelfGrid extends BattleGrid {
           if (name.equals("Player1")) {
             battleShip.getPlayer1Data().addShip(coords);
             // Tạo một khoảng thời gian chờ
-            soundPlayer.wait_Giay(200);
+            //soundPlayer.wait_Giay(200);
             draw();
 
           } else if (name.equals("Player2")) {
             battleShip.getPlayer2Data().addShip(coords);
             // Tạo một khoảng thời gian chờ
-            soundPlayer.wait_Giay(200);
+            //soundPlayer.wait_Giay(200);
             draw();
           }
 
