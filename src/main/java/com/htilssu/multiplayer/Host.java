@@ -11,10 +11,12 @@ import org.jetbrains.annotations.NotNull;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.UUID;
 
 public class Host extends MultiHandler implements Runnable {
 
     private static Host instance;
+    final String id = UUID.randomUUID().toString();
     ServerSocket serverSocket;
     Socket socket;
     Thread hostListenThread = new Thread(this);
@@ -99,6 +101,10 @@ public class Host extends MultiHandler implements Runnable {
 
     public void stop() {
         canHost = false;
+    }
+
+    public String getId() {
+        return id;
     }
 
 }

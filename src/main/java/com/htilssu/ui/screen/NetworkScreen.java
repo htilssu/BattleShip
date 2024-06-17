@@ -1,8 +1,5 @@
 package com.htilssu.ui.screen;
 
-import static com.htilssu.util.AssetUtils.getImage;
-import static com.htilssu.util.AssetUtils.loadImage;
-
 import com.htilssu.BattleShip;
 import com.htilssu.entity.Sprite;
 import com.htilssu.event.game.GameAction;
@@ -14,15 +11,16 @@ import com.htilssu.setting.GameSetting;
 import com.htilssu.ui.component.GameButton;
 import com.htilssu.util.AssetUtils;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ThreadPoolExecutor;
-import javax.swing.*;
+
+import static com.htilssu.util.AssetUtils.getImage;
+
 
 public class NetworkScreen extends JPanel implements ComponentListener, MouseListener, FocusListener {
     private final BufferedImage hostListText;
@@ -44,10 +42,10 @@ public class NetworkScreen extends JPanel implements ComponentListener, MouseLis
         addFocusListener(this);
 
         this.battleShip = battleShip;
-        backGroundAsset = loadImage("/sea_of_thief.png");
+        backGroundAsset = AssetUtils.loadImage("/sea_of_thief.png");
         blurHostListArea = new BufferedImage(500, 500, BufferedImage.TYPE_INT_ARGB);
-        refreshButton = new GameButton(new Sprite(getAsset(AssetUtils.ASSET_REFRESH_BUTTON)));
-        hostListText = getAsset(AssetUtils.ASSET_HOST_LIST_TEXT);
+        refreshButton = new GameButton(new Sprite(getImage(AssetUtils.ASSET_REFRESH_BUTTON)));
+        hostListText = getImage(AssetUtils.ASSET_HOST_LIST_TEXT);
         refreshButton.setBounds(0, 0, 300, 300);
     }
 

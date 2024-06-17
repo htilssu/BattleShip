@@ -3,7 +3,6 @@ package com.htilssu.entity;
 import com.htilssu.render.Collision;
 import com.htilssu.render.Renderable;
 import com.htilssu.util.AssetUtils;
-import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -36,7 +35,7 @@ public class Sprite extends Collision implements Renderable {
     }
 
     public Sprite(String filePath) {
-        this(0, 0, 0, 0, AssetUtils.loadAsset(filePath));
+        this(0, 0, 0, 0, AssetUtils.loadImage(filePath));
     }
 
     public Sprite(Sprite sprite) {

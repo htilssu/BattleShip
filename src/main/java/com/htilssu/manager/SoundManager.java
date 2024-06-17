@@ -9,18 +9,16 @@ import java.util.Map;
 
 public final class SoundManager {
 
-    private static Clip backgroundClip;
     public static final int BOOM_SOUND = 1;
     public static final int DUCK_SOUND = 2;
     public static final int PUT_SHIP_SOUND = 3;
     public static final int ATTACK_SOUND = 4;
     public static final int BACKGROUND_TEST = 5;
-
+    private static final Map<Integer, AudioInputStream> soundMap = new HashMap<>();
     static boolean isBackgroundPlaying = false;
+    private static Clip backgroundClip;
 
-    private static Map<Integer, AudioInputStream>  soundMap = new HashMap<>();
-
-    static  {
+    static {
         soundMap.put(BOOM_SOUND, AssetUtils.loadSound("/sound/A_BoomSound.wav"));
         soundMap.put(DUCK_SOUND, AssetUtils.loadSound("/sound/A_DuckSound.wav"));
         soundMap.put(PUT_SHIP_SOUND, AssetUtils.loadSound("/sound/A_PutShipSound.wav"));
@@ -35,7 +33,6 @@ public final class SoundManager {
             var audioInputStream = soundMap.get(soundName);
 
 
-
             // Tạo clip
             var clip = AudioSystem.getClip();
             // Mở clip
@@ -47,12 +44,10 @@ public final class SoundManager {
         }
     }
 
-    public static void playBackGround(int backgroundSound){
+    public static void playBackGround(int backgroundSound) {
         var audioInputStream = soundMap.get(backgroundSound);
-        if(backgroundClip != null)
-        {
-            backgroundClip.stop();
-        }
+        if (backgroundClip != null) backgroundClip.stop();
+
         isBackgroundPlaying = false;
 
         try {
@@ -62,7 +57,7 @@ public final class SoundManager {
             backgroundClip.loop(Clip.LOOP_CONTINUOUSLY);
             isBackgroundPlaying = true;
         } catch (LineUnavailableException | IOException e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
     }
 

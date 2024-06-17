@@ -94,7 +94,7 @@ public class BattleShip extends JFrame implements Runnable, KeyListener, Compone
         setUndecorated(true);
         setLocationRelativeTo(null);
         add(screenManager.getCurrentScreen());
-        setIconImage(AssetUtils.loadAsset("/game_icon.png"));
+        setIconImage(AssetUtils.loadImage("/game_icon.png"));
         addKeyListener(this);
         setFocusable(true);
         setResizable(false);

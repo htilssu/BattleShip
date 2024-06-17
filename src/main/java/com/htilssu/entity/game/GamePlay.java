@@ -41,14 +41,14 @@ public class GamePlay implements Renderable {
     int direction = Ship.HORIZONTAL;
     Sprite setUpSprite;
     boolean isMultiPlayer = false;
-    Sprite readyButton = new Sprite(AssetUtils.getAsset(AssetUtils.ASSET_READY_BUTTON));
+    Sprite readyButton = new Sprite(AssetUtils.getImage(AssetUtils.ASSET_READY_BUTTON));
     private GameManager gameManager;
 
     {
-        sprites.add(new Sprite(AssetUtils.getAsset(AssetUtils.ASSET_SHIP_2)));
-        sprites.add(new Sprite(AssetUtils.getAsset(AssetUtils.ASSET_SHIP_3)));
-        sprites.add(new Sprite(AssetUtils.getAsset(AssetUtils.ASSET_SHIP_4)));
-        sprites.add(new Sprite(AssetUtils.getAsset(AssetUtils.ASSET_SHIP_5)));
+        sprites.add(new Sprite(AssetUtils.getImage(AssetUtils.ASSET_SHIP_2)));
+        sprites.add(new Sprite(AssetUtils.getImage(AssetUtils.ASSET_SHIP_3)));
+        sprites.add(new Sprite(AssetUtils.getImage(AssetUtils.ASSET_SHIP_4)));
+        sprites.add(new Sprite(AssetUtils.getImage(AssetUtils.ASSET_SHIP_5)));
 
         shipInBoard.put(Ship.SHIP_2, 1);
         shipInBoard.put(Ship.SHIP_3, 2);
@@ -359,7 +359,7 @@ public class GamePlay implements Renderable {
 
     private void ready() {
         isReady = true;
-        readyButton.setAsset(AssetUtils.getAsset(AssetUtils.ASSET_UNREADY_BUTTON), null);
+        readyButton.setAsset(AssetUtils.getImage(AssetUtils.ASSET_UNREADY_BUTTON), null);
         if (Host.getInstance().isHost()) {
             Host.getInstance().ready();
         } else {
@@ -369,7 +369,7 @@ public class GamePlay implements Renderable {
 
     private void unReady() {
         isReady = false;
-        readyButton.setAsset(AssetUtils.getAsset(AssetUtils.ASSET_READY_BUTTON), null);
+        readyButton.setAsset(AssetUtils.getImage(AssetUtils.ASSET_READY_BUTTON), null);
         Client.getInstance().send(GameAction.UNREADY);
     }
 

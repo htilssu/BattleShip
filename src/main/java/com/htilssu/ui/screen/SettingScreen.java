@@ -44,7 +44,7 @@ public class SettingScreen extends JPanel {
 
     private void initializeComponents() {
         // Tạo JLabel cho biểu tượng cái loa
-        volumeIconLabel = new JLabel(new ImageIcon(AssetUtils.loadAsset("/soundon.png")));
+        volumeIconLabel = new JLabel(new ImageIcon(AssetUtils.loadImage("/soundon.png")));
         volumeIconLabel.setBounds(100, 100, 100, 80);
         volumeIconLabel.addMouseListener(
                 new MouseAdapter() {

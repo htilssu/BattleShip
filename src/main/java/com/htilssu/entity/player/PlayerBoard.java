@@ -40,7 +40,7 @@ public class PlayerBoard extends Collision implements Renderable {
         this.size = size;
         shotBoard = new byte[size][size];
         update();
-        this.bg = AssetUtils.getAsset(AssetUtils.ASSET_BACK_SEA);
+        this.bg = AssetUtils.getImage(AssetUtils.ASSET_BACK_SEA);
     }
 
     public void shoot(Position position, int status) {
@@ -127,10 +127,10 @@ public class PlayerBoard extends Collision implements Renderable {
 
         switch (shotBoard[row][col]) {
             case (byte) SHOOT_MISS:
-                g.drawImage(AssetUtils.getAsset(AssetUtils.ASSET_SHOOT_MISS), x, y, cellSize, cellSize, null);
+                g.drawImage(AssetUtils.getImage(AssetUtils.ASSET_SHOOT_MISS), x, y, cellSize, cellSize, null);
                 break;
             case (byte) SHOOT_HIT:
-                g.drawImage(AssetUtils.getAsset(AssetUtils.ASSET_SHOOT_HIT), x, y, cellSize, cellSize, null);
+                g.drawImage(AssetUtils.getImage(AssetUtils.ASSET_SHOOT_HIT), x, y, cellSize, cellSize, null);
                 break;
         }
 
