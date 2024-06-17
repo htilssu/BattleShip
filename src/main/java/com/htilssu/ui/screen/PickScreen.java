@@ -22,8 +22,8 @@ public class PickScreen extends JPanel {
         window = battleShip;
         setLayout(null);
         setPreferredSize(new Dimension(800, 600));
-        normalImage = AssetUtils.loadAsset("/Normal.png");
-        hardImage = AssetUtils.loadAsset("/Hard.png");
+        normalImage = AssetUtils.loadImage("/Normal.png");
+        hardImage = AssetUtils.loadImage("/Hard.png");
         loadBackgroundImage();
         addMouseListener(new MouseAdapter() {
             @Override
@@ -150,6 +150,6 @@ public class PickScreen extends JPanel {
     }
 
     private void loadBackgroundImage() {
-        backgroundImage = AssetUtils.loadAsset("/ground.png"); // Tải hình nền
+        backgroundImage = AssetUtils.loadImage("/ground.png"); // Tải hình nền
     }
 }

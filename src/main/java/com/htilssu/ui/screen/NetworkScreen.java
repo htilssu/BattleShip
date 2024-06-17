@@ -1,7 +1,7 @@
 package com.htilssu.ui.screen;
 
-import static com.htilssu.util.AssetUtils.getAsset;
-import static com.htilssu.util.AssetUtils.loadAsset;
+import static com.htilssu.util.AssetUtils.getImage;
+import static com.htilssu.util.AssetUtils.loadImage;
 
 import com.htilssu.BattleShip;
 import com.htilssu.entity.Sprite;
@@ -28,11 +28,11 @@ public class NetworkScreen extends JPanel implements ComponentListener {
     this.battleShip = battleShip;
     setLayout(null);
     setFocusable(true);
-    backGroundAsset = loadAsset("/sea_of_thief.png");
+    backGroundAsset = loadImage("/sea_of_thief.png");
     blurHostListArea = new BufferedImage(500, 500, BufferedImage.TYPE_INT_ARGB);
     // TODO: replace refresh image
     refreshButton =
-        new GameButton(new Sprite(AssetUtils.rotate90(getAsset(AssetUtils.ASSET_SHIP_2))));
+        new GameButton(new Sprite(AssetUtils.rotate90(getImage(AssetUtils.ASSET_SHIP_2))));
     addComponentListener(this);
     add(refreshButton);
     setComponentZOrder(refreshButton, 0);
@@ -53,7 +53,7 @@ public class NetworkScreen extends JPanel implements ComponentListener {
 
     Graphics2D g2d = (Graphics2D) g;
     g2d.setFont(new Font("Arial", Font.BOLD, 20));
-    BufferedImage hostListText = getAsset(AssetUtils.ASSET_HOST_LIST_TEXT);
+    BufferedImage hostListText = getImage(AssetUtils.ASSET_HOST_LIST_TEXT);
     g2d.drawImage(backGroundAsset, 0, 0, getWidth(), getHeight(), null);
     g2d.fillRoundRect(
         (int) (margin * GameSetting.SCALE * 2),

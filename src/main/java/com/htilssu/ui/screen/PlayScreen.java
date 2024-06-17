@@ -31,7 +31,7 @@ public class PlayScreen extends JPanel
     super.paintComponent(g);
     Graphics2D g2d = (Graphics2D) g;
     g.drawImage(
-        AssetUtils.getAsset(AssetUtils.ASSET_BACK_SEA_2), 0, 0, getWidth(), getHeight(), null);
+        AssetUtils.getImage(AssetUtils.ASSET_BACK_SEA_2), 0, 0, getWidth(), getHeight(), null);
     window.getGameManager().getCurrentGamePlay().render(g2d);
     g2d.setColor(Color.BLACK);
   }

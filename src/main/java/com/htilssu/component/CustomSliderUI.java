@@ -21,11 +21,11 @@ public class CustomSliderUI extends BasicSliderUI {
     }
 
     private void loadThumbImage() {
-        thumbImage = AssetUtils.loadAsset("/track.png"); // Thay đổi đường dẫn tới ảnh thumb
+        thumbImage = AssetUtils.loadImage("/track.png"); // Thay đổi đường dẫn tới ảnh thumb
     }
 
     private void loadTrackImage() {
-        trackImage = AssetUtils.loadAsset("/sider.png"); // Thay đổi đường dẫn tới ảnh track
+        trackImage = AssetUtils.loadImage("/sider.png"); // Thay đổi đường dẫn tới ảnh track
     }
 
     @Override

@@ -80,7 +80,7 @@ public class PlayerBoard extends Collision implements Renderable {
     }
 
     AlphaComposite aC = AlphaComposite.getInstance(AlphaComposite.SRC_OUT, 0.7f);
-    BufferedImage bg = AssetUtils.getAsset(AssetUtils.ASSET_BACK_SEA);
+    BufferedImage bg = AssetUtils.getImage(AssetUtils.ASSET_BACK_SEA);
     BufferedImage opaBg =
         new BufferedImage(bg.getWidth(), bg.getHeight(), BufferedImage.TYPE_INT_ARGB);
 

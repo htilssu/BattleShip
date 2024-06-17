@@ -55,12 +55,12 @@ public class MenuScreen extends JPanel {
 
   private void loadBackgroundImage() {
 
-    backgroundImage = AssetUtils.loadAsset("/sea1.png");
+    backgroundImage = AssetUtils.loadImage("/sea1.png");
     // Load background image
   }
 
   private void loadCursorImage() {
-    cursorImage = AssetUtils.loadAsset("/Layer2.png"); // Load cursor image
+    cursorImage = AssetUtils.loadImage("/Layer2.png"); // Load cursor image
   }
 
   private void setCustomCursor() {
@@ -72,7 +72,7 @@ public class MenuScreen extends JPanel {
   }
 
   private void loadMenu() {
-    menuImage = AssetUtils.loadAsset("/MENU2.png"); // Tải hình ảnh biểu tượng menu
+    menuImage = AssetUtils.loadImage("/MENU2.png"); // Tải hình ảnh biểu tượng menu
   }
 
   public Clip getBackgroundMusicClip() {
