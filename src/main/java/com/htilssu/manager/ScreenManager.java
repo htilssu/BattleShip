@@ -23,8 +23,17 @@ public final class ScreenManager {
      */
     public static final int GAME_SCREEN = 2;
 
+    /**
+     * Màn hình cài đặt
+     */
     public static final int SETTING_SCREEN = 3;
+    /**
+     * Màn hình chọn chế độ
+     */
     public static final int PICK_SCREEN = 4;
+    /**
+     * Màn hình chọn host cho chế độ chơi online
+     */
     public static final int NETWORK_SCREEN = 5;
 
     public static final int START2_PLAYER_SCREEN = 6;   ///Game Tuan
@@ -35,7 +44,7 @@ public final class ScreenManager {
     /***
      * Màn hình hiện tại
      */
-    int currentScreen = GAME_SCREEN;
+    int currentScreen = MENU_SCREEN;
 
     public ScreenManager(BattleShip battleShip) {
         this.battleShip = battleShip;

@@ -32,8 +32,9 @@ public class AssetUtils {
     public static final int ASSET_BACK_SEA_2 = 11;
     public static final int ASSET_UNREADY_BUTTON = 12;
     public static final int ASSET_REFRESH_BUTTON = 13;
+    public static final int ASSET_BACK_BUTTON = 14;
 
-  static Map<Integer, BufferedImage> assetMap = new HashMap<>();
+    static Map<Integer, BufferedImage> assetMap = new HashMap<>();
 
   static {
     initAsset();
@@ -55,7 +56,8 @@ public class AssetUtils {
         if (buttonAsset != null) {
             assetMap.put(ASSET_READY_BUTTON, buttonAsset.getSubimage(0, 0, 64 * 6, 64 * 2));
             assetMap.put(ASSET_UNREADY_BUTTON, buttonAsset.getSubimage(64 * 6, 0, 64 * 6, 64 * 2));
-            assetMap.put(ASSET_REFRESH_BUTTON, buttonAsset.getSubimage(64 * 12, 0, 64 * 2, 64 * 2));
+            assetMap.put(ASSET_REFRESH_BUTTON, buttonAsset.getSubimage(64 * 12, 0, 64 * 6, 64 * 2));
+            assetMap.put(ASSET_BACK_BUTTON, buttonAsset.getSubimage(0, 64*2, 64*3, 64*3));
         }
 
         assetMap.put(ASSET_BACK_SEA, blur(loadImage("/sea.png")));
@@ -88,6 +90,34 @@ public class AssetUtils {
     }
 
     /**
+     * Phương thức làm mờ ảnh
+     *
+     * @param image ảnh cần làm mờ
+     * @return ảnh đã được làm mờ
+     */
+    public static BufferedImage blur(@Nullable BufferedImage image) {
+        if (image == null) {
+            return null;
+        }
+        BufferedImage opaBg =
+                new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
+        AlphaComposite aC = AlphaComposite.getInstance(AlphaComposite.SRC_OUT, 0.7f);
+
+        float[] a = new float[3 * 3];
+        Arrays.fill(a, 0.1111f);
+        Kernel kernel = new Kernel(3, 3, a);
+
+        ConvolveOp cOP = new ConvolveOp(kernel, ConvolveOp.EDGE_NO_OP, null);
+
+        Graphics2D g2dd = opaBg.createGraphics();
+
+        g2dd.setComposite(aC);
+        g2dd.drawImage(image, 0, 0, opaBg.getWidth(), opaBg.getHeight(), null);
+        g2dd.dispose();
+        return cOP.filter(opaBg, null);
+    }
+
+    /**
      * Phương thức lấy asset đã được load trước đó và lưu vào map ở phương thức {@link
      * AssetUtils#initAsset()}
      *
@@ -115,33 +145,6 @@ public class AssetUtils {
         return rotatedImage;
     }
 
-    /**
-     * Phương thức làm mờ ảnh
-     *
-     * @param image ảnh cần làm mờ
-     * @return ảnh đã được làm mờ
-     */
-    public static BufferedImage blur(@Nullable BufferedImage image) {
-        if (image == null) {
-            return null;
-        }
-        BufferedImage opaBg =
-                new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
-        AlphaComposite aC = AlphaComposite.getInstance(AlphaComposite.SRC_OUT, 0.7f);
-
-        float[] a = new float[3 * 3];
-        Arrays.fill(a, 0.1111f);
-        Kernel kernel = new Kernel(3, 3, a);
-
-        ConvolveOp cOP = new ConvolveOp(kernel, ConvolveOp.EDGE_NO_OP, null);
-
-        Graphics2D g2dd = opaBg.createGraphics();
-
-        g2dd.setComposite(aC);
-        g2dd.drawImage(image, 0, 0, opaBg.getWidth(), opaBg.getHeight(), null);
-        g2dd.dispose();
-        return cOP.filter(opaBg, null);
-    }
     public static AudioInputStream loadSound(String path)  {
         //read sound file
         InputStream ip = AssetUtils.class.getResourceAsStream(path);

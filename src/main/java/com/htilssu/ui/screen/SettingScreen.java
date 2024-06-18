@@ -4,6 +4,7 @@ import com.htilssu.BattleShip;
 import com.htilssu.ui.component.CustomSliderUI;
 import com.htilssu.manager.ScreenManager;
 import com.htilssu.util.AssetUtils;
+import com.htilssu.util.Color;
 
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -32,16 +33,6 @@ public class SettingScreen extends JPanel {
         loadBackgroundImage();
     }
 
-    private void backToMenu() {
-        // Sử dụng BattleShip để chuyển đổi màn hình
-        window.changeScreen(ScreenManager.MENU_SCREEN);
-    }
-
-    private void loadBackgroundImage() {
-
-    backgroundImage = AssetUtils.loadImage("/sea2.png"); // Load background image
-  }
-
     private void initializeComponents() {
         // Tạo JLabel cho biểu tượng cái loa
         volumeIconLabel = new JLabel(new ImageIcon(AssetUtils.loadImage("/soundon.png")));
@@ -69,7 +60,7 @@ public class SettingScreen extends JPanel {
         // Tạo JSlider để điều chỉnh âm lượng
         volumeSlider = new JSlider(0, 100, currentVolume);
         volumeSlider.setBounds(sliderX, sliderY, sliderWidth, 50);
-        volumeSlider.setBackground(new Color(0, 0, 0, 0));
+        volumeSlider.setBackground(Color.TRANSPARENT);
         volumeSlider.setUI(new CustomSliderUI(volumeSlider));
         volumeSlider.addChangeListener(
                 e -> {
@@ -94,16 +85,21 @@ public class SettingScreen extends JPanel {
     add(backButton);
   }
 
-    private void adjustVolume(int volume) {
-        if (volume < 0) volume = 0;
-        if (volume > 100) volume = 100;
-        currentVolume = volume;
+  private void loadCursorImage() {
+    cursorImage = AssetUtils.loadImage("/Layer2.png"); // Load cursor image
+  }
 
-        MenuScreen menuScreen = MenuScreen.getInstance();
-        if (menuScreen != null) {
-            menuScreen.setVolume(volume);
-        }
+    private void setCustomCursor() {
+        Cursor customCursor =
+                Toolkit.getDefaultToolkit()
+                        .createCustomCursor(cursorImage, new Point(0, 0), "Custom Cursor");
+        setCursor(customCursor);
     }
+
+    private void loadBackgroundImage() {
+
+    backgroundImage = AssetUtils.loadImage("/sea2.png"); // Load background image
+  }
 
   private void toggleMute() {
     isMuted = !isMuted;
@@ -126,15 +122,20 @@ public class SettingScreen extends JPanel {
     }
   }
 
-  private void loadCursorImage() {
-    cursorImage = AssetUtils.loadImage("/Layer2.png"); // Load cursor image
-  }
+    private void adjustVolume(int volume) {
+        if (volume < 0) volume = 0;
+        if (volume > 100) volume = 100;
+        currentVolume = volume;
 
-    private void setCustomCursor() {
-        Cursor customCursor =
-                Toolkit.getDefaultToolkit()
-                        .createCustomCursor(cursorImage, new Point(0, 0), "Custom Cursor");
-        setCursor(customCursor);
+        MenuScreen menuScreen = MenuScreen.getInstance();
+        if (menuScreen != null) {
+            menuScreen.setVolume(volume);
+        }
+    }
+
+    private void backToMenu() {
+        // Sử dụng BattleShip để chuyển đổi màn hình
+        window.changeScreen(ScreenManager.MENU_SCREEN);
     }
 
     @Override

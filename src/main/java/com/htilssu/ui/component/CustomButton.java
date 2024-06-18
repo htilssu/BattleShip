@@ -34,6 +34,16 @@ public class CustomButton extends JButton {
                 });
     }
 
+    public CustomButton(BufferedImage image) {
+        this.normalImage = image;
+
+        setBorderPainted(false);
+        setContentAreaFilled(false);
+        setFocusPainted(false);
+        setOpaque(false);
+
+    }
+
     @Override
     protected void paintComponent(Graphics g) {
         if (isHovered) { // neu da hover
