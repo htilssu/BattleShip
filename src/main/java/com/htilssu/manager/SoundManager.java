@@ -56,6 +56,13 @@ public final class SoundManager {
             backgroundClip.start();
             backgroundClip.loop(Clip.LOOP_CONTINUOUSLY);
             isBackgroundPlaying = true;
+
+            //disable volume
+
+            //TODO: remove
+            FloatControl gainControl =
+                    (FloatControl) backgroundClip.getControl(FloatControl.Type.MASTER_GAIN);
+            gainControl.setValue(gainControl.getMinimum());
         } catch (LineUnavailableException | IOException e) {
             System.out.println(e.getMessage());
         }

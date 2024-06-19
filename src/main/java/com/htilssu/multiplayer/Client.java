@@ -1,7 +1,9 @@
 package com.htilssu.multiplayer;
 
 import com.htilssu.BattleShip;
+import com.htilssu.manager.ScreenManager;
 import com.htilssu.setting.GameSetting;
+import com.htilssu.ui.screen.NetworkScreen;
 import com.htilssu.util.GameLogger;
 import com.htilssu.util.NetworkUtils;
 
@@ -10,6 +12,11 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import static com.htilssu.manager.ScreenManager.NETWORK_SCREEN;
+import static java.util.concurrent.Executors.newFixedThreadPool;
 
 /**
  * Lớp quản lý kết nối giữa client với server
@@ -73,8 +80,14 @@ public class Client extends MultiHandler implements Runnable {
     }
 
     public synchronized void scanHost() {
-        hostList.clear();
-        hostList.addAll(NetworkUtils.find(GameSetting.DEFAULT_PORT));
+        new Thread(() -> {
+            hostList.clear();
+            hostList.addAll(NetworkUtils.find(GameSetting.DEFAULT_PORT));
+
+            var networkScreen = (NetworkScreen) battleShip.getScreenManager().getScreen(NETWORK_SCREEN);
+            networkScreen.updateListHost(getHostList());
+            networkScreen.repaint();
+        }).start();
     }
 
     public List<InetAddress> getHostList() {

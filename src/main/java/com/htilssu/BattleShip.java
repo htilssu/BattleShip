@@ -72,19 +72,6 @@ public class BattleShip extends JFrame implements Runnable, KeyListener, Compone
         registerListener();
     }
 
-    public static void main(String[] args) {
-        BattleShip battleShip = new BattleShip();
-        battleShip.start();
-    }
-
-    public GameManager getGameManager() {
-        return gameManager;
-    }
-
-    public ListenerManager getListenerManager() {
-        return listenerManager;
-    }
-
     /**
      * Cài đặt các sự kiện cho frame
      */
@@ -113,6 +100,11 @@ public class BattleShip extends JFrame implements Runnable, KeyListener, Compone
         listenerManager.registerListener(GameStartListener.class);
     }
 
+    public static void main(String[] args) {
+        BattleShip battleShip = new BattleShip();
+        battleShip.start();
+    }
+
     /**
      * Gọi hàm này để bắt đầu chạy app
      */
@@ -121,8 +113,14 @@ public class BattleShip extends JFrame implements Runnable, KeyListener, Compone
 
         running = true;
         //        thread.start();
-        host.start();
-        client.scanHost();
+    }
+
+    public GameManager getGameManager() {
+        return gameManager;
+    }
+
+    public ListenerManager getListenerManager() {
+        return listenerManager;
     }
 
     /**
@@ -165,6 +163,13 @@ public class BattleShip extends JFrame implements Runnable, KeyListener, Compone
     }
 
     /**
+     * Hàm update dữ liệu mỗi tick
+     */
+    private void updateData() {
+        // empty
+    }
+
+    /**
      * Hàm check event
      */
     private void checkEvent() {
@@ -176,32 +181,6 @@ public class BattleShip extends JFrame implements Runnable, KeyListener, Compone
     private void render() {
         setTitle("BattleShip - FPS: " + currentFPS);
         screenManager.getCurrentScreen().repaint();
-    }
-
-    /**
-     * Hàm update dữ liệu mỗi tick
-     */
-    private void updateData() {
-        // empty
-    }
-
-    /**
-     * Thay đổi màn hình hiện tại
-     *
-     * @param screen màn hình cần chuyển đến
-     */
-    public synchronized void changeScreen(int screen) {
-        JPanel targetScreen = screenManager.getScreen(screen);
-        JPanel currentScreen = screenManager.getCurrentScreen();
-        if (targetScreen == currentScreen) return;
-        remove(currentScreen);
-
-        screenManager.setCurrentScreen(screen);
-        add(screenManager.getCurrentScreen());
-        screenManager.getCurrentScreen().requestFocusInWindow();
-
-        pack();
-        repaint();
     }
 
     @Override
@@ -223,6 +202,25 @@ public class BattleShip extends JFrame implements Runnable, KeyListener, Compone
                 break;
             default:
         }
+    }
+
+    /**
+     * Thay đổi màn hình hiện tại
+     *
+     * @param screen màn hình cần chuyển đến
+     */
+    public synchronized void changeScreen(int screen) {
+        JPanel targetScreen = screenManager.getScreen(screen);
+        JPanel currentScreen = screenManager.getCurrentScreen();
+        if (targetScreen == currentScreen) return;
+        remove(currentScreen);
+
+        screenManager.setCurrentScreen(screen);
+        add(screenManager.getCurrentScreen());
+        screenManager.getCurrentScreen().requestFocusInWindow();
+
+        pack();
+        repaint();
     }
 
     @Override

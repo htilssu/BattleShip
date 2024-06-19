@@ -1,11 +1,9 @@
 package com.htilssu.ui.screen;
 
 import com.htilssu.BattleShip;
-import com.htilssu.entity.Sprite;
 import com.htilssu.manager.ScreenManager;
 import com.htilssu.multiplayer.Client;
 import com.htilssu.setting.GameSetting;
-import com.htilssu.ui.component.CustomButton;
 import com.htilssu.ui.component.GameButton;
 import com.htilssu.ui.component.GamePanel;
 import com.htilssu.util.AssetUtils;
@@ -14,21 +12,19 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.htilssu.util.AssetUtils.*;
 
-public class NetworkScreen extends GamePanel implements ComponentListener, FocusListener {
+public class NetworkScreen extends GamePanel implements ComponentListener {
     BattleShip battleShip;
     List<HostListItem> hostListItems = new ArrayList<>();
     GamePanel listHostPanel;
-    Sprite listHostBackground;
     int margin = 50;
     private GamePanel hostListTextPanel;
+    private JPanel buttonPanel;
 
     public NetworkScreen(BattleShip battleShip) {
         super();
@@ -39,7 +35,6 @@ public class NetworkScreen extends GamePanel implements ComponentListener, Focus
         setFocusable(true);
 
         addComponentListener(this);
-        addFocusListener(this);
 
         initListHost();
 
@@ -71,14 +66,12 @@ public class NetworkScreen extends GamePanel implements ComponentListener, Focus
     private void initBackButton() {
         var backButton = new GameButton(AssetUtils.getImage(ASSET_BACK_BUTTON));
 
-        backButton.addActionListener(e -> {
-            battleShip.changeScreen(ScreenManager.MENU_SCREEN);
-        });
+        backButton.addActionListener(e -> battleShip.changeScreen(ScreenManager.MENU_SCREEN));
 
-        backButton.setSize(new Dimension(64,64));
-        backButton.setLocation(20,20);
+        backButton.setSize(new Dimension(64, 64));
+        backButton.setLocation(40, 40);
 
-        add(backButton,0);
+        add(backButton, 0);
     }
 
     private void initListHostHeader() {
@@ -114,15 +107,16 @@ public class NetworkScreen extends GamePanel implements ComponentListener, Focus
     }
 
     private void initListHostButton() {
-        var buttonPanel = new GamePanel();
+        buttonPanel = new JPanel();
+        buttonPanel.setBackground(new Color(0, 0, 0, 0));
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
 
-        var refreshButton = new GameButton(AssetUtils.getImage(ASSET_REFRESH_BUTTON));
+        var refreshButton = new GameButton(AssetUtils.getImage(ASSET_BACK_BUTTON));
         refreshButton.addActionListener(e -> refreshNetwork());
         Dimension buttonSize = new Dimension(64 * 3, 64);
         refreshButton.setPreferredSize(buttonSize);
         refreshButton.setMaximumSize(buttonSize); // Set the maximum size
-        var testBtn = new CustomButton(AssetUtils.getImage(ASSET_REFRESH_BUTTON));
+        var testBtn = new GameButton(AssetUtils.getImage(ASSET_REFRESH_BUTTON));
         testBtn.addActionListener(e -> refreshNetwork());
         testBtn.setMaximumSize(buttonSize); // Set the maximum size
         testBtn.setPreferredSize(buttonSize); // Set the maximum size
@@ -134,60 +128,35 @@ public class NetworkScreen extends GamePanel implements ComponentListener, Focus
         buttonPanel.add(Box.createHorizontalGlue());
 
 
-        listHostPanel.add(Box.createVerticalGlue());
         listHostPanel.add(buttonPanel);
-        listHostPanel.add(Box.createVerticalStrut(20));
-        updateUI();
     }
 
     public void refreshNetwork() {
         Client client = battleShip.getClient();
-        SwingUtilities.invokeLater(() -> {
-            client.scanHost();
-            updateListHost(client.getHostList());
-            repaint();
-        });
+        client.scanHost();
     }
 
-    private void updateListHost(List<InetAddress> hostList) {
+    public void updateListHost(List<InetAddress> hostList) {
         hostListItems.clear();
         for (int i = 0, hostListSize = hostList.size(); i < hostListSize; i++) {
 
         }
     }
 
-    @Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        Graphics2D g2d = (Graphics2D) g;
-
-        g2d.setFont(new Font("Arial", Font.BOLD, 20));
-
-        if (listHostBackground != null) {
-            listHostBackground.render(g);
-        }
-
-        g2d.setColor(Color.WHITE);
-
-        renderListHost(g);
-    }
-
-    private void renderListHost(Graphics g) {
-        for (HostListItem hostListItem : hostListItems) {
-            // TODO: render host list item
-        }
-    }
 
     @Override
     public void componentResized(ComponentEvent e) {
         listHostPanel.setSize((int) (getWidth() - margin * GameSetting.SCALE * 6),
                               getHeight() - margin * 2);
         listHostPanel.setMaximumSize(new Dimension((int) (getWidth() - margin * GameSetting.SCALE * 6),
-                                                   getHeight() - margin * 2));
+                                                   getHeight() - margin * 3));
         listHostPanel.setLocation((getWidth() - listHostPanel.getWidth()) / 2,
                                   (getHeight() - listHostPanel.getHeight()) / 2);
         hostListTextPanel.setLocation((getWidth() - hostListTextPanel.getWidth()) / 2,
                                       listHostPanel.getY() - hostListTextPanel.getHeight() / 2);
+
+        buttonPanel.setLocation(listHostPanel.getX(), listHostPanel.getY() + listHostPanel.getHeight());
+        buttonPanel.setSize(new Dimension(listHostPanel.getWidth(), 64));
 
         listHostPanel.setRadius(40);
 
@@ -206,14 +175,6 @@ public class NetworkScreen extends GamePanel implements ComponentListener, Focus
     public void componentHidden(ComponentEvent e) {
     }
 
-    @Override
-    public void focusGained(FocusEvent e) {
-        refreshNetwork();
-    }
-
-    @Override
-    public void focusLost(FocusEvent e) {
-    }
 
     class HostListItem extends GamePanel {
         String hostName;
@@ -226,7 +187,6 @@ public class NetworkScreen extends GamePanel implements ComponentListener, Focus
             this.hostName = hostName;
             this.ipAddress = ipAddress;
             this.status = status;
-            setSize(listHostBackground.getWidth() - margin * 2, 50);
             setLocation(point);
         }
     }

@@ -1,12 +1,12 @@
 package com.htilssu.ui.component;
 
-import com.htilssu.entity.Sprite;
-
+import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-import javax.swing.*;
 
 public class GameButton extends JButton {
 
@@ -19,23 +19,10 @@ public class GameButton extends JButton {
     }
 
     public GameButton() {
-        setFocusPainted(false);
+        super();
         setBorderPainted(false);
         setContentAreaFilled(false);
-        setOpaque(false);
-        setBackground(new Color(0, 0, 0, 0));
-
-        addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                setCursor(new Cursor(Cursor.HAND_CURSOR));
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-                setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-            }
-        });
+        setFocusPainted(false);
     }
 
     public BufferedImage getBackgroundImage() {
