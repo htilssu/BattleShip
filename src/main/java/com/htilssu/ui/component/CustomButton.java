@@ -1,4 +1,4 @@
-package com.htilssu.component;
+package com.htilssu.ui.component;
 
 import com.htilssu.util.AssetUtils;
 
@@ -25,15 +25,23 @@ public class CustomButton extends JButton {
                     @Override
                     public void mouseEntered(MouseEvent e) { // khi tro chuot vao
                         isHovered = true;
-                        repaint();
                     }
 
                     @Override
                     public void mouseExited(MouseEvent e) {
                         isHovered = false;
-                        repaint();
                     }
                 });
+    }
+
+    public CustomButton(BufferedImage image) {
+        this.normalImage = image;
+
+        setBorderPainted(false);
+        setContentAreaFilled(false);
+        setFocusPainted(false);
+        setOpaque(false);
+
     }
 
     @Override

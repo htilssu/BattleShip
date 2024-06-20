@@ -40,6 +40,7 @@ public class Player {
 
   public void setPlayerBoard(PlayerBoard playerBoard) {
     this.playerBoard = playerBoard;
+    this.playerBoard.player = this;
   }
 
   public String getName() {
