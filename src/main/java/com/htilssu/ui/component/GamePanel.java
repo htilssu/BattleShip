@@ -22,6 +22,18 @@ public class GamePanel extends JPanel {
         setBackground(Color.TRANSPARENT);
     }
 
+    public static GamePanel createVerticalBox(){
+        var gamePanel = new  GamePanel();
+        gamePanel.setLayout(new BoxLayout(gamePanel,BoxLayout.Y_AXIS));
+        return gamePanel;
+    }
+
+    public static GamePanel createHorizontalBox() {
+        var gamePanel = new GamePanel();
+        gamePanel.setLayout(new BoxLayout(gamePanel, BoxLayout.X_AXIS));
+        return gamePanel;
+    }
+
     public BufferedImage getBackgroundImage() {
         return backgroundImage;
     }
@@ -46,14 +58,16 @@ public class GamePanel extends JPanel {
 
     public void setRadius(int radius) {
         this.radius = radius;
-        Shape rect = new RoundRectangle2D.Double(0, 0, getWidth(), getHeight(), radius, radius);
-        this.getGraphics().setClip(rect);
     }
 
     @Override
     protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        renderBackground(g);
+        Graphics2D g2d = (Graphics2D) g.create();
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2d.setClip(new RoundRectangle2D.Double(0, 0, getWidth(), getHeight(), radius, radius));
+        super.paintComponent(g2d);
+        renderBackground(g2d);
+        g2d.dispose();
     }
 
     private void renderBackground(Graphics g) {

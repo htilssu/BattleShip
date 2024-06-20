@@ -33,12 +33,27 @@ public class AssetUtils {
     public static final int ASSET_UNREADY_BUTTON = 12;
     public static final int ASSET_REFRESH_BUTTON = 13;
     public static final int ASSET_BACK_BUTTON = 14;
+    public static final int ASSET_TEXT_FIELD = 15;
+
+    public static Font gameFont;
+
 
     static Map<Integer, BufferedImage> assetMap = new HashMap<>();
 
-  static {
-    initAsset();
-  }
+    static {
+        initAsset();
+        loadFont();
+    }
+
+    private static void loadFont() {
+        try (var is = AssetUtils.class.getResourceAsStream("/font/Junter.otf")) {
+            if (is != null) {
+                gameFont = Font.createFont(Font.TRUETYPE_FONT, is).deriveFont(24f);
+            }
+        } catch (IOException | FontFormatException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     private static void initAsset() {
         BufferedImage asset1 = loadImage("/assets_1.png");
@@ -57,7 +72,7 @@ public class AssetUtils {
             assetMap.put(ASSET_READY_BUTTON, buttonAsset.getSubimage(0, 0, 64 * 6, 64 * 2));
             assetMap.put(ASSET_UNREADY_BUTTON, buttonAsset.getSubimage(64 * 6, 0, 64 * 6, 64 * 2));
             assetMap.put(ASSET_REFRESH_BUTTON, buttonAsset.getSubimage(64 * 12, 0, 64 * 6, 64 * 2));
-            assetMap.put(ASSET_BACK_BUTTON, buttonAsset.getSubimage(0, 64*2, 64*3, 64*3));
+            assetMap.put(ASSET_BACK_BUTTON, buttonAsset.getSubimage(0, 64 * 2, 64 * 3, 64 * 3));
         }
 
         assetMap.put(ASSET_BACK_SEA, blur(loadImage("/sea.png")));
@@ -69,6 +84,9 @@ public class AssetUtils {
                         GameLogger.error("asset: " + integer + " is null");
                     }
                 });
+
+
+        assetMap.put(ASSET_TEXT_FIELD, loadImage("/Item_TextField.png"));
     }
 
     /**
@@ -145,10 +163,10 @@ public class AssetUtils {
         return rotatedImage;
     }
 
-    public static AudioInputStream loadSound(String path)  {
+    public static AudioInputStream loadSound(String path) {
         //read sound file
         InputStream ip = AssetUtils.class.getResourceAsStream(path);
-        if (ip != null){
+        if (ip != null) {
             try {
                 return AudioSystem.getAudioInputStream(ip);
             } catch (UnsupportedAudioFileException | IOException e) {
