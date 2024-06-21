@@ -1,5 +1,6 @@
 package com.htilssu.entity.component;
 
+import com.htilssu.manager.SoundManager;
 import com.htilssu.screen.Start2Player;
 import com.htilssu.ui.screen.Player2Screen;
 
@@ -55,14 +56,14 @@ public class AttackGrid extends BattleGrid {
 
                             boolean success = battleShip.getPlayer2Data().isHit(hit);
                             if (success) {
-                                //soundPlayer.playSound_Boom();
+                                SoundManager.playSound(SoundManager.BOOM_SOUND);
                                 battleShip.getPlayer1Data().setAttackData(x, y, "success");
-                                //soundPlayer.wait_Giay(250);
+                                SoundManager.wait_Giay(250);
                                 draw();
                             } else {
-                                //soundPlayer.playSound_Duck();
+                                SoundManager.playSound(SoundManager.DUCK_SOUND);
                                 battleShip.getPlayer1Data().setAttackData(x, y, "failure");
-                                //soundPlayer.wait_Giay(250);
+                                SoundManager.wait_Giay(250);
                                 draw();
                             }
 
@@ -93,15 +94,15 @@ public class AttackGrid extends BattleGrid {
 
                             boolean success = battleShip.getPlayer1Data().isHit(hit);
                             if (success) {
-                                //soundPlayer.playSound_Boom();
+                                SoundManager.playSound(SoundManager.BOOM_SOUND);
                                 System.out.print("player2 attack");
                                 battleShip.getPlayer2Data().setAttackData(x, y, "success");
-                                //soundPlayer.wait_Giay(250);
+                                SoundManager.wait_Giay(250);
                                 draw();
                             } else {
-                                //soundPlayer.playSound_Duck();
+                                SoundManager.playSound(SoundManager.DUCK_SOUND);
                                 battleShip.getPlayer2Data().setAttackData(x, y, "failure");
-                                //soundPlayer.wait_Giay(250);
+                                SoundManager.wait_Giay(250);
                                 draw();
                             }
 

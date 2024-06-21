@@ -36,7 +36,6 @@ public class Start2Player extends JPanel implements GameState {
 
         setLayout(new GridBagLayout());
         loadBackground();
-        SoundManager.playBackGround(SoundManager.BACKGROUND_TEST);
 
         JButton playButton = new JButton("Bắt Đầu");
         playButton.setPreferredSize(new Dimension(100, 50)); // Kích thước cụ thể cho JButton
@@ -50,12 +49,12 @@ public class Start2Player extends JPanel implements GameState {
         playButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                //Dang bi loi am thanh cho nay
-                //soundPlayer.playSound_Start();
+                SoundManager.playSound(SoundManager.START_SOUND);
                 // Đóng màn hình hiện tại
                 SwingUtilities.getWindowAncestor(Start2Player.this).dispose();
                 SetNew();
-
+                //time delay
+                SoundManager.wait_Giay(200);
                 player1Turn();
                 player2turn();
             }
@@ -64,7 +63,7 @@ public class Start2Player extends JPanel implements GameState {
 
     public void SetNew()
     {
-
+        SoundManager.playBackGround(SoundManager.BACKGROUND_TEST);
         player1 = new Player2Screen("Player1", true,this);
         player2 = new Player2Screen("Player2", false,this);
         player1Data = new PlayerData(player1);
@@ -84,7 +83,7 @@ public class Start2Player extends JPanel implements GameState {
     }
 
     private void loadBackground(){
-        backgroundImage = AssetUtils.loadImage("/player2game.png");
+        backgroundImage = AssetUtils.loadImage("/imageStart2game.png");
     }
 
     @Override
