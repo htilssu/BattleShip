@@ -49,18 +49,16 @@ public class Start2Player extends JPanel implements GameState {
         playButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                SoundManager.playSound(SoundManager.START_SOUND);
                 // Đóng màn hình hiện tại
                 SwingUtilities.getWindowAncestor(Start2Player.this).dispose();
                 SetNew();
                 //time delay
+                SoundManager.wait_Giay(200);
                 player1Turn();
                 player2turn();
             }
         });
-    }
-
-    private void loadBackground() {
-        backgroundImage = AssetUtils.loadImage("/imageStart2game.png");
     }
 
     public void SetNew()
@@ -77,21 +75,24 @@ public class Start2Player extends JPanel implements GameState {
     }
 
     @Override
-    public void player1Turn() {
-        state.player1Turn();
-    }
-
-    @Override
-    public void player2turn() {
-        state.player2turn();
-    }
-
-    @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         if (backgroundImage != null) {
             g.drawImage(backgroundImage, 0, 0, this.getWidth(), this.getHeight(), this);
         }
+    }
+
+    private void loadBackground(){
+        backgroundImage = AssetUtils.loadImage("/imageStart2game.png");
+    }
+
+    @Override
+    public void player1Turn() {
+        state.player1Turn();
+    }
+    @Override
+    public void player2turn() {
+        state.player2turn();
     }
 
     public GameState getMiddleOfTheGame() {

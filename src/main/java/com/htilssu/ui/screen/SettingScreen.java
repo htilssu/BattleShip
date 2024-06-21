@@ -1,18 +1,18 @@
 package com.htilssu.ui.screen;
 
 import com.htilssu.BattleShip;
-import com.htilssu.manager.ScreenManager;
 import com.htilssu.ui.component.CustomSliderUI;
+import com.htilssu.manager.ScreenManager;
 import com.htilssu.util.AssetUtils;
 import com.htilssu.util.Color;
 
-import javax.sound.sampled.Clip;
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.util.Objects;
+import javax.sound.sampled.Clip;
+import javax.swing.*;
 
 public class SettingScreen extends JPanel {
     private final BattleShip window;
@@ -34,9 +34,19 @@ public class SettingScreen extends JPanel {
         loadBackgroundImage();
     }
 
+  private void backToMenu() {
+    // Sử dụng BattleShip để chuyển đổi màn hình
+    window.changeScreen(ScreenManager.MENU_SCREEN);
+  }
+
+  private void loadBackgroundImage() {
+
+    backgroundImage = AssetUtils.loadImage("/sea2.png"); // Load background image
+  }
+
   private void initializeComponents() {
     // Tạo JLabel cho biểu tượng cái loa
-      volumeIconLabel = new JLabel(new ImageIcon(Objects.requireNonNull(AssetUtils.loadImage("/images/soundon.png"))));
+    volumeIconLabel = new JLabel(new ImageIcon(AssetUtils.loadImage("/soundon.png")));
     volumeIconLabel.setBounds(100, 100, 100, 80);
     volumeIconLabel.addMouseListener(
         new MouseAdapter() {
@@ -67,7 +77,7 @@ public class SettingScreen extends JPanel {
                 e -> {
                     int value = volumeSlider.getValue();
                     volumePercentageLabel.setText(value + "%"); // Sử dụng biến thành viên
-                    adjustVolume(value);
+
                 });
         add(volumeSlider);
 
@@ -77,7 +87,7 @@ public class SettingScreen extends JPanel {
         add(volumePercentageLabel);
 
     // Tạo nút "Back" để quay lại màn hình menu
-      JButton backButton = new JButton(new ImageIcon(Objects.requireNonNull(AssetUtils.loadImage("/images/back.png"))));
+    JButton backButton = new JButton(new ImageIcon(Objects.requireNonNull(AssetUtils.loadImage("/back.png"))));
     backButton.setBounds(100, 300, 200, 52); // Điều chỉnh vị trí và kích thước theo nhu cầu của bạn
     backButton.setContentAreaFilled(false);
     backButton.setBorderPainted(false);
@@ -86,9 +96,9 @@ public class SettingScreen extends JPanel {
     add(backButton);
   }
 
-    private void loadCursorImage() {
-        cursorImage = AssetUtils.loadImage("/images/Layer2.png"); // Load cursor image
-    }
+  private void loadCursorImage() {
+    cursorImage = AssetUtils.loadImage("/Layer2.png"); // Load cursor image
+  }
 
     private void setCustomCursor() {
         Cursor customCursor =
@@ -97,10 +107,6 @@ public class SettingScreen extends JPanel {
         setCursor(customCursor);
     }
 
-    private void loadBackgroundImage() {
-
-    backgroundImage = AssetUtils.loadImage("/sea2.png"); // Load background image
-  }
 
   private void toggleMute() {
     isMuted = !isMuted;
@@ -112,34 +118,18 @@ public class SettingScreen extends JPanel {
           backgroundMusicClip.stop();
           volumeIconLabel.setIcon(
               new ImageIcon(
-                      Objects.requireNonNull(
-                              AssetUtils.loadImage("/soundoff.png")))); // Thay đổi hình ảnh khi tắt âm thanh
+                  AssetUtils.loadImage("/soundoff.png"))); // Thay đổi hình ảnh khi tắt âm thanh
         } else {
           backgroundMusicClip.start();
           volumeIconLabel.setIcon(
               new ImageIcon(
-                      Objects.requireNonNull(
-                              AssetUtils.loadImage("/soundon.png")))); // Thay đổi hình ảnh khi mở âm thanh
+                  AssetUtils.loadImage("/soundon.png"))); // Thay đổi hình ảnh khi mở âm thanh
         }
       }
     }
   }
 
-    private void adjustVolume(int volume) {
-        if (volume < 0) volume = 0;
-        if (volume > 100) volume = 100;
-        currentVolume = volume;
 
-        MenuScreen menuScreen = MenuScreen.getInstance();
-        if (menuScreen != null) {
-            menuScreen.setVolume(volume);
-        }
-    }
-
-    private void backToMenu() {
-        // Sử dụng BattleShip để chuyển đổi màn hình
-        window.changeScreen(ScreenManager.MENU_SCREEN);
-    }
 
     @Override
     protected void paintComponent(Graphics g) {
