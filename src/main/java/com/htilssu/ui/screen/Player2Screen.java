@@ -1,8 +1,6 @@
 package com.htilssu.ui.screen;
 
 import com.htilssu.listener.ButtonClickListener;
-import com.htilssu.manager.SoundManager;
-import com.htilssu.screen.Start2Player;
 import com.htilssu.entity.component.AttackGrid;
 import com.htilssu.entity.component.SelfGrid;
 import com.htilssu.setting.GameSetting;

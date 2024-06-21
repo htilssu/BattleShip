@@ -10,6 +10,7 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.util.Objects;
 import javax.sound.sampled.Clip;
 import javax.swing.*;
 
@@ -76,7 +77,7 @@ public class SettingScreen extends JPanel {
                 e -> {
                     int value = volumeSlider.getValue();
                     volumePercentageLabel.setText(value + "%"); // Sử dụng biến thành viên
-                    adjustVolume(value);
+
                 });
         add(volumeSlider);
 
@@ -86,7 +87,7 @@ public class SettingScreen extends JPanel {
         add(volumePercentageLabel);
 
     // Tạo nút "Back" để quay lại màn hình menu
-    JButton backButton = new JButton(new ImageIcon(AssetUtils.loadImage("/back.png")));
+    JButton backButton = new JButton(new ImageIcon(Objects.requireNonNull(AssetUtils.loadImage("/back.png"))));
     backButton.setBounds(100, 300, 200, 52); // Điều chỉnh vị trí và kích thước theo nhu cầu của bạn
     backButton.setContentAreaFilled(false);
     backButton.setBorderPainted(false);
@@ -106,10 +107,6 @@ public class SettingScreen extends JPanel {
         setCursor(customCursor);
     }
 
-    private void loadBackgroundImage() {
-
-    backgroundImage = AssetUtils.loadImage("/sea2.png"); // Load background image
-  }
 
   private void toggleMute() {
     isMuted = !isMuted;
@@ -132,14 +129,7 @@ public class SettingScreen extends JPanel {
     }
   }
 
-  private void loadCursorImage() {
-    cursorImage = AssetUtils.loadImage("/Layer2.png"); // Load cursor image
-  }
 
-    private void backToMenu() {
-        // Sử dụng BattleShip để chuyển đổi màn hình
-        window.changeScreen(ScreenManager.MENU_SCREEN);
-    }
 
     @Override
     protected void paintComponent(Graphics g) {

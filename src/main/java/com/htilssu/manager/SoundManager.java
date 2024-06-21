@@ -19,7 +19,6 @@ public final class SoundManager {
     public static final int ERROR_SOUND = 7;
 
     static boolean isBackgroundPlaying = false;
-    private static Clip backgroundClip;
 
     private static Map<Integer, String> soundMap = new HashMap<>();
 
