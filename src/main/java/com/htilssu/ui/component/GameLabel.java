@@ -8,12 +8,12 @@ public class GameLabel extends JLabel {
 
     public GameLabel(String text) {
         super(text);
+        setOpaque(false);
         setFont(AssetUtils.gameFont.deriveFont(20f));
     }
 
     public GameLabel() {
         super();
-
         setFont(AssetUtils.gameFont.deriveFont(20f));
     }
 

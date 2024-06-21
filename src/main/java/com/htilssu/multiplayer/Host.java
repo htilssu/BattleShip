@@ -6,9 +6,10 @@ import com.htilssu.event.game.GameAction;
 import com.htilssu.event.game.GameStartEvent;
 import com.htilssu.setting.GameSetting;
 import com.htilssu.util.GameLogger;
-import org.jetbrains.annotations.NotNull;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.UUID;
@@ -22,10 +23,8 @@ public class Host extends MultiHandler implements Runnable {
     Thread hostListenThread = new Thread(this);
     boolean canHost = true;
     int ready = 0;
+    private String hostName;
 
-    public Host() {
-        super();
-    }
 
     public Host(BattleShip battleShip) {
         super(battleShip);
@@ -46,7 +45,6 @@ public class Host extends MultiHandler implements Runnable {
         hostListenThread.start();
     }
 
-
     @Override
     public void run() {
         while (canHost) {
@@ -61,20 +59,6 @@ public class Host extends MultiHandler implements Runnable {
                 readData(socket);
             }
             setHost(false);
-        }
-    }
-
-    public void send(Object... obj) {
-        try {
-            OutputStream os = socket.getOutputStream();
-            PrintWriter pw = new PrintWriter(os, true);
-            StringBuilder sb = new StringBuilder();
-            for (Object o : obj) {
-                sb.append(o).append("|");
-            }
-            pw.println(sb);
-        } catch (IOException e) {
-            GameLogger.error("Có lỗi khi gửi dữ liệu tới client");
         }
     }
 
@@ -99,6 +83,20 @@ public class Host extends MultiHandler implements Runnable {
         }
     }
 
+    public void send(Object... obj) {
+        try {
+            OutputStream os = socket.getOutputStream();
+            PrintWriter pw = new PrintWriter(os, true);
+            StringBuilder sb = new StringBuilder();
+            for (Object o : obj) {
+                sb.append(o).append("|");
+            }
+            pw.println(sb);
+        } catch (IOException e) {
+            GameLogger.error("Có lỗi khi gửi dữ liệu tới client");
+        }
+    }
+
     public void stop() {
         canHost = false;
     }
@@ -107,4 +105,11 @@ public class Host extends MultiHandler implements Runnable {
         return id;
     }
 
+    public String getHostName() {
+        return hostName;
+    }
+
+    public void setHostName(String hostName) {
+        this.hostName = hostName;
+    }
 }

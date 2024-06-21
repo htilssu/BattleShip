@@ -27,10 +27,9 @@ public class NetworkScreen extends GamePanel implements ComponentListener {
     private final List<Component> spaceStructItemList = new ArrayList<>();
     private final int margin = 50;
     private final BufferedImage hostItemBackground;
-    private GamePanel hostListPanel;
-    private GamePanel textHostPanel;
+    private GamePanel textHostPanel, hostListPanel, hostSettingPanel;
+    private GameTextField hostNameTextField;
     private JPanel buttonPanel;
-    private GamePanel hostSettingPanel;
 
     public NetworkScreen(BattleShip battleShip) {
         super();
@@ -115,7 +114,20 @@ public class NetworkScreen extends GamePanel implements ComponentListener {
         hostSettingPanel.add(inputBox);
 
         hostSettingPanel.add(Box.createVerticalStrut(30));
-        GamePanel createHostButton = new GamePanel(AssetUtils.loadImage("/images/Icon_Add.png"));
+
+        //add create host button
+        GameButton createHostButton = new GameButton(AssetUtils.getImage(ASSET_BUTTON_2));
+        createHostButton.setMaximumSize(new Dimension(64 * 2, 64));
+        createHostButton.setPreferredSize(createHostButton.getMaximumSize());
+        createHostButton.setMinimumSize(createHostButton.getMaximumSize());
+        createHostButton.setAlignmentX(CENTER_ALIGNMENT);
+        createHostButton.setText("Create");
+        createHostButton.addActionListener(e -> {
+            battleShip.getHost().setHostName(hostNameTextField.getText());
+            battleShip.getHost().start();
+            hideHostSettingPanel();
+        });
+
         hostSettingPanel.add(createHostButton);
 
 
@@ -189,33 +201,36 @@ public class NetworkScreen extends GamePanel implements ComponentListener {
 
     private Box getInputBox() {
         var inputBox = Box.createHorizontalBox();
-        inputBox.add(Box.createHorizontalGlue());
+        //set test border
+
         Box inputContentBox = Box.createVerticalBox();
         inputContentBox.setMaximumSize(new Dimension(450, Integer.MAX_VALUE));
         inputContentBox.setPreferredSize(inputContentBox.getMaximumSize());
 
+        inputBox.add(Box.createHorizontalGlue());
         inputBox.add(inputContentBox);
         inputBox.add(Box.createHorizontalGlue());
 
 
         //hostName input
-        GameLabel hostNameLabel = new GameLabel("HostName: ");
-
-        var hostNameTextField = new GameTextField();
-        hostNameTextField.setHorizontalAlignment(JTextField.CENTER);
-        hostNameTextField.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
-        hostNameTextField.setRadius(20);
-
         var hostNameBox = Box.createHorizontalBox();
-        hostNameBox.add(Box.createHorizontalGlue());
-        hostNameBox.add(hostNameTextField);
+        GameLabel hostNameLabel = new GameLabel("HostName: ");
+        hostNameBox.add(hostNameLabel);
         hostNameBox.add(Box.createHorizontalGlue());
 
-        inputContentBox.add(hostNameLabel);
-        inputContentBox.add(Box.createVerticalStrut(10));
         inputContentBox.add(hostNameBox);
 
 
+        hostNameTextField = new GameTextField();
+        hostNameTextField.setName("hostName");
+        hostNameTextField.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
+        hostNameTextField.setRadius(20);
+
+
+        inputContentBox.add(hostNameTextField);
+
+
+        inputBox.updateUI();
         return inputBox;
     }
 
@@ -278,9 +293,6 @@ public class NetworkScreen extends GamePanel implements ComponentListener {
         updateUI();
     }
 
-
-
-
     @Override
     public void componentResized(ComponentEvent e) {
         hostListPanel.setSize((int) (getWidth() - margin * GameSetting.SCALE * 6),
@@ -317,7 +329,6 @@ public class NetworkScreen extends GamePanel implements ComponentListener {
         String hostName;
         InetAddress ipAddress;
         String status;
-        private boolean isSelected;
 
         public HostItem(String hostName, InetAddress ipAddress, String status) {
             super();
