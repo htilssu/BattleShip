@@ -1,10 +1,16 @@
 name: publish a release
 on:
   push:
-    branches:
-      - release/*
-      - releases/*
-      - main
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to publish'
+        required: true
+        default: 'v0.0.0'
+
+
 
 jobs:
   build:
@@ -22,7 +28,7 @@ jobs:
           distribution: 'corretto'
 
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@v3
+        uses: gradle/actions/setup-gradle@v3
 
       - name: Build with Gradle Wrapper
         run: |
@@ -30,6 +36,8 @@ jobs:
           ./gradlew build
 
   publish:
+    needs:
+      - build
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -42,10 +50,19 @@ jobs:
           java-version: '21'
           distribution: 'corretto'
 
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: 'build project'
+        run: |
+          chmod +x ./gradlew
+          ./gradlew build
+
       - name: GH Release
         uses: softprops/action-gh-release@v2.0.6
         with:
           make_latest: true
-          files: |
-            build/libs/*
-          tag_name: ${{ github.ref }}
+          files: '${{ github.workspace }}/build/libs/*.jar'
+          name: 'release'
+          tag_name: |
+            ${{github.ref.tags == null && inputs.tag || github.ref.tags}}
