@@ -32,9 +32,9 @@ public class NetworkScreen extends GamePanel implements ComponentListener {
     public NetworkScreen(BattleShip battleShip) {
         super();
         this.battleShip = battleShip;
-        listHostBackground = AssetUtils.loadImage("/ListHostBG.jpg");
+        listHostBackground = AssetUtils.loadImage("/images/ListHostBG.jpg");
 
-        setBackgroundImage(AssetUtils.loadImage("/sea_of_thief.png"));
+        setBackgroundImage(AssetUtils.loadImage("/images/sea_of_thief.png"));
         setLayout(null);
         setFocusable(true);
 
@@ -55,9 +55,6 @@ public class NetworkScreen extends GamePanel implements ComponentListener {
 
         add(listHostPanel);
         listHostPanel.add(Box.createVerticalStrut(margin));
-
-//        initListHostHeader();
-
 
         initListHostButton();
     }
@@ -80,11 +77,11 @@ public class NetworkScreen extends GamePanel implements ComponentListener {
     }
 
     private void initHostSettingPanel() {
-        hostSettingPanel = new GamePanel(AssetUtils.loadImage("/Menu_Bg.png"));
+        hostSettingPanel = new GamePanel(AssetUtils.loadImage("/images/Menu_Bg.png"));
 
         hostSettingPanel.setLayout(new BoxLayout(hostSettingPanel, BoxLayout.Y_AXIS));
         //create exit button
-        var exitButton = new GamePanel(AssetUtils.loadImage("/Icon_X.png"));
+        var exitButton = new GamePanel(AssetUtils.loadImage("/images/Icon_X.png"));
 
         exitButton.setMaximumSize(new Dimension(32, 32));
         exitButton.setPreferredSize(exitButton.getMaximumSize());
@@ -124,7 +121,7 @@ public class NetworkScreen extends GamePanel implements ComponentListener {
         Dimension buttonSize = new Dimension(64 * 3, 64);
         refreshButton.setPreferredSize(buttonSize);
         refreshButton.setMaximumSize(buttonSize);
-        var createHost = new GamePanel(AssetUtils.loadImage("/Icon_Add.png"));
+        var createHost = new GamePanel(AssetUtils.loadImage("/images/Icon_Add.png"));
         createHost.setMaximumSize(new Dimension(64, 64));
         createHost.setPreferredSize(createHost.getMaximumSize());
 
@@ -236,7 +233,40 @@ public class NetworkScreen extends GamePanel implements ComponentListener {
         }
 
         updateUI();
-        repaint();
+    }
+
+
+    @Deprecated
+    private void initListHostHeader() {
+
+        var font = new Font("Arial", Font.BOLD, 20);
+
+        JLabel hostName = new JLabel("Host Name");
+        hostName.setForeground(Color.WHITE);
+        hostName.setFont(font);
+        JLabel ipAddress = new JLabel("IP Address");
+        ipAddress.setForeground(Color.WHITE);
+        ipAddress.setFont(font);
+        JLabel status = new JLabel("Status");
+        status.setForeground(Color.WHITE);
+        status.setFont(font);
+
+        var container = GamePanel.createHorizontalBox();
+        container.add(Box.createHorizontalStrut(margin));
+        container.add(hostName);
+        container.add(Box.createHorizontalGlue());
+        container.add(ipAddress);
+        container.add(Box.createHorizontalGlue());
+        container.add(status);
+        container.add(Box.createHorizontalStrut(margin));
+
+        container.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
+        container.setBackground(com.htilssu.util.Color.TRANSPARENT);
+
+
+        listHostPanel.add(container);
+        listHostPanel.add(Box.createVerticalStrut(10));
+        updateUI();
     }
 
     @Override
@@ -275,6 +305,7 @@ public class NetworkScreen extends GamePanel implements ComponentListener {
         String hostName;
         InetAddress ipAddress;
         String status;
+        private boolean isSelected;
 
         public HostListItem(String hostName, InetAddress ipAddress, String status) {
             super();

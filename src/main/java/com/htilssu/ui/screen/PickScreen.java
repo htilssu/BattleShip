@@ -29,8 +29,8 @@ public class PickScreen extends JPanel {
         addMouseListener(
                 new MouseAdapter() {
                     @Override
-                    public void mouseMoved(MouseEvent e) {
-                        handleMouseMove(e.getX(), e.getY());
+                    public void mouseClicked(MouseEvent e) {
+                        handleMouseClick(e.getX(), e.getY());
                     }
 
                     @Override
@@ -46,8 +46,8 @@ public class PickScreen extends JPanel {
                     }
 
                     @Override
-                    public void mouseClicked(MouseEvent e) {
-                        handleMouseClick(e.getX(), e.getY());
+                    public void mouseMoved(MouseEvent e) {
+                        handleMouseMove(e.getX(), e.getY());
                     }
                 });
 
@@ -60,11 +60,8 @@ public class PickScreen extends JPanel {
                 });
     }
 
-    private void handleMouseClick(int mouseX, int mouseY) {
-        if (isInsideImage(
-                mouseX, mouseY, normalImageX, normalImageY, newNormalImageWidth, newImageHeight)) {
-            transitionToGameScreen();
-        }
+    private void loadBackgroundImage() {
+        backgroundImage = AssetUtils.loadImage("/images/ground.png"); // Tải hình nền
     }
 
     private void handleMouseMove(int mouseX, int mouseY) {
@@ -81,12 +78,23 @@ public class PickScreen extends JPanel {
         }
     }
 
+    private void handleMouseClick(int mouseX, int mouseY) {
+        if (isInsideImage(
+                mouseX, mouseY, normalImageX, normalImageY, newNormalImageWidth, newImageHeight)) {
+            transitionToGameScreen();
+        }
+    }
+
     private boolean isInsideImage(
             int mouseX, int mouseY, int imageX, int imageY, int imageWidth, int imageHeight) {
         return mouseX >= imageX
                 && mouseX <= imageX + imageWidth
                 && mouseY >= imageY
                 && mouseY <= imageY + imageHeight;
+    }
+
+    private void transitionToGameScreen() {
+        window.changeScreen(ScreenManager.START2_PLAYER_SCREEN);
     }
 
     @Override
@@ -155,13 +163,5 @@ public class PickScreen extends JPanel {
         int xOffset = (width - newWidth) / 2; // Tọa độ x khi hover
         int yOffset = (height - newHeight) / 2; // Tọa độ y khi hover
         g.drawImage(image, x + xOffset, y + yOffset, newWidth, newHeight, this);
-    }
-
-    private void transitionToGameScreen() {
-        window.changeScreen(ScreenManager.START2_PLAYER_SCREEN);
-    }
-
-    private void loadBackgroundImage() {
-        backgroundImage = AssetUtils.loadImage("/ground.png"); // Tải hình nền
     }
 }

@@ -19,10 +19,6 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import javax.imageio.ImageIO;
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.UnsupportedAudioFileException;
 
 public class AssetUtils {
     public static final int ASSET_BOARD_FRAME = 1;
@@ -62,8 +58,8 @@ public class AssetUtils {
     }
 
     private static void initAsset() {
-        BufferedImage asset1 = loadImage("/assets_1.png");
-        BufferedImage buttonAsset = loadImage("/button_asset.png");
+        BufferedImage asset1 = loadImage("/images/assets_1.png");
+        BufferedImage buttonAsset = loadImage("/images/button_asset.png");
         if (asset1 != null) {
             assetMap.put(ASSET_SHOOT_MISS, asset1.getSubimage(0, 0, 64, 64));
             assetMap.put(ASSET_SHOOT_HIT, asset1.getSubimage(64, 0, 64, 64));
@@ -81,8 +77,8 @@ public class AssetUtils {
             assetMap.put(ASSET_BACK_BUTTON, buttonAsset.getSubimage(0, 64 * 2, 64 * 3, 64 * 3));
         }
 
-        assetMap.put(ASSET_BACK_SEA, blur(loadImage("/sea.png")));
-        assetMap.put(ASSET_BACK_SEA_2, loadImage("/sea_of_thief_2.png"));
+        assetMap.put(ASSET_BACK_SEA, blur(loadImage("/images/sea.png")));
+        assetMap.put(ASSET_BACK_SEA_2, loadImage("/images/sea_of_thief_2.png"));
 
         assetMap.forEach(
                 (integer, bufferedImage) -> {
@@ -92,7 +88,7 @@ public class AssetUtils {
                 });
 
 
-        assetMap.put(ASSET_TEXT_FIELD, loadImage("/Item_TextField.png"));
+        assetMap.put(ASSET_TEXT_FIELD, loadImage("/images/Item_TextField.png"));
     }
 
     /**
@@ -170,7 +166,7 @@ public class AssetUtils {
     }
 
     public static AudioInputStream loadSound(String path) {
-        //read sound file
+        //read sounds file
         InputStream ip = AssetUtils.class.getResourceAsStream(path);
         if (ip != null) {
             try {
