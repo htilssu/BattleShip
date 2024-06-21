@@ -13,7 +13,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,14 +58,6 @@ public class NetworkScreen extends GamePanel implements ComponentListener {
 
 //        initListHostHeader();
 
-        var testInet = new ArrayList<InetAddress>();
-        testInet.add(InetAddress.getLoopbackAddress());
-        try {
-            testInet.add(InetAddress.getByName("192.22.42.2"));
-        } catch (UnknownHostException e) {
-            throw new RuntimeException(e);
-        }
-        updateListHost(testInet);
 
         initListHostButton();
     }
@@ -116,32 +107,6 @@ public class NetworkScreen extends GamePanel implements ComponentListener {
         hostSettingPanel.setSize(new Dimension(600, 450));
 
         hostSettingPanel.setVisible(true);
-    }
-
-    public void updateListHost(List<InetAddress> hostList) {
-
-        for (HostListItem hostListItem : hostListItems) {
-            listHostPanel.remove(hostListItem);
-        }
-
-        for (Component component : listStruct) {
-            listHostPanel.remove(component);
-        }
-
-        listStruct.clear();
-        hostListItems.clear();
-
-        for (InetAddress host : hostList) {
-            HostListItem hostListItem = new HostListItem(host.getHostName(), host, "Ready");
-            hostListItem.setRadius(20);
-            hostListItems.add(hostListItem);
-            var struct = Box.createVerticalStrut(20);
-            listHostPanel.add(struct);
-            listStruct.add(struct);
-            listHostPanel.add(hostListItem);
-        }
-
-        updateUI();
     }
 
     private void initListHostButton() {
@@ -247,36 +212,31 @@ public class NetworkScreen extends GamePanel implements ComponentListener {
         timer.start();
     }
 
-    private void initListHostHeader() {
+    public void updateListHost(List<InetAddress> hostList) {
 
-        var font = new Font("Arial", Font.BOLD, 20);
+        for (HostListItem hostListItem : hostListItems) {
+            listHostPanel.remove(hostListItem);
+        }
 
-        JLabel hostName = new JLabel("Host Name");
-        hostName.setForeground(Color.WHITE);
-        hostName.setFont(font);
-        JLabel ipAddress = new JLabel("IP Address");
-        ipAddress.setForeground(Color.WHITE);
-        ipAddress.setFont(font);
-        JLabel status = new JLabel("Status");
-        status.setForeground(Color.WHITE);
-        status.setFont(font);
+        for (Component component : listStruct) {
+            listHostPanel.remove(component);
+        }
 
-        var container = GamePanel.createHorizontalBox();
-        container.add(Box.createHorizontalStrut(margin));
-        container.add(hostName);
-        container.add(Box.createHorizontalGlue());
-        container.add(ipAddress);
-        container.add(Box.createHorizontalGlue());
-        container.add(status);
-        container.add(Box.createHorizontalStrut(margin));
+        listStruct.clear();
+        hostListItems.clear();
 
-        container.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
-        container.setBackground(com.htilssu.util.Color.TRANSPARENT);
+        for (InetAddress host : hostList) {
+            HostListItem hostListItem = new HostListItem(host.getHostName(), host, "Ready");
+            hostListItem.setRadius(20);
+            hostListItems.add(hostListItem);
+            var struct = Box.createVerticalStrut(20);
+            listHostPanel.add(struct);
+            listStruct.add(struct);
+            listHostPanel.add(hostListItem);
+        }
 
-
-        listHostPanel.add(container);
-        listHostPanel.add(Box.createVerticalStrut(10));
         updateUI();
+        repaint();
     }
 
     @Override
@@ -315,7 +275,6 @@ public class NetworkScreen extends GamePanel implements ComponentListener {
         String hostName;
         InetAddress ipAddress;
         String status;
-        private boolean isSelected;
 
         public HostListItem(String hostName, InetAddress ipAddress, String status) {
             super();
