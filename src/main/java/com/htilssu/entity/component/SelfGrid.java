@@ -1,7 +1,6 @@
 package com.htilssu.entity.component;
 
 import com.htilssu.dataPlayer.PlayerData;
-import com.htilssu.manager.SoundManager;
 import com.htilssu.ui.screen.Start2Player;
 
 import javax.swing.*;
@@ -52,11 +51,16 @@ public class SelfGrid extends BattleGrid {
     return p.x >= 0 && p.x < self.getWidth() && p.y >= 0 && p.y < self.getHeight();
   }
 
-  // Phương thức này gọi getComponentAt để lấy JPanel tại tọa độ được chỉ định và gán nó cho biến thePanel:
-  public void getJpanel(Point newPoint) {
-    thePanel = this.getComponentAt(newPoint);
-    if (thePanel == null) {
-      System.err.println("The panel at " + newPoint + " is null.");
+  // Phương thức để xóa các ô mẫu
+  private void clearHighlight() {
+    for (Component comp : self.getComponents()) {
+      if (comp instanceof JPanel) {
+        JPanel cell = (JPanel) comp;
+        if (!Color.RED.equals(cell.getBackground())) {
+          cell.setBackground(new Color(0, 0, 0, 0));
+          cell.setOpaque(false);
+        }
+      }
     }
   }
 
@@ -83,12 +87,10 @@ public class SelfGrid extends BattleGrid {
           // Kiểm tra xem tọa độ đã được đặt thuyền chưa và số lượng tàu đủ chưa
           PlayerData playerData = name.equals("Player1") ? battleShip.getPlayer1Data() : battleShip.getPlayer2Data();
           if (playerData.getSelfData()[x][y] == 1) {
-            SoundManager.playSound(SoundManager.ERROR_SOUND);
             System.out.println("Toa do da bi trung. Vui long chon khac!");
             return;
           }
           if (playerData.shipsCount() >= 4) {
-            SoundManager.playSound(SoundManager.ERROR_SOUND);
             System.out.println("SO LUONG TAU DA DU!");
             return;
           }
@@ -109,13 +111,11 @@ public class SelfGrid extends BattleGrid {
           if (name.equals("Player1")) {
             battleShip.getPlayer1Data().addShip(coords);
             // Tạo một khoảng thời gian chờ
-            SoundManager.wait_Giay(200);
             draw();
 
           } else if (name.equals("Player2")) {
             battleShip.getPlayer2Data().addShip(coords);
             // Tạo một khoảng thời gian chờ
-            SoundManager.wait_Giay(200);
             draw();
           }
 
@@ -141,43 +141,6 @@ public class SelfGrid extends BattleGrid {
     });
 
     return firstCell;
-  }
-
-  // Phương thức để hiển thị các ô mẫu
-  private void highlightCells(int startX, int startY, int shipSize) {
-    // Xóa các ô mẫu hiện tại
-    clearHighlight();
-
-    for (int i = 0; i < shipSize; i++) {
-      int x = isHorizontal ? startX + i : startX;
-      int y = isHorizontal ? startY : startY + i;
-
-      JPanel cell = (JPanel) self.getComponentAt(new Point(x * 25, y * 25));
-      if (cell != null) {
-        if (!Color.RED.equals(cell.getBackground())) {
-          cell.setBackground(Color.BLUE); // Đặt màu cho ô mẫu
-          cell.setOpaque(true);
-        }
-      }
-    }
-  }
-
-  // Phương thức để xóa các ô mẫu
-  private void clearHighlight() {
-    for (Component comp : self.getComponents()) {
-      if (comp instanceof JPanel) {
-        JPanel cell = (JPanel) comp;
-        if (!Color.RED.equals(cell.getBackground())) {
-          cell.setBackground(new Color(0, 0, 0, 0));
-          cell.setOpaque(false);
-        }
-      }
-    }
-  }
-
-  // Phương thức để xoay tàu
-  public void rotateShip() {
-    isHorizontal = !isHorizontal; //Đảo ngược trạng thái hướng của tàu
   }
 
   public void draw() {
@@ -218,12 +181,42 @@ public class SelfGrid extends BattleGrid {
     }
   }
 
+  // Phương thức để hiển thị các ô mẫu
+  private void highlightCells(int startX, int startY, int shipSize) {
+    // Xóa các ô mẫu hiện tại
+    clearHighlight();
+
+    for (int i = 0; i < shipSize; i++) {
+      int x = isHorizontal ? startX + i : startX;
+      int y = isHorizontal ? startY : startY + i;
+
+      JPanel cell = (JPanel) self.getComponentAt(new Point(x * 25, y * 25));
+      if (cell != null) {
+        if (!Color.RED.equals(cell.getBackground())) {
+          cell.setBackground(Color.BLUE); // Đặt màu cho ô mẫu
+          cell.setOpaque(true);
+        }
+      }
+    }
+  }
 
   //Hàm numberToPanel(int s) chuyển đổi giá trị s từ hệ tọa độ dữ liệu (0-10) thành hệ tọa độ giao diện đồ họa.
   public int numberToPanel(int s) {
     return (s - 1) * 25;
   }
 
+  // Phương thức này gọi getComponentAt để lấy JPanel tại tọa độ được chỉ định và gán nó cho biến thePanel:
+  public void getJpanel(Point newPoint) {
+    thePanel = this.getComponentAt(newPoint);
+    if (thePanel == null) {
+      System.err.println("The panel at " + newPoint + " is null.");
+    }
+  }
+
+  // Phương thức để xoay tàu
+  public void rotateShip() {
+    isHorizontal = !isHorizontal; //Đảo ngược trạng thái hướng của tàu
+  }
 
   public boolean getSelfGridListener() {
     return isSelfGridListener;

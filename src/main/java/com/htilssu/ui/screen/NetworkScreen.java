@@ -279,38 +279,7 @@ public class NetworkScreen extends GamePanel implements ComponentListener {
     }
 
 
-    @Deprecated
-    private void initListHostHeader() {
 
-        var font = new Font("Arial", Font.BOLD, 20);
-
-        JLabel hostName = new JLabel("Host Name");
-        hostName.setForeground(Color.WHITE);
-        hostName.setFont(font);
-        JLabel ipAddress = new JLabel("IP Address");
-        ipAddress.setForeground(Color.WHITE);
-        ipAddress.setFont(font);
-        JLabel status = new JLabel("Status");
-        status.setForeground(Color.WHITE);
-        status.setFont(font);
-
-        var container = GamePanel.createHorizontalBox();
-        container.add(Box.createHorizontalStrut(margin));
-        container.add(hostName);
-        container.add(Box.createHorizontalGlue());
-        container.add(ipAddress);
-        container.add(Box.createHorizontalGlue());
-        container.add(status);
-        container.add(Box.createHorizontalStrut(margin));
-
-        container.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
-        container.setBackground(com.htilssu.util.Color.TRANSPARENT);
-
-
-        listHostPanel.add(container);
-        listHostPanel.add(Box.createVerticalStrut(10));
-        updateUI();
-    }
 
     @Override
     public void componentResized(ComponentEvent e) {

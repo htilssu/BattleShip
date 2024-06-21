@@ -1,12 +1,13 @@
 package com.htilssu.entity.component;
 
 import com.htilssu.manager.SoundManager;
-import com.htilssu.screen.Start2Player;
 import com.htilssu.ui.screen.Player2Screen;
+import com.htilssu.ui.screen.Start2Player;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 /**
  Represents the player's own grid
  */
@@ -58,12 +59,10 @@ public class AttackGrid extends BattleGrid {
                             if (success) {
                                 SoundManager.playSound(SoundManager.BOOM_SOUND);
                                 battleShip.getPlayer1Data().setAttackData(x, y, "success");
-                                SoundManager.wait_Giay(250);
                                 draw();
                             } else {
                                 SoundManager.playSound(SoundManager.DUCK_SOUND);
                                 battleShip.getPlayer1Data().setAttackData(x, y, "failure");
-                                SoundManager.wait_Giay(250);
                                 draw();
                             }
 
@@ -97,12 +96,10 @@ public class AttackGrid extends BattleGrid {
                                 SoundManager.playSound(SoundManager.BOOM_SOUND);
                                 System.out.print("player2 attack");
                                 battleShip.getPlayer2Data().setAttackData(x, y, "success");
-                                SoundManager.wait_Giay(250);
                                 draw();
                             } else {
                                 SoundManager.playSound(SoundManager.DUCK_SOUND);
                                 battleShip.getPlayer2Data().setAttackData(x, y, "failure");
-                                SoundManager.wait_Giay(250);
                                 draw();
                             }
 
