@@ -1,6 +1,7 @@
 package com.htilssu.manager;
 
 import com.htilssu.util.AssetUtils;
+import com.htilssu.util.GameLogger;
 
 import javax.sound.sampled.*;
 import java.io.IOException;
@@ -9,7 +10,6 @@ import java.util.Map;
 
 public final class SoundManager {
 
-    private static Clip backgroundClip;
     public static final int BOOM_SOUND = 1;
     public static final int DUCK_SOUND = 2;
     public static final int PUT_SHIP_SOUND = 3;
@@ -17,19 +17,18 @@ public final class SoundManager {
     public static final int BACKGROUND_TEST = 5;
     public static final int START_SOUND = 6;
     public static final int ERROR_SOUND = 7;
-
+    private static final Map<Integer, String> soundMap = new HashMap<>();
     static boolean isBackgroundPlaying = false;
-
-    private static Map<Integer, String> soundMap = new HashMap<>();
+    private static Clip backgroundClip;
 
     static {
-        soundMap.put(BOOM_SOUND, "/sound/A_BoomSound.wav");
-        soundMap.put(DUCK_SOUND, "/sound/A_DuckSound.wav");
-        soundMap.put(PUT_SHIP_SOUND, "/sound/A_PutShipSound.wav");
-        soundMap.put(ATTACK_SOUND, "/sound/A_SoundAttack.wav");
-        soundMap.put(BACKGROUND_TEST, "/sound/A_SoundNen.wav");
-        soundMap.put(START_SOUND, "/sound/A_SoundStart.wav");
-        soundMap.put(ERROR_SOUND, "/sound/A_ErrorSound.wav");
+        soundMap.put(BOOM_SOUND, "/sounds/A_BoomSound.wav");
+        soundMap.put(DUCK_SOUND, "/sounds/A_DuckSound.wav");
+        soundMap.put(PUT_SHIP_SOUND, "/sounds/A_PutShipSound.wav");
+        soundMap.put(ATTACK_SOUND, "/sounds/A_SoundAttack.wav");
+        soundMap.put(BACKGROUND_TEST, "/sounds/A_SoundNen.wav");
+        soundMap.put(START_SOUND, "/sounds/A_SoundStart.wav");
+        soundMap.put(ERROR_SOUND, "/sounds/A_ErrorSound.wav");
     }
 
     public static synchronized void playSound(int soundName) {
@@ -56,7 +55,7 @@ một AudioInputStream mới sẽ được tạo và sử dụng, am thanh co th
                 }
             });
         } catch (LineUnavailableException | IOException e) {
-            e.printStackTrace();
+            GameLogger.log(e.getMessage());
         }
     }
 ///ham nay dung de lap lai am thanh
@@ -85,14 +84,9 @@ một AudioInputStream mới sẽ được tạo và sử dụng, am thanh co th
             backgroundClip.loop(Clip.LOOP_CONTINUOUSLY);
             isBackgroundPlaying = true;
 
-            //disable volume
-
-            //TODO: remove
-            FloatControl gainControl =
-                    (FloatControl) backgroundClip.getControl(FloatControl.Type.MASTER_GAIN);
-            gainControl.setValue(gainControl.getMinimum());
         } catch (LineUnavailableException | IOException e) {
-            e.printStackTrace();
+            GameLogger.log(e.getMessage());
+
         }
     }
 
@@ -101,7 +95,7 @@ một AudioInputStream mới sẽ được tạo và sử dụng, am thanh co th
         try {
             Thread.sleep(milliseconds);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            GameLogger.log(e.getMessage());
         }
     }
 }
