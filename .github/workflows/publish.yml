@@ -48,5 +48,4 @@ jobs:
           make_latest: true
           files: |
             build/libs/*
-
-      
+          tag_name: ${{ github.ref }}
