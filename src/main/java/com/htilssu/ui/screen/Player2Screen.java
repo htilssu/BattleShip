@@ -1,15 +1,18 @@
 package com.htilssu.ui.screen;
 
-import com.htilssu.listener.ButtonClickListener;
 import com.htilssu.entity.component.AttackGrid;
 import com.htilssu.entity.component.SelfGrid;
+import com.htilssu.listener.ButtonClickListener;
 import com.htilssu.setting.GameSetting;
 import com.htilssu.util.AssetUtils;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
 public class Player2Screen extends JFrame {
+
+    public static final int MAXIMIZED_BOTH = JFrame.MAXIMIZED_BOTH;
     public JLabel ownShipSunk;
     public JLabel enemyShipSunk;
     int size;
@@ -19,7 +22,6 @@ public class Player2Screen extends JFrame {
     JLabel shipBeginning;
     private BufferedImage backgroundImage;
     private boolean isSelfGridVisible = true; // Biến để theo dõi trạng thái hiển thị của SelfGrid
-    public static final int MAXIMIZED_BOTH = JFrame.MAXIMIZED_BOTH ;
 
     public Player2Screen(String name, boolean show, Start2Player startScreen) {
         super(name);

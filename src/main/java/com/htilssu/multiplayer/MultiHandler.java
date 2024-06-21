@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public abstract class MultiHandler {
+
     public static final int PING = -1;
     public static final int PONG = -2;
     protected BattleShip battleShip;
@@ -27,10 +28,6 @@ public abstract class MultiHandler {
 
     public MultiHandler(BattleShip battleShip) {
         this.battleShip = battleShip;
-    }
-
-    public MultiHandler() {
-        //empty
     }
 
     public boolean isHost() {
@@ -41,23 +38,40 @@ public abstract class MultiHandler {
         isHost = host;
     }
 
+    public void readData(Socket socket) {
+        try {
+            BufferedReader bis = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
+            while (socket.isConnected()) {
+                String message = bis.readLine();
+                if (message == null) {
+                    break;
+                }
+                handle(message);
+            }
+        } catch (IOException e) {
+            //empty
+        }
+    }
+
     private void handle(String message) {
         List<String> messageParts = Arrays.asList(message.split("\\|"));
         Integer action = null;
         try {
-            action = Integer.parseInt(messageParts.get(0));
+            action = Integer.parseInt(messageParts.getFirst());
         } catch (NumberFormatException e) {
-            GameLogger.error("Invalid action: " + messageParts.get(0));
+            GameLogger.error("Invalid action: " + messageParts.getFirst());
         }
 
         if (action != null) {
+            String playerId;
             switch (action) {
                 case GameAction.JOIN:
                     if (messageParts.size() < 3) {
                         GameLogger.error("Invalid message (Player Join): " + message);
                         return;
                     }
-                    String playerId = messageParts.get(1);
+                    playerId = messageParts.get(1);
                     String playerName = messageParts.get(2);
                     Player player = new Player(playerId, playerName);
 
@@ -71,10 +85,13 @@ public abstract class MultiHandler {
                     }
                     battleShip.getGameManager().addPlayer(player);
                     battleShip.getGameManager().createNewGamePlay();
-                    battleShip.getListenerManager().callEvent(new PlayerJoinEvent(player, battleShip.getGameManager().getCurrentGamePlay()), battleShip.getGameManager());
+                    battleShip.getListenerManager()
+                            .callEvent(new PlayerJoinEvent(player, battleShip.getGameManager().getCurrentGamePlay()),
+                                       battleShip.getGameManager());
                     battleShip.changeScreen(ScreenManager.GAME_SCREEN);
                     if (this instanceof Host) {
-                        this.send(GameAction.JOIN, GameManager.gamePlayer.getId(), GameManager.gamePlayer.getName(), DifficultyManager.difficulty);
+                        this.send(GameAction.JOIN, GameManager.gamePlayer.getId(), GameManager.gamePlayer.getName(),
+                                  DifficultyManager.difficulty);
                     }
                     break;
 
@@ -92,7 +109,8 @@ public abstract class MultiHandler {
                         Player currentPlayer = gamePlay.getCurrentPlayer();
                         if (currentPlayer.getId().equals(playerId)) {
                             battleShip.getListenerManager().callEvent(
-                                    new PlayerShootEvent(currentPlayer, gamePlay.getOpponent().getBoard(), pos), battleShip.getGameManager()
+                                    new PlayerShootEvent(currentPlayer, gamePlay.getOpponent().getBoard(), pos),
+                                    battleShip.getGameManager()
                             );
                         }
                     }
@@ -125,22 +143,6 @@ public abstract class MultiHandler {
                     GameLogger.log("Unknown message: " + message);
                     break;
             }
-        }
-    }
-
-    public void readData(Socket socket) {
-        try {
-            BufferedReader bis = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-
-            while (socket.isConnected()) {
-                String message = bis.readLine();
-                if (message == null) {
-                    break;
-                }
-                handle(message);
-            }
-        } catch (IOException e) {
-            //empty
         }
     }
 

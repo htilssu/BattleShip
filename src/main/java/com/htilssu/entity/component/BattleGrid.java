@@ -7,15 +7,15 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 
 public abstract class BattleGrid extends JPanel {
-  private JPanel temp;
   JPanel self;
+    private JPanel temp;
   private BufferedImage backgroundImage;
 
   public BattleGrid() {
     self = new JPanel();
     self.setLayout(new GridLayout(10,10));
     self.setOpaque(false); // Đảm bảo các ô trong suốt
-    backgroundImage = AssetUtils.loadImage("/sea.png");
+      backgroundImage = AssetUtils.loadImage("/images/sea.png");
 
     for (int i = 0; i < 10; i++) {
       for (int j = 0; j < 10; j++) {
@@ -26,6 +26,8 @@ public abstract class BattleGrid extends JPanel {
 
     this.add(self);
   }
+
+    protected abstract JPanel getCell();
 
   @Override
   protected void paintComponent(Graphics g) {
@@ -44,6 +46,4 @@ public abstract class BattleGrid extends JPanel {
     }
     return null;
   }
-
-  protected abstract JPanel getCell();
 }

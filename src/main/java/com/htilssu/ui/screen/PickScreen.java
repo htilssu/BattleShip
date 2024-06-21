@@ -11,9 +11,12 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 
 public class PickScreen extends JPanel {
+
     private static final int IMAGE_GAP = 30; // Khoảng cách cố định giữa các hình ảnh
-    private BattleShip window;
-    private BufferedImage normalImage, hardImage, backgroundImage;
+    private final BattleShip window;
+    private final BufferedImage normalImage;
+    private final BufferedImage hardImage;
+    private BufferedImage backgroundImage;
     private boolean isNormalImageHovered = false;
     private boolean isHardImageHovered = false;
     private int normalImageX, normalImageY, newNormalImageWidth, newImageHeight;
@@ -23,14 +26,14 @@ public class PickScreen extends JPanel {
         window = battleShip;
         setLayout(null);
         setPreferredSize(new Dimension(800, 600));
-        normalImage = AssetUtils.loadImage("/Normal.png");
-        hardImage = AssetUtils.loadImage("/Hard.png");
+        normalImage = AssetUtils.loadImage("/images/Normal.png");
+        hardImage = AssetUtils.loadImage("/images/Hard.png");
         loadBackgroundImage();
         addMouseListener(
                 new MouseAdapter() {
                     @Override
-                    public void mouseMoved(MouseEvent e) {
-                        handleMouseMove(e.getX(), e.getY());
+                    public void mouseClicked(MouseEvent e) {
+                        handleMouseClick(e.getX(), e.getY());
                     }
 
                     @Override
@@ -46,8 +49,8 @@ public class PickScreen extends JPanel {
                     }
 
                     @Override
-                    public void mouseClicked(MouseEvent e) {
-                        handleMouseClick(e.getX(), e.getY());
+                    public void mouseMoved(MouseEvent e) {
+                        handleMouseMove(e.getX(), e.getY());
                     }
                 });
 
@@ -58,6 +61,10 @@ public class PickScreen extends JPanel {
                         handleMouseMove(e.getX(), e.getY());
                     }
                 });
+    }
+
+    private void loadBackgroundImage() {
+        backgroundImage = AssetUtils.loadImage("/images/ground.png"); // Tải hình nền
     }
 
     private void handleMouseClick(int mouseX, int mouseY) {
@@ -87,6 +94,10 @@ public class PickScreen extends JPanel {
                 && mouseX <= imageX + imageWidth
                 && mouseY >= imageY
                 && mouseY <= imageY + imageHeight;
+    }
+
+    private void transitionToGameScreen() {
+        window.changeScreen(ScreenManager.START2_PLAYER_SCREEN);
     }
 
     @Override
@@ -119,9 +130,9 @@ public class PickScreen extends JPanel {
             if (totalWidth > panelWidth) {
                 float scaleFactor =
                         (float) (panelWidth - IMAGE_GAP) / (newNormalImageWidth + newHardImageWidth);
-                newNormalImageWidth *= scaleFactor;
-                newHardImageWidth *= scaleFactor;
-                newImageHeight *= scaleFactor;
+                newNormalImageWidth = (int) (newNormalImageWidth * scaleFactor);
+                newHardImageWidth = (int) (newHardImageWidth * scaleFactor);
+                newImageHeight = (int) (newImageHeight * scaleFactor);
             }
 
             // Tính toán vị trí để căn giữa hình ảnh với khoảng cách
@@ -134,14 +145,16 @@ public class PickScreen extends JPanel {
             if (isNormalImageHovered) {
                 drawResizedImage(
                         g, normalImage, normalImageX, normalImageY, newNormalImageWidth, newImageHeight);
-            } else {
+            }
+            else {
                 g.drawImage(
                         normalImage, normalImageX, normalImageY, newNormalImageWidth, newImageHeight, this);
             }
 
             if (isHardImageHovered) {
                 drawResizedImage(g, hardImage, hardImageX, hardImageY, newHardImageWidth, newImageHeight);
-            } else {
+            }
+            else {
                 g.drawImage(hardImage, hardImageX, hardImageY, newHardImageWidth, newImageHeight, this);
             }
         }
@@ -155,13 +168,5 @@ public class PickScreen extends JPanel {
         int xOffset = (width - newWidth) / 2; // Tọa độ x khi hover
         int yOffset = (height - newHeight) / 2; // Tọa độ y khi hover
         g.drawImage(image, x + xOffset, y + yOffset, newWidth, newHeight, this);
-    }
-
-    private void transitionToGameScreen() {
-        window.changeScreen(ScreenManager.START2_PLAYER_SCREEN);
-    }
-
-    private void loadBackgroundImage() {
-        backgroundImage = AssetUtils.loadImage("/ground.png"); // Tải hình nền
     }
 }
