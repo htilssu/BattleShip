@@ -1,9 +1,11 @@
 package com.htilssu.ui.screen;
 
 import com.htilssu.BattleShip;
-import com.htilssu.component.CustomSliderUI;
+import com.htilssu.ui.component.CustomSliderUI;
 import com.htilssu.manager.ScreenManager;
 import com.htilssu.util.AssetUtils;
+import com.htilssu.util.Color;
+
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -12,24 +14,24 @@ import javax.sound.sampled.Clip;
 import javax.swing.*;
 
 public class SettingScreen extends JPanel {
-  private final BattleShip window;
-  private JLabel volumeIconLabel;
-  private JSlider volumeSlider;
-  private JLabel volumePercentageLabel;
-  private boolean isMuted = false;
-  private int currentVolume = 100; // Giả định giá trị ban đầu của âm lượng
-  private BufferedImage cursorImage, backgroundImage;
+    private final BattleShip window;
+    private JLabel volumeIconLabel;
+    private JSlider volumeSlider;
+    private JLabel volumePercentageLabel;
+    private boolean isMuted = false;
+    private int currentVolume = 100; // Giả định giá trị ban đầu của âm lượng
+    private BufferedImage cursorImage, backgroundImage;
 
-  public SettingScreen(BattleShip battleShip) {
-    this.window = battleShip;
-    setLayout(null);
-    setPreferredSize(
-        new Dimension(800, 600)); // Assuming 800x600 as GameSetting.WIDTH, GameSetting.HEIGHT
-    initializeComponents();
-    loadCursorImage();
-    setCustomCursor();
-    loadBackgroundImage();
-  }
+    public SettingScreen(BattleShip battleShip) {
+        this.window = battleShip;
+        setLayout(null);
+        setPreferredSize(
+                new Dimension(800, 600)); // Assuming 800x600 as GameSetting.WIDTH, GameSetting.HEIGHT
+        initializeComponents();
+        loadCursorImage();
+        setCustomCursor();
+        loadBackgroundImage();
+    }
 
   private void backToMenu() {
     // Sử dụng BattleShip để chuyển đổi màn hình
@@ -54,34 +56,34 @@ public class SettingScreen extends JPanel {
         });
     add(volumeIconLabel);
 
-    // Calculate positions dynamically
-    int iconWidth = volumeIconLabel.getWidth();
-    int iconHeight = volumeIconLabel.getHeight();
-    int sliderWidth = 300;
-    int sliderHeight = 50;
-    int spacing = 20;
-    int sliderX = volumeIconLabel.getX() + iconWidth + spacing;
-    int sliderY =
-        volumeIconLabel.getY()
-            + (iconHeight - 30) / 2; // Center the slider vertically relative to the icon
+        // Calculate positions dynamically
+        int iconWidth = volumeIconLabel.getWidth();
+        int iconHeight = volumeIconLabel.getHeight();
+        int sliderWidth = 300;
+        int sliderHeight = 50;
+        int spacing = 20;
+        int sliderX = volumeIconLabel.getX() + iconWidth + spacing;
+        int sliderY =
+                volumeIconLabel.getY()
+                        + (iconHeight - 30) / 2; // Center the slider vertically relative to the icon
 
-    // Tạo JSlider để điều chỉnh âm lượng
-    volumeSlider = new JSlider(0, 100, currentVolume);
-    volumeSlider.setBounds(sliderX, sliderY, sliderWidth, 50);
-    volumeSlider.setBackground(new Color(0, 0, 0, 0));
-    volumeSlider.setUI(new CustomSliderUI(volumeSlider));
-    volumeSlider.addChangeListener(
-        e -> {
-          int value = volumeSlider.getValue();
-          volumePercentageLabel.setText(value + "%"); // Sử dụng biến thành viên
-          adjustVolume(value);
-        });
-    add(volumeSlider);
+        // Tạo JSlider để điều chỉnh âm lượng
+        volumeSlider = new JSlider(0, 100, currentVolume);
+        volumeSlider.setBounds(sliderX, sliderY, sliderWidth, 50);
+        volumeSlider.setBackground(Color.TRANSPARENT);
+        volumeSlider.setUI(new CustomSliderUI(volumeSlider));
+        volumeSlider.addChangeListener(
+                e -> {
+                    int value = volumeSlider.getValue();
+                    volumePercentageLabel.setText(value + "%"); // Sử dụng biến thành viên
+                    adjustVolume(value);
+                });
+        add(volumeSlider);
 
-    // Tạo JLabel cho phần trăm âm lượng
-    volumePercentageLabel = new JLabel(currentVolume + "%"); // Khởi tạo biến thành viên
-    volumePercentageLabel.setBounds(sliderX + sliderWidth + spacing, sliderY, 50, 50);
-    add(volumePercentageLabel);
+        // Tạo JLabel cho phần trăm âm lượng
+        volumePercentageLabel = new JLabel(currentVolume + "%"); // Khởi tạo biến thành viên
+        volumePercentageLabel.setBounds(sliderX + sliderWidth + spacing, sliderY, 50, 50);
+        add(volumePercentageLabel);
 
     // Tạo nút "Back" để quay lại màn hình menu
     JButton backButton = new JButton(new ImageIcon(AssetUtils.loadImage("/back.png")));
@@ -93,15 +95,20 @@ public class SettingScreen extends JPanel {
     add(backButton);
   }
 
-  private void adjustVolume(int volume) {
-    if (volume < 0) volume = 0;
-    if (volume > 100) volume = 100;
-    currentVolume = volume;
+  private void loadCursorImage() {
+    cursorImage = AssetUtils.loadImage("/Layer2.png"); // Load cursor image
+  }
 
-    MenuScreen menuScreen = MenuScreen.getInstance();
-    if (menuScreen != null) {
-      menuScreen.setVolume(volume);
+    private void setCustomCursor() {
+        Cursor customCursor =
+                Toolkit.getDefaultToolkit()
+                        .createCustomCursor(cursorImage, new Point(0, 0), "Custom Cursor");
+        setCursor(customCursor);
     }
+
+    private void loadBackgroundImage() {
+
+    backgroundImage = AssetUtils.loadImage("/sea2.png"); // Load background image
   }
 
   private void toggleMute() {
@@ -125,22 +132,38 @@ public class SettingScreen extends JPanel {
     }
   }
 
-  private void loadCursorImage() {
-    cursorImage = AssetUtils.loadImage("/Layer2.png"); // Load cursor image
-  }
+    private void adjustVolume(int volume) {
+        if (volume < 0) volume = 0;
+        if (volume > 100) volume = 100;
+        currentVolume = volume;
 
-  private void setCustomCursor() {
-    Cursor customCursor =
-        Toolkit.getDefaultToolkit()
-            .createCustomCursor(cursorImage, new Point(0, 0), "Custom Cursor");
-    setCursor(customCursor);
-  }
-
-  @Override
-  protected void paintComponent(Graphics g) {
-    super.paintComponent(g);
-    if (backgroundImage != null) {
-      g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
+        MenuScreen menuScreen = MenuScreen.getInstance();
+        if (menuScreen != null) {
+            menuScreen.setVolume(volume);
+        }
     }
-  }
+
+    private void loadCursorImage() {
+        cursorImage = AssetUtils.loadImage("/Layer2.png"); // Load cursor image
+    }
+
+    private void setCustomCursor() {
+        Cursor customCursor =
+                Toolkit.getDefaultToolkit()
+                        .createCustomCursor(cursorImage, new Point(0, 0), "Custom Cursor");
+        setCursor(customCursor);
+    }
+
+    private void backToMenu() {
+        // Sử dụng BattleShip để chuyển đổi màn hình
+        window.changeScreen(ScreenManager.MENU_SCREEN);
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        if (backgroundImage != null) {
+            g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
+        }
+    }
 }

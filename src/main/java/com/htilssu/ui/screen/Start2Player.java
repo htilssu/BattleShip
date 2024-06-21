@@ -1,4 +1,4 @@
-package com.htilssu.screen;
+package com.htilssu.ui.screen;
 
 import com.htilssu.BattleShip;
 import com.htilssu.dataPlayer.PlayerData;
@@ -7,7 +7,6 @@ import com.htilssu.state.BeginGame2;
 import com.htilssu.state.EndGame2;
 import com.htilssu.state.GameState;
 import com.htilssu.state.MidGame2;
-import com.htilssu.ui.screen.Player2Screen;
 import com.htilssu.util.AssetUtils;
 
 import javax.swing.*;
@@ -36,6 +35,7 @@ public class Start2Player extends JPanel implements GameState {
 
         setLayout(new GridBagLayout());
         loadBackground();
+        SoundManager.playBackGround(SoundManager.BACKGROUND_TEST);
 
         JButton playButton = new JButton("Bắt Đầu");
         playButton.setPreferredSize(new Dimension(100, 50)); // Kích thước cụ thể cho JButton
@@ -107,12 +107,12 @@ public class Start2Player extends JPanel implements GameState {
         this.state = state;
     }
 
-    public void setTakeTurnAttack(boolean isPlayerTurn) {
-        this.takeTurnAttack = isPlayerTurn;
-    }
-
     public boolean getTakeTurnAttack() {
         return takeTurnAttack;
+    }
+
+    public void setTakeTurnAttack(boolean isPlayerTurn) {
+        this.takeTurnAttack = isPlayerTurn;
     }
 
     public PlayerData getPlayer2Data() {

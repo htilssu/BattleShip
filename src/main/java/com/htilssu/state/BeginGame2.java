@@ -1,6 +1,6 @@
 package com.htilssu.state;
 
-import com.htilssu.screen.Start2Player;
+import com.htilssu.ui.screen.Start2Player;
 import com.htilssu.ui.screen.Player2Screen;
 
 public class BeginGame2 implements GameState {
