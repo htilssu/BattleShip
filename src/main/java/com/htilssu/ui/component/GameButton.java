@@ -20,8 +20,8 @@ public class GameButton extends JButton {
         super();
         setFont(AssetUtils.gameFont.deriveFont(20f));
         setBorderPainted(false);
-        setOpaque(false);
         setContentAreaFilled(false);
+        setOpaque(false);
         setFocusPainted(false);
     }
 
@@ -31,6 +31,8 @@ public class GameButton extends JButton {
 
     @Override
     protected void paintComponent(Graphics g) {
+
+
         renderBackground(g);
 
         super.paintComponent(g);
