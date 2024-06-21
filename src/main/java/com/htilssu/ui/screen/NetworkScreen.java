@@ -5,7 +5,9 @@ import com.htilssu.manager.ScreenManager;
 import com.htilssu.multiplayer.Client;
 import com.htilssu.setting.GameSetting;
 import com.htilssu.ui.component.GameButton;
+import com.htilssu.ui.component.GameLabel;
 import com.htilssu.ui.component.GamePanel;
+import com.htilssu.ui.component.GameTextField;
 import com.htilssu.util.AssetUtils;
 
 import javax.swing.*;
@@ -19,20 +21,21 @@ import java.util.List;
 import static com.htilssu.util.AssetUtils.*;
 
 public class NetworkScreen extends GamePanel implements ComponentListener {
-    BattleShip battleShip;
-    List<HostListItem> hostListItems = new ArrayList<>();
-    List<Component> listStruct = new ArrayList<>();
-    BufferedImage listHostBackground;
-    GamePanel listHostPanel;
-    int margin = 50;
-    private GamePanel hostListTextPanel;
+
+    private final BattleShip battleShip;
+    private final List<HostItem> hostItemList = new ArrayList<>();
+    private final List<Component> spaceStructItemList = new ArrayList<>();
+    private final int margin = 50;
+    private final BufferedImage hostItemBackground;
+    private GamePanel hostListPanel;
+    private GamePanel textHostPanel;
     private JPanel buttonPanel;
     private GamePanel hostSettingPanel;
 
     public NetworkScreen(BattleShip battleShip) {
         super();
         this.battleShip = battleShip;
-        listHostBackground = AssetUtils.loadImage("/images/ListHostBG.jpg");
+        hostItemBackground = AssetUtils.loadImage("/images/Item_TextField.png");
 
         setBackgroundImage(AssetUtils.loadImage("/images/sea_of_thief.png"));
         setLayout(null);
@@ -47,22 +50,22 @@ public class NetworkScreen extends GamePanel implements ComponentListener {
     }
 
     private void initListHost() {
-        listHostPanel = new GamePanel();
-        listHostPanel.setBackground(new Color(.1f, .2f, .3f, .9f));
+        hostListPanel = new GamePanel();
+        hostListPanel.setBackground(new Color(.1f, .2f, .3f, .9f));
 
-        listHostPanel.setLayout(new BoxLayout(listHostPanel, BoxLayout.Y_AXIS));
+        hostListPanel.setLayout(new BoxLayout(hostListPanel, BoxLayout.Y_AXIS));
 
 
-        add(listHostPanel);
-        listHostPanel.add(Box.createVerticalStrut(margin));
+        add(hostListPanel);
+        hostListPanel.add(Box.createVerticalStrut(margin));
 
         initListHostButton();
     }
 
     private void initListHostText() {
-        hostListTextPanel = new GamePanel(getImage(AssetUtils.ASSET_HOST_LIST_TEXT));
-        hostListTextPanel.setSize(GameSetting.TILE_SIZE * 12, GameSetting.TILE_SIZE * 2);
-        add(hostListTextPanel, 0);
+        textHostPanel = new GamePanel(getImage(AssetUtils.ASSET_HOST_LIST_TEXT));
+        textHostPanel.setSize(GameSetting.TILE_SIZE * 12, GameSetting.TILE_SIZE * 2);
+        add(textHostPanel, 0);
     }
 
     private void initBackButton() {
@@ -80,6 +83,7 @@ public class NetworkScreen extends GamePanel implements ComponentListener {
         hostSettingPanel = new GamePanel(AssetUtils.loadImage("/images/Menu_Bg.png"));
 
         hostSettingPanel.setLayout(new BoxLayout(hostSettingPanel, BoxLayout.Y_AXIS));
+
         //create exit button
         var exitButton = new GamePanel(AssetUtils.loadImage("/images/Icon_X.png"));
 
@@ -93,17 +97,29 @@ public class NetworkScreen extends GamePanel implements ComponentListener {
             }
         });
 
+        Box inputBox = getInputBox();
+
+
         hostSettingPanel.add(Box.createVerticalStrut(20));
         hostSettingPanel.add(new GamePanel() {{
             setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
             add(Box.createHorizontalGlue());
             add(exitButton);
             setMaximumSize(new Dimension(Integer.MAX_VALUE, 32));
+            setMinimumSize(getMaximumSize());
+            setPreferredSize(getMaximumSize());
             add(Box.createHorizontalStrut(30));
         }});
-        hostSettingPanel.setSize(new Dimension(600, 450));
 
-        hostSettingPanel.setVisible(true);
+        hostSettingPanel.add(Box.createVerticalStrut(30));
+        hostSettingPanel.add(inputBox);
+
+        hostSettingPanel.add(Box.createVerticalStrut(30));
+        GamePanel createHostButton = new GamePanel(AssetUtils.loadImage("/images/Icon_Add.png"));
+        hostSettingPanel.add(createHostButton);
+
+
+        hostSettingPanel.setVisible(false);
     }
 
     private void initListHostButton() {
@@ -118,6 +134,7 @@ public class NetworkScreen extends GamePanel implements ComponentListener {
                 refreshNetwork();
             }
         });
+
         Dimension buttonSize = new Dimension(64 * 3, 64);
         refreshButton.setPreferredSize(buttonSize);
         refreshButton.setMaximumSize(buttonSize);
@@ -129,11 +146,7 @@ public class NetworkScreen extends GamePanel implements ComponentListener {
             @Override
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
-                if (hostSettingPanel.isVisible()) {
-                    hideHostSettingPanel();
-                }
-                else showHostSettingPanel();
-
+                if (!hostSettingPanel.isVisible()) showHostSettingPanel();
             }
         });
 
@@ -144,18 +157,18 @@ public class NetworkScreen extends GamePanel implements ComponentListener {
         buttonPanel.add(Box.createHorizontalGlue());
 
 
-        listHostPanel.add(Box.createVerticalGlue());
-        listHostPanel.add(buttonPanel);
+        hostListPanel.add(Box.createVerticalGlue());
+        hostListPanel.add(buttonPanel);
+        hostListPanel.add(Box.createVerticalStrut(20));
     }
 
     private void hideHostSettingPanel() {
-        int targetWidth = 0; // The desired width
-        int targetHeight = 0; // The desired height
-        int speed = 40; // The speed of the animation
+        int targetWidth = 0;
+        int targetHeight = 0;
+        int speed = 40;
 
         Timer timer = new Timer(10, null);
         timer.addActionListener(e -> {
-            // Decrease the size of the panel
             int newWidth = Math.max(hostSettingPanel.getWidth() - speed, targetWidth);
             int newHeight = Math.max(hostSettingPanel.getHeight() - speed, targetHeight);
             hostSettingPanel.setSize(newWidth, newHeight);
@@ -163,10 +176,8 @@ public class NetworkScreen extends GamePanel implements ComponentListener {
             updateUI();
             repaint();
 
-            // Center the panel
             hostSettingPanel.setLocation((getWidth() - newWidth) / 2, (getHeight() - newHeight) / 2);
 
-            // Stop the timer when the target size is reached
             if (newWidth == targetWidth && newHeight == targetHeight) {
                 ((Timer) e.getSource()).stop();
                 hostSettingPanel.setVisible(false);
@@ -174,6 +185,38 @@ public class NetworkScreen extends GamePanel implements ComponentListener {
             }
         });
         timer.start();
+    }
+
+    private Box getInputBox() {
+        var inputBox = Box.createHorizontalBox();
+        inputBox.add(Box.createHorizontalGlue());
+        Box inputContentBox = Box.createVerticalBox();
+        inputContentBox.setMaximumSize(new Dimension(450, Integer.MAX_VALUE));
+        inputContentBox.setPreferredSize(inputContentBox.getMaximumSize());
+
+        inputBox.add(inputContentBox);
+        inputBox.add(Box.createHorizontalGlue());
+
+
+        //hostName input
+        GameLabel hostNameLabel = new GameLabel("HostName: ");
+
+        var hostNameTextField = new GameTextField();
+        hostNameTextField.setHorizontalAlignment(JTextField.CENTER);
+        hostNameTextField.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
+        hostNameTextField.setRadius(20);
+
+        var hostNameBox = Box.createHorizontalBox();
+        hostNameBox.add(Box.createHorizontalGlue());
+        hostNameBox.add(hostNameTextField);
+        hostNameBox.add(Box.createHorizontalGlue());
+
+        inputContentBox.add(hostNameLabel);
+        inputContentBox.add(Box.createVerticalStrut(10));
+        inputContentBox.add(hostNameBox);
+
+
+        return inputBox;
     }
 
     public void refreshNetwork() {
@@ -211,25 +254,25 @@ public class NetworkScreen extends GamePanel implements ComponentListener {
 
     public void updateListHost(List<InetAddress> hostList) {
 
-        for (HostListItem hostListItem : hostListItems) {
-            listHostPanel.remove(hostListItem);
+        for (HostItem hostItem : hostItemList) {
+            hostListPanel.remove(hostItem);
         }
 
-        for (Component component : listStruct) {
-            listHostPanel.remove(component);
+        for (Component component : spaceStructItemList) {
+            hostListPanel.remove(component);
         }
 
-        listStruct.clear();
-        hostListItems.clear();
+        spaceStructItemList.clear();
+        hostItemList.clear();
 
         for (InetAddress host : hostList) {
-            HostListItem hostListItem = new HostListItem(host.getHostName(), host, "Ready");
-            hostListItem.setRadius(20);
-            hostListItems.add(hostListItem);
+            HostItem hostItem = new HostItem(host.getHostName(), host, "Ready");
+            hostItem.setRadius(20);
+            hostItemList.add(hostItem);
             var struct = Box.createVerticalStrut(20);
-            listHostPanel.add(struct);
-            listStruct.add(struct);
-            listHostPanel.add(hostListItem);
+            hostListPanel.add(struct);
+            spaceStructItemList.add(struct);
+            hostListPanel.add(hostItem);
         }
 
         updateUI();
@@ -271,19 +314,19 @@ public class NetworkScreen extends GamePanel implements ComponentListener {
 
     @Override
     public void componentResized(ComponentEvent e) {
-        listHostPanel.setSize((int) (getWidth() - margin * GameSetting.SCALE * 6),
+        hostListPanel.setSize((int) (getWidth() - margin * GameSetting.SCALE * 6),
                               getHeight() - margin * 2);
-        listHostPanel.setMaximumSize(new Dimension((int) (getWidth() - margin * GameSetting.SCALE * 6),
+        hostListPanel.setMaximumSize(new Dimension((int) (getWidth() - margin * GameSetting.SCALE * 6),
                                                    getHeight() - margin * 3));
-        listHostPanel.setLocation((getWidth() - listHostPanel.getWidth()) / 2,
-                                  (getHeight() - listHostPanel.getHeight()) / 2);
-        hostListTextPanel.setLocation((getWidth() - hostListTextPanel.getWidth()) / 2,
-                                      listHostPanel.getY() - hostListTextPanel.getHeight() / 2);
+        hostListPanel.setLocation((getWidth() - hostListPanel.getWidth()) / 2,
+                                  (getHeight() - hostListPanel.getHeight()) / 2);
+        textHostPanel.setLocation((getWidth() - textHostPanel.getWidth()) / 2,
+                                  hostListPanel.getY() - textHostPanel.getHeight() / 2);
 
-        buttonPanel.setLocation(listHostPanel.getX(), listHostPanel.getY() + listHostPanel.getHeight());
-        buttonPanel.setSize(new Dimension(listHostPanel.getWidth(), 64));
+        buttonPanel.setLocation(hostListPanel.getX(), hostListPanel.getY() + hostListPanel.getHeight());
+        buttonPanel.setSize(new Dimension(hostListPanel.getWidth(), 64));
 
-        listHostPanel.setRadius(40);
+        hostListPanel.setRadius(40);
 
         updateUI();
     }
@@ -300,14 +343,14 @@ public class NetworkScreen extends GamePanel implements ComponentListener {
     public void componentHidden(ComponentEvent e) {
     }
 
+    class HostItem extends GamePanel implements MouseListener {
 
-    class HostListItem extends GamePanel implements MouseListener {
         String hostName;
         InetAddress ipAddress;
         String status;
         private boolean isSelected;
 
-        public HostListItem(String hostName, InetAddress ipAddress, String status) {
+        public HostItem(String hostName, InetAddress ipAddress, String status) {
             super();
             setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 
@@ -330,7 +373,7 @@ public class NetworkScreen extends GamePanel implements ComponentListener {
             var contentPanel = GamePanel.createHorizontalBox();
             contentPanel.setRadius(10);
             contentPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 100));
-            contentPanel.setBackgroundImage(AssetUtils.getImage(ASSET_TEXT_FIELD));
+            contentPanel.setBackgroundImage(hostItemBackground);
 
             var labelHostName = new JLabel(hostName);
             labelHostName.setForeground(Color.WHITE);
@@ -360,8 +403,8 @@ public class NetworkScreen extends GamePanel implements ComponentListener {
 
         @Override
         public void mouseClicked(MouseEvent e) {
-            if (e.getClickCount() > 1){
-                battleShip.getClient().connect(this.ipAddress,GameSetting.DEFAULT_PORT);
+            if (e.getClickCount() > 1) {
+                battleShip.getClient().connect(this.ipAddress, GameSetting.DEFAULT_PORT);
             }
         }
 
