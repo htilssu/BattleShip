@@ -12,6 +12,7 @@ import java.awt.event.MouseMotionAdapter;
 import java.util.ArrayList;
 
 public class SelfGrid extends BattleGrid {
+  public static final int MAXIMIZED_BOTH = JFrame.MAXIMIZED_BOTH / 6;   //lay kich thuoc full man hinh
   private String gridType = "selfGrid";  // Chuỗi xác định loại lưới (ở đây là "selfGrid").
   private boolean isSelfGridListener;  // Biến boolean để kiểm tra xem listener của lưới có đang hoạt động hay không.
   private String name;  // Tên người chơi
@@ -68,7 +69,7 @@ public class SelfGrid extends BattleGrid {
     firstCell.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
     firstCell.setPreferredSize(new Dimension(25, 25));
 
-    firstCell.setBackground(new Color(0, 0, 0, 0)); // Đặt màu nền trong suốt
+    firstCell.setBackground(com.htilssu.util.Color.TRANSPARENT); // Đặt màu nền trong suốt
 
     firstCell.addMouseListener(new MouseAdapter() {
       @Override
@@ -218,17 +219,38 @@ public class SelfGrid extends BattleGrid {
     }
   }
 
+  public void getComp2(Point newPoint) {
+    secondNextCell = this.getComponentAt(newPoint);
+  }
+
+  public void getComp3(Point newPoint) {
+    thirdNextCell = this.getComponentAt(newPoint);
+  }
+
   //Hàm numberToPanel(int s) chuyển đổi giá trị s từ hệ tọa độ dữ liệu (0-10) thành hệ tọa độ giao diện đồ họa.
   public int numberToPanel(int s) {
     return (s - 1) * 25;
   }
 
-  public void setSelfGridListener(boolean selfGridListener) {
-    this.isSelfGridListener = selfGridListener;
+  // Phương thức này gọi getComponentAt để lấy JPanel tại tọa độ được chỉ định và gán nó cho biến thePanel:
+  public void getJpanel(Point newPoint) {
+    thePanel = this.getComponentAt(newPoint);
+    if (thePanel == null) {
+      System.err.println("The panel at " + newPoint + " is null.");
+    }
+  }
+
+  // Phương thức để xoay tàu
+  public void rotateShip() {
+    isHorizontal = !isHorizontal; //Đảo ngược trạng thái hướng của tàu
   }
 
   public boolean getSelfGridListener() {
     return isSelfGridListener;
+  }
+
+  public void setSelfGridListener(boolean selfGridListener) {
+    this.isSelfGridListener = selfGridListener;
   }
 
   public String getGridType() {

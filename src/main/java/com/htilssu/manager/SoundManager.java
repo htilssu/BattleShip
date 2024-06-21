@@ -19,6 +19,7 @@ public final class SoundManager {
     public static final int ERROR_SOUND = 7;
 
     static boolean isBackgroundPlaying = false;
+    private static Clip backgroundClip;
 
     private static Map<Integer, String> soundMap = new HashMap<>();
 
@@ -84,6 +85,13 @@ một AudioInputStream mới sẽ được tạo và sử dụng, am thanh co th
             backgroundClip.start();
             backgroundClip.loop(Clip.LOOP_CONTINUOUSLY);
             isBackgroundPlaying = true;
+
+            //disable volume
+
+            //TODO: remove
+            FloatControl gainControl =
+                    (FloatControl) backgroundClip.getControl(FloatControl.Type.MASTER_GAIN);
+            gainControl.setValue(gainControl.getMinimum());
         } catch (LineUnavailableException | IOException e) {
             e.printStackTrace();
         }
