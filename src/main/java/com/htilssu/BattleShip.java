@@ -26,15 +26,10 @@ public class BattleShip extends JFrame implements Runnable, KeyListener, Compone
      */
     private final Thread thread = new Thread(this);
 
-    /**
-     * Quản lý sự kiện
-     */
-    private final ListenerManager listenerManager = new ListenerManager();
-
-    /**
-     * Quản lý host
-     */
-    private final Host host = new Host(this);
+  /** Quản lý sự kiện */
+  private final ListenerManager listenerManager = new ListenerManager();
+  /** Quản lý host */
+  private final Host host = new Host(this);
 
     /**
      * Số frame mỗi giây hiện tại
