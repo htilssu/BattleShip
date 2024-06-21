@@ -9,6 +9,7 @@ import com.htilssu.ui.component.GameLabel;
 import com.htilssu.ui.component.GamePanel;
 import com.htilssu.ui.component.GameTextField;
 import com.htilssu.util.AssetUtils;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
@@ -24,10 +25,9 @@ public class NetworkScreen extends GamePanel implements ComponentListener {
 
     private final BattleShip battleShip;
     private final List<HostItem> hostItemList = new ArrayList<>();
-    private final List<Component> spaceStructItemList = new ArrayList<>();
     private final int margin = 50;
     private final BufferedImage hostItemBackground;
-    private GamePanel textHostPanel, hostListPanel, hostSettingPanel;
+    private GamePanel textHostPanel, hostListPanel, hostSettingPanel, hostItemPanel;
     private GameTextField hostNameTextField;
     private JPanel buttonPanel;
 
@@ -54,10 +54,11 @@ public class NetworkScreen extends GamePanel implements ComponentListener {
 
         hostListPanel.setLayout(new BoxLayout(hostListPanel, BoxLayout.Y_AXIS));
 
-
         add(hostListPanel);
         hostListPanel.add(Box.createVerticalStrut(margin));
 
+        hostListPanel.add(Box.createVerticalStrut(margin));
+        initListHostItem();
         initListHostButton();
     }
 
@@ -134,15 +135,27 @@ public class NetworkScreen extends GamePanel implements ComponentListener {
         hostSettingPanel.setVisible(false);
     }
 
+    private void initListHostItem() {
+        hostItemPanel = new GamePanel();
+        hostItemPanel.setLayout(new BoxLayout(hostItemPanel, BoxLayout.Y_AXIS));
+        hostListPanel.add(hostItemPanel);
+        hostListPanel.add(Box.createVerticalGlue());
+
+    }
+
     private void initListHostButton() {
         buttonPanel = GamePanel.createHorizontalBox();
         buttonPanel.setBackground(com.htilssu.util.Color.TRANSPARENT);
 
-        var refreshButton = new GamePanel(AssetUtils.getImage(ASSET_REFRESH_BUTTON));
+        var refreshButton = new GameButton(AssetUtils.getImage(ASSET_BUTTON_2));
+        refreshButton.setPreferredSize(new Dimension(64 * 2, 64));
+        refreshButton.setText("Refresh");
         refreshButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
+                hostItemPanel.removeAll();
+                repaint();
                 refreshNetwork();
             }
         });
@@ -150,22 +163,19 @@ public class NetworkScreen extends GamePanel implements ComponentListener {
         Dimension buttonSize = new Dimension(64 * 3, 64);
         refreshButton.setPreferredSize(buttonSize);
         refreshButton.setMaximumSize(buttonSize);
-        var createHost = new GamePanel(AssetUtils.loadImage("/images/Icon_Add.png"));
-        createHost.setMaximumSize(new Dimension(64, 64));
-        createHost.setPreferredSize(createHost.getMaximumSize());
+        var createHostButton = new GameButton(AssetUtils.getImage(ASSET_BUTTON_2));
+        createHostButton.setMaximumSize(new Dimension(64 * 3, 64));
+        createHostButton.setText("Create Host");
+        createHostButton.setPreferredSize(createHostButton.getMaximumSize());
 
-        createHost.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                super.mouseClicked(e);
-                if (!hostSettingPanel.isVisible()) showHostSettingPanel();
-            }
+        createHostButton.addActionListener(e -> {
+            if (!hostSettingPanel.isVisible()) showHostSettingPanel();
         });
 
         buttonPanel.add(Box.createHorizontalGlue());
         buttonPanel.add(refreshButton);
         buttonPanel.add(Box.createHorizontalGlue());
-        buttonPanel.add(createHost);
+        buttonPanel.add(createHostButton);
         buttonPanel.add(Box.createHorizontalGlue());
 
 
@@ -247,10 +257,18 @@ public class NetworkScreen extends GamePanel implements ComponentListener {
         hostSettingPanel.setLocation(getWidth() / 2, getHeight() / 2);
         hostSettingPanel.setVisible(true);
 
+        //focus to hostNameTextField
+        hostNameTextField.requestFocus();
+
         int targetWidth = 600;
         int targetHeight = 450;
         int speed = 40;
 
+        final Timer timer = getTimer(speed, targetWidth, targetHeight);
+        timer.start();
+    }
+
+    private @NotNull Timer getTimer(int speed, int targetWidth, int targetHeight) {
         Timer timer = new Timer(10, null);
         timer.addActionListener(e -> {
             int newWidth = Math.min(hostSettingPanel.getWidth() + speed, targetWidth);
@@ -264,30 +282,19 @@ public class NetworkScreen extends GamePanel implements ComponentListener {
                 ((Timer) e.getSource()).stop();
             }
         });
-        timer.start();
+        return timer;
     }
 
     public void updateListHost(List<InetAddress> hostList) {
 
-        for (HostItem hostItem : hostItemList) {
-            hostListPanel.remove(hostItem);
-        }
-
-        for (Component component : spaceStructItemList) {
-            hostListPanel.remove(component);
-        }
-
-        spaceStructItemList.clear();
         hostItemList.clear();
+        //remove all child in hostListPanel
 
         for (InetAddress host : hostList) {
             HostItem hostItem = new HostItem(host.getHostName(), host, "Ready");
             hostItem.setRadius(20);
-            hostItemList.add(hostItem);
-            var struct = Box.createVerticalStrut(20);
-            hostListPanel.add(struct);
-            spaceStructItemList.add(struct);
-            hostListPanel.add(hostItem);
+            hostItemPanel.add(Box.createVerticalStrut(20));
+            hostItemPanel.add(hostItem);
         }
 
         updateUI();
@@ -295,10 +302,9 @@ public class NetworkScreen extends GamePanel implements ComponentListener {
 
     @Override
     public void componentResized(ComponentEvent e) {
-        hostListPanel.setSize((int) (getWidth() - margin * GameSetting.SCALE * 6),
-                              getHeight() - margin * 2);
-        hostListPanel.setMaximumSize(new Dimension((int) (getWidth() - margin * GameSetting.SCALE * 6),
-                                                   getHeight() - margin * 3));
+        hostListPanel.setSize((int) (getWidth() - margin * GameSetting.SCALE * 6), getHeight() - margin * 2);
+        hostListPanel.setMaximumSize(
+                new Dimension((int) (getWidth() - margin * GameSetting.SCALE * 6), getHeight() - margin * 3));
         hostListPanel.setLocation((getWidth() - hostListPanel.getWidth()) / 2,
                                   (getHeight() - hostListPanel.getHeight()) / 2);
         textHostPanel.setLocation((getWidth() - textHostPanel.getWidth()) / 2,
@@ -384,7 +390,12 @@ public class NetworkScreen extends GamePanel implements ComponentListener {
         @Override
         public void mouseClicked(MouseEvent e) {
             if (e.getClickCount() > 1) {
-                battleShip.getClient().connect(this.ipAddress, GameSetting.DEFAULT_PORT);
+                Client client = battleShip.getClient();
+                client.connect(this.ipAddress, GameSetting.DEFAULT_PORT);
+
+                if (client.isConnected()) {
+                    client.join();
+                }
             }
         }
 
