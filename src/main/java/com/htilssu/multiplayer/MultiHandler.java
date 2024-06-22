@@ -183,32 +183,26 @@ public abstract class MultiHandler {
         Position pos = new Position(Integer.parseInt(messageParts.get(2)),
                                     Integer.parseInt(messageParts.get(3)));
         GamePlay gamePlay = battleShip.getGameManager().getCurrentGamePlay();
-        if (gamePlay != null) {
-            Player currentPlayer = gamePlay.getCurrentPlayer();
-            if (currentPlayer.getId().equals(playerId)) {
-                PlayerBoard playerBoard = gamePlayer.getBoard();
-                var ship = playerBoard.getShipAtPosition(pos);
-                var responseStatus = SHOOT_MISS;
-                int shipType = 0;
-                int direction = 0;
+        Player currentPlayer = gamePlay.getCurrentPlayer();
+        if (currentPlayer.getId().equals(playerId)) {
+            PlayerBoard playerBoard = gamePlayer.getBoard();
+            var ship = playerBoard.getShipAtPosition(pos);
+            var responseStatus = SHOOT_MISS;
 
-                if (ship != null) {
-                    var status = playerBoard.isShipDestroyed(ship);
-                    if (status) {
-                        responseStatus = PlayerBoard.SHOOT_DESTROYED;
-                        shipType = ship.getShipType();
-                        direction = ship.getDirection();
-                    }
-                    else responseStatus = PlayerBoard.SHOOT_HIT;
+            if (ship != null) {
+                var status = playerBoard.isShipDestroyed(ship);
+                if (status) {
+                    responseStatus = PlayerBoard.SHOOT_DESTROYED;
                 }
-
-                sendResponseShoot(responseStatus, pos.getX(), pos.getY(), ship);
-
-                battleShip.getListenerManager()
-                        .callEvent(
-                                new PlayerShootEvent(currentPlayer, gamePlay.getOpponent().getBoard(), pos),
-                                battleShip.getGameManager());
+                else responseStatus = PlayerBoard.SHOOT_HIT;
             }
+
+            sendResponseShoot(responseStatus, pos.getX(), pos.getY(), ship);
+
+            battleShip.getListenerManager()
+                    .callEvent(
+                            new PlayerShootEvent(currentPlayer, gamePlay.getOpponent().getBoard(), pos),
+                            battleShip.getGameManager());
         }
     }
 
