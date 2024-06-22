@@ -193,11 +193,14 @@ public abstract class MultiHandler {
                 var status = playerBoard.isShipDestroyed(ship);
                 if (status) {
                     responseStatus = PlayerBoard.SHOOT_DESTROYED;
+                    playerBoard.markShipDestroyed(ship);
                 }
                 else responseStatus = PlayerBoard.SHOOT_HIT;
             }
 
+            playerBoard.shoot(pos, responseStatus);
             sendResponseShoot(responseStatus, pos.getX(), pos.getY(), ship);
+            if (responseStatus == SHOOT_MISS) gamePlay.endTurn();
 
             battleShip.getListenerManager()
                     .callEvent(
@@ -211,23 +214,25 @@ public abstract class MultiHandler {
         var x = Integer.parseInt(messageParts.get(2));
         var y = Integer.parseInt(messageParts.get(3));
         Position pos = new Position(x, y);
-        Ship ship;
-        if (shootStatus == PlayerBoard.SHOOT_DESTROYED) {
-            if (messageParts.size() > 4) {
-                var shipType = Integer.parseInt(messageParts.get(4));
-                var direction = Integer.parseInt(messageParts.get(5));
-                ship = new Ship(direction, new Sprite(GamePlay.sprites.get(shipType)), new Position(x, y), shipType);
-                PlayerBoard playerBoard = battleShip.getGameManager().getCurrentGamePlay().getOpponent().getBoard();
 
-                playerBoard.addShip(ship);
-            }
-        }
 
         GamePlay gamePlay = battleShip.getGameManager().getCurrentGamePlay();
 
         Player currentPlayer = gamePlay.getCurrentPlayer();
         PlayerBoard playerBoard = gamePlay.getOpponent().getBoard();
         playerBoard.shoot(pos, shootStatus);
+
+        Ship ship;
+        if (shootStatus == PlayerBoard.SHOOT_DESTROYED) {
+            if (messageParts.size() > 4) {
+                var shipType = Integer.parseInt(messageParts.get(4));
+                var direction = Integer.parseInt(messageParts.get(5));
+                ship = new Ship(direction, new Sprite(GamePlay.sprites.get(shipType)), new Position(x, y), shipType);
+
+                playerBoard.addShip(ship);
+            }
+        }
+
         if (shootStatus == SHOOT_MISS) gamePlay.endTurn();
 
 
