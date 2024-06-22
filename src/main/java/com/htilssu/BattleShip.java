@@ -20,7 +20,6 @@ import java.awt.event.KeyListener;
 
 public class BattleShip extends JFrame implements Runnable, KeyListener, ComponentListener {
 
-
     /**
      * Luồng render và update game
      */
@@ -30,37 +29,30 @@ public class BattleShip extends JFrame implements Runnable, KeyListener, Compone
      * Quản lý sự kiện
      */
     private final ListenerManager listenerManager = new ListenerManager();
-
     /**
      * Quản lý host
      */
     private final Host host = new Host(this);
-
     /**
      * Số frame mỗi giây hiện tại
      */
     int currentFPS = 0;
-
     /**
      * Quản lý các màn hình trong game
      */
     ScreenManager screenManager = new ScreenManager(this);
-
     /**
      * Quản lý game, chứa thông tin về người chơi, trạng thái game, ...
      */
     GameManager gameManager = new GameManager(this);
-
     /**
      * Quản lý giao tiếp với server
      */
     Client client = new Client(this);
-
     /**
      * Biến đánh dấu có đang chạy thread render hay không
      */
     private boolean running;
-
     private boolean isFullScreen = false;
 
     private BattleShip() {
@@ -113,6 +105,10 @@ public class BattleShip extends JFrame implements Runnable, KeyListener, Compone
 
         running = true;
         //        thread.start();
+    }
+
+    public Host getHost() {
+        return host;
     }
 
     public GameManager getGameManager() {
@@ -241,7 +237,8 @@ public class BattleShip extends JFrame implements Runnable, KeyListener, Compone
 
         if (isFullScreen) {
             setExtendedState(Frame.MAXIMIZED_BOTH);
-        } else {
+        }
+        else {
             setExtendedState(Frame.NORMAL);
             setSize(GameSetting.WIDTH, GameSetting.HEIGHT);
             GameSetting.SCALE = 1;

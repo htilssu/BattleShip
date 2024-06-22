@@ -12,13 +12,13 @@ import java.awt.event.MouseMotionAdapter;
 import java.util.ArrayList;
 
 public class SelfGrid extends BattleGrid {
-  public static final int MAXIMIZED_BOTH = JFrame.MAXIMIZED_BOTH / 6;   //lay kich thuoc full man hinh
   private String gridType = "selfGrid";  // Chuỗi xác định loại lưới (ở đây là "selfGrid").
   private boolean isSelfGridListener;  // Biến boolean để kiểm tra xem listener của lưới có đang hoạt động hay không.
   private String name;  // Tên người chơi
   private Start2Player battleShip;  // Tham chiếu đến đối tượng BattleShip.
   private JPanel thePanel = new JPanel();  // Biến JPanel được sử dụng để tạm thời lưu trữ ô hiện tại.
   private boolean isHorizontal = true; // Biến để xác định hướng của tàu
+  public static final int MAXIMIZED_BOTH = JFrame.MAXIMIZED_BOTH / 6;   //lay kich thuoc full man hinh
 
 
   public SelfGrid(String name, Start2Player battleShip) {
@@ -175,10 +175,7 @@ public class SelfGrid extends BattleGrid {
     }
   }
 
-  // Phương thức để xoay tàu
-  public void rotateShip() {
-    isHorizontal = !isHorizontal; //Đảo ngược trạng thái hướng của tàu
-  }
+
 
   public void draw() {
     int[][] temp = null;
@@ -224,6 +221,11 @@ public class SelfGrid extends BattleGrid {
     return (s - 1) * 25;
   }
 
+
+  // Phương thức để xoay tàu
+  public void rotateShip() {
+    isHorizontal = !isHorizontal; //Đảo ngược trạng thái hướng của tàu
+  }
 
   public boolean getSelfGridListener() {
     return isSelfGridListener;

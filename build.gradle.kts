@@ -3,7 +3,7 @@ plugins {
 }
 
 group = "com.htilssu"
-version = "1.0-SNAPSHOT"
+version = ""
 
 repositories {
     mavenCentral()

@@ -1,9 +1,9 @@
 package com.htilssu.ui.component;
 
+import com.htilssu.util.AssetUtils;
+
 import javax.swing.*;
-import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.awt.event.*;
 import java.awt.image.BufferedImage;
 
 public class GameButton extends JButton {
@@ -18,10 +18,11 @@ public class GameButton extends JButton {
 
     public GameButton() {
         super();
+        setFont(AssetUtils.gameFont.deriveFont(20f));
         setBorderPainted(false);
         setContentAreaFilled(false);
+        setOpaque(false);
         setFocusPainted(false);
-
     }
 
     public BufferedImage getBackgroundImage() {
@@ -30,9 +31,11 @@ public class GameButton extends JButton {
 
     @Override
     protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
+
 
         renderBackground(g);
+
+        super.paintComponent(g);
     }
 
     private void renderBackground(Graphics g) {
@@ -40,6 +43,5 @@ public class GameButton extends JButton {
             g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), null);
         }
     }
-
 
 }

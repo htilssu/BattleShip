@@ -11,9 +11,12 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 
 public class PickScreen extends JPanel {
+
     private static final int IMAGE_GAP = 30; // Khoảng cách cố định giữa các hình ảnh
-    private BattleShip window;
-    private BufferedImage normalImage, hardImage, backgroundImage;
+    private final BattleShip window;
+    private final BufferedImage normalImage;
+    private final BufferedImage hardImage;
+    private BufferedImage backgroundImage;
     private boolean isNormalImageHovered = false;
     private boolean isHardImageHovered = false;
     private int normalImageX, normalImageY, newNormalImageWidth, newImageHeight;
@@ -23,8 +26,8 @@ public class PickScreen extends JPanel {
         window = battleShip;
         setLayout(null);
         setPreferredSize(new Dimension(800, 600));
-        normalImage = AssetUtils.loadImage("/Normal.png");
-        hardImage = AssetUtils.loadImage("/Hard.png");
+        normalImage = AssetUtils.loadImage("/images/Normal.png");
+        hardImage = AssetUtils.loadImage("/images/Hard.png");
         loadBackgroundImage();
         addMouseListener(
                 new MouseAdapter() {
@@ -64,6 +67,13 @@ public class PickScreen extends JPanel {
         backgroundImage = AssetUtils.loadImage("/images/ground.png"); // Tải hình nền
     }
 
+    private void handleMouseClick(int mouseX, int mouseY) {
+        if (isInsideImage(
+                mouseX, mouseY, normalImageX, normalImageY, newNormalImageWidth, newImageHeight)) {
+            transitionToGameScreen();
+        }
+    }
+
     private void handleMouseMove(int mouseX, int mouseY) {
         boolean previouslyHovered = isNormalImageHovered || isHardImageHovered;
 
@@ -75,13 +85,6 @@ public class PickScreen extends JPanel {
 
         if (previouslyHovered != (isNormalImageHovered || isHardImageHovered)) {
             repaint();
-        }
-    }
-
-    private void handleMouseClick(int mouseX, int mouseY) {
-        if (isInsideImage(
-                mouseX, mouseY, normalImageX, normalImageY, newNormalImageWidth, newImageHeight)) {
-            transitionToGameScreen();
         }
     }
 
@@ -127,9 +130,9 @@ public class PickScreen extends JPanel {
             if (totalWidth > panelWidth) {
                 float scaleFactor =
                         (float) (panelWidth - IMAGE_GAP) / (newNormalImageWidth + newHardImageWidth);
-                newNormalImageWidth *= scaleFactor;
-                newHardImageWidth *= scaleFactor;
-                newImageHeight *= scaleFactor;
+                newNormalImageWidth = (int) (newNormalImageWidth * scaleFactor);
+                newHardImageWidth = (int) (newHardImageWidth * scaleFactor);
+                newImageHeight = (int) (newImageHeight * scaleFactor);
             }
 
             // Tính toán vị trí để căn giữa hình ảnh với khoảng cách
@@ -142,14 +145,16 @@ public class PickScreen extends JPanel {
             if (isNormalImageHovered) {
                 drawResizedImage(
                         g, normalImage, normalImageX, normalImageY, newNormalImageWidth, newImageHeight);
-            } else {
+            }
+            else {
                 g.drawImage(
                         normalImage, normalImageX, normalImageY, newNormalImageWidth, newImageHeight, this);
             }
 
             if (isHardImageHovered) {
                 drawResizedImage(g, hardImage, hardImageX, hardImageY, newHardImageWidth, newImageHeight);
-            } else {
+            }
+            else {
                 g.drawImage(hardImage, hardImageX, hardImageY, newHardImageWidth, newImageHeight, this);
             }
         }

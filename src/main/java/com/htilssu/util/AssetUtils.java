@@ -19,6 +19,10 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import javax.imageio.ImageIO;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.UnsupportedAudioFileException;
 
 public class AssetUtils {
     public static final int ASSET_BOARD_FRAME = 1;
@@ -36,6 +40,10 @@ public class AssetUtils {
     public static final int ASSET_REFRESH_BUTTON = 13;
     public static final int ASSET_BACK_BUTTON = 14;
     public static final int ASSET_TEXT_FIELD = 15;
+    public static final int ASSET_BUTTON_1 = 16;
+    public static final int ASSET_BUTTON_2 = 17;
+    public static final int ASSET_BUTTON_3 = 18;
+    public static final int ASSET_BUTTON_4 = 19;
 
     public static Font gameFont;
 
@@ -89,6 +97,10 @@ public class AssetUtils {
 
 
         assetMap.put(ASSET_TEXT_FIELD, loadImage("/images/Item_TextField.png"));
+        assetMap.put(ASSET_BUTTON_1, loadImage("/images/button_1.png"));
+        assetMap.put(ASSET_BUTTON_2, loadImage("/images/button_2.png"));
+        assetMap.put(ASSET_BUTTON_3, loadImage("/images/button_3.png"));
+        assetMap.put(ASSET_BUTTON_4, loadImage("/images/button_4.png"));
     }
 
     /**

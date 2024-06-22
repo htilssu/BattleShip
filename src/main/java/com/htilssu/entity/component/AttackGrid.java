@@ -1,8 +1,9 @@
 package com.htilssu.entity.component;
 
 import com.htilssu.manager.SoundManager;
-import com.htilssu.screen.Start2Player;
+
 import com.htilssu.ui.screen.Player2Screen;
+import com.htilssu.ui.screen.Start2Player;
 
 import javax.swing.*;
 import java.awt.*;
@@ -36,7 +37,7 @@ public class AttackGrid extends BattleGrid {
         panel.setBorder(BorderFactory.createLineBorder(Color.red, 1));
         panel.setPreferredSize(new Dimension(30, 30));
 
-        panel.setBackground(com.htilssu.util.Color.TRANSPARENT); // Đặt màu nền trong suốt
+        panel.setBackground(new Color(0, 0, 0, 0)); // Đặt màu nền trong suốt
 
         panel.addMouseListener(new MouseAdapter() {
             @Override
@@ -131,6 +132,13 @@ public class AttackGrid extends BattleGrid {
         });
         return panel;
     }
+    public void setAttackGridListener (boolean attackGridListener){
+        this.isAttackGridListener = attackGridListener;
+
+    }
+    public void getJpanel(Point newPoint){
+        thePanel = this.getComponentAt(newPoint);
+    }
 
     public void draw(){
         int[][] temp=null;
@@ -169,14 +177,5 @@ public class AttackGrid extends BattleGrid {
     public int numberToPanel(int s){
         int temp = (s-1)*30;
         return temp;
-    }
-
-    public void getJpanel(Point newPoint){
-        thePanel = this.getComponentAt(newPoint);
-    }
-
-    public void setAttackGridListener (boolean attackGridListener){
-        this.isAttackGridListener = attackGridListener;
-
     }
 }

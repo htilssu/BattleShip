@@ -1,11 +1,13 @@
 package com.htilssu.util;
 
-import static java.util.concurrent.Executors.newFixedThreadPool;
-
 import java.io.IOException;
 import java.net.*;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
+
+import static java.util.concurrent.Executors.newFixedThreadPool;
 
 public class NetworkUtils {
 
@@ -46,6 +48,13 @@ public class NetworkUtils {
         return inetAddresses;
     }
 
+    /**
+     * Lấy subnetmask của một địa chỉ IP
+     *
+     * @param prefixLength
+     *
+     * @return
+     */
     private static InetAddress getSubnetMask(int prefixLength) {
         int value = 0xffffffff << (32 - prefixLength);
         byte[] bytes =
@@ -59,21 +68,6 @@ public class NetworkUtils {
         try {
             return InetAddress.getByAddress(bytes);
         } catch (Exception e) {
-            return null;
-        }
-    }
-
-    private static InetAddress getDefaultGateway(InetAddress inetAddress, InetAddress subnetMask) {
-        byte[] address = inetAddress.getAddress();
-        byte[] mask = subnetMask.getAddress();
-
-        for (int i = 0; i < address.length; i++) {
-            address[i] = (byte) (address[i] & mask[i]);
-        }
-
-        try {
-            return InetAddress.getByAddress(address);
-        } catch (UnknownHostException e) {
             return null;
         }
     }
@@ -132,5 +126,20 @@ public class NetworkUtils {
         }
 
         return new ArrayList<>(inetAddresses);
+    }
+
+    private static InetAddress getDefaultGateway(InetAddress inetAddress, InetAddress subnetMask) {
+        byte[] address = inetAddress.getAddress();
+        byte[] mask = subnetMask.getAddress();
+
+        for (int i = 0; i < address.length; i++) {
+            address[i] = (byte) (address[i] & mask[i]);
+        }
+
+        try {
+            return InetAddress.getByAddress(address);
+        } catch (UnknownHostException e) {
+            return null;
+        }
     }
 }
