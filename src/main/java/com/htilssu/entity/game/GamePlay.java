@@ -284,7 +284,7 @@ public class GamePlay implements Renderable {
     private void ready() {
         isReady = true;
         readyButton.setAsset(AssetUtils.getImage(AssetUtils.ASSET_UNREADY_BUTTON), null);
-        if (Host.getInstance().isHost()) {
+        if (Host.getInstance().isConnected()) {
             Host.getInstance().ready();
         }
         else {
