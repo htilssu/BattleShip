@@ -7,13 +7,12 @@ import com.htilssu.entity.game.GamePlay;
 import com.htilssu.render.Collision;
 import com.htilssu.render.Renderable;
 import com.htilssu.util.AssetUtils;
+import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.jetbrains.annotations.NotNull;
 
 /**
  * Lớp chứa thông tin bảng của người chơi Bảng này lưu trữ các ô mà người chơi đã bắn và chứa các
@@ -23,6 +22,7 @@ public class PlayerBoard extends Collision implements Renderable {
 
     public static final int SHOOT_MISS = 1;
     public static final int SHOOT_HIT = 2;
+    public static final int SHOOT_DESTROYED = 3;
     private final BufferedImage bg;
     private final byte[][] shotBoard;
     Player player;
@@ -43,27 +43,6 @@ public class PlayerBoard extends Collision implements Renderable {
         this.bg = AssetUtils.getImage(AssetUtils.ASSET_BACK_SEA);
     }
 
-    public void shoot(Position position, int status) {
-        if (canShoot(position)) {
-            shotBoard[position.x][position.y] = (byte) status;
-        }
-    }
-
-    /**
-     * Kiểm tra xem người chơi có thể bắn vào ô này không
-     * vị trí sẽ là hai số nguyên {@code x}, {@code y} đại diện cho hàng và cột
-     *
-     * @param position vị trí cần bắn
-     * @return {@code true} nếu có thể bắn, {@code false} nếu không thể bắn
-     */
-    public boolean canShoot(Position position) {
-        return canShoot(position.x, position.y);
-    }
-
-    public int getCellSize() {
-        return cellSize;
-    }
-
     /**
      * Cập nhật kích thước của bảng người chơi
      */
@@ -79,6 +58,10 @@ public class PlayerBoard extends Collision implements Renderable {
     public void setSize(int width, int height) {
         //noinspection SuspiciousNameCombination
         super.setSize(height, height);
+    }
+
+    public int getCellSize() {
+        return cellSize;
     }
 
     @Override
@@ -210,34 +193,64 @@ public class PlayerBoard extends Collision implements Renderable {
         return canAddShip(ship.getSprite().getX(), ship.getSprite().getY(), ship.getSprite().getWidth(), ship.getSprite().getHeight());
     }
 
-    public byte shoot(Position position) {
-
+    public Ship getShipAtPosition(Position position) {
         for (Ship ship : ships) {
             Position pos = ship.getPosition();
             switch (ship.getDirection()) {
                 case Ship.HORIZONTAL -> {
                     if (position.x == pos.x && position.y >= pos.y && position.y < pos.y + ship.getShipType()) {
-                        shoot(position, SHOOT_HIT);
-                        return SHOOT_HIT;
-                    } else {
-                        shoot(position, SHOOT_MISS);
-                        return SHOOT_MISS;
-
+                        return ship;
                     }
                 }
                 case Ship.VERTICAL -> {
                     if (position.y == pos.y && position.x >= pos.x && position.x < pos.x + ship.getShipType()) {
-                        shoot(position, SHOOT_HIT);
-                        return SHOOT_HIT;
-                    } else {
-                        shoot(position, SHOOT_MISS);
-                        return SHOOT_MISS;
+                        return ship;
                     }
                 }
             }
         }
-        return SHOOT_MISS;
+        return null;
     }
+
+    public void shoot(Position position, int status) {
+        if (canShoot(position)) {
+            shotBoard[position.x][position.y] = (byte) status;
+        }
+    }
+
+    /**
+     * Kiểm tra xem người chơi có thể bắn vào ô này không
+     * vị trí sẽ là hai số nguyên {@code x}, {@code y} đại diện cho hàng và cột
+     *
+     * @param position vị trí cần bắn
+     *
+     * @return {@code true} nếu có thể bắn, {@code false} nếu không thể bắn
+     */
+    public boolean canShoot(Position position) {
+        return canShoot(position.x, position.y);
+    }
+
+    public boolean isShipDestroyed(Ship ship) {
+        Position pos = ship.getPosition();
+
+        for (int i = 0; i < ship.getShipType(); i++) {
+            switch (ship.getDirection()) {
+                case Ship.HORIZONTAL -> {
+                    if (shotBoard[pos.x][pos.y + i] != SHOOT_HIT) {
+                        return false;
+                    }
+                }
+                case Ship.VERTICAL -> {
+                    if (shotBoard[pos.x + i][pos.y] != SHOOT_HIT) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+
 }
 
 

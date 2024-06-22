@@ -50,44 +50,6 @@ public class Client extends MultiHandler implements Runnable {
         this.status = status;
     }
 
-    /**
-     * Kết nối đến host với port và địa chỉ IP
-     *
-     * @param ip   Địa chỉ IP của host
-     * @param port Cổng kết nối
-     */
-    public void connect(InetAddress ip, short port) {
-        if (isConnected()) disconnect();
-        try {
-            socket = new Socket(ip, port);
-            new Thread(this).start();
-            status = "Đã kết nối đến máy chủ";
-        } catch (IOException e) {
-            status = "Không thể kết nối đến máy chủ";
-        }
-    }
-
-    /**
-     * Kiểm tra xem client có đang kết nối với host không
-     *
-     * @return Trả về {@code true} nếu client đang kết nối với host, ngược lại trả về {@code false}
-     */
-    public boolean isConnected() {
-        return socket != null;
-    }
-
-    /**
-     * Ngắt kết nối giữa client và host
-     */
-    public void disconnect() {
-        try {
-            socket.close();
-        } catch (IOException e) {
-            GameLogger.log("Không thể ngắt kết nối");
-        }
-        socket = null;
-    }
-
     public int getPing() {
         long time = System.currentTimeMillis();
         send(MultiHandler.PING + "");
@@ -119,7 +81,11 @@ public class Client extends MultiHandler implements Runnable {
     public synchronized void scanHost() {
         new Thread(() -> {
             hostList.clear();
-            hostList.addAll(NetworkUtils.find(GameSetting.DEFAULT_PORT));
+
+            for (InetAddress inetAddress : NetworkUtils.find(GameSetting.DEFAULT_PORT)) {
+                connect(inetAddress, GameSetting.DEFAULT_PORT);
+                send(PING);
+            }
 
             var networkScreen = (NetworkScreen) battleShip.getScreenManager().getScreen(NETWORK_SCREEN);
             networkScreen.updateListHost(getHostList());
@@ -127,8 +93,47 @@ public class Client extends MultiHandler implements Runnable {
         }).start();
     }
 
+    /**
+     * Kết nối đến host với port và địa chỉ IP
+     * phương thức này sẽ không tạo thread mới để chạy
+     *
+     * @param ip   Địa chỉ IP của host
+     * @param port Cổng kết nối
+     */
+    public void connect(InetAddress ip, short port) {
+        if (isConnected()) disconnect();
+        try {
+            socket = new Socket(ip, port);
+            new Thread(this).start();
+            status = "Đã kết nối đến máy chủ";
+        } catch (IOException e) {
+            status = "Không thể kết nối đến máy chủ";
+        }
+    }
+
     public List<InetAddress> getHostList() {
         return hostList;
+    }
+
+    /**
+     * Kiểm tra xem client có đang kết nối với host không
+     *
+     * @return Trả về {@code true} nếu client đang kết nối với host, ngược lại trả về {@code false}
+     */
+    public boolean isConnected() {
+        return socket != null;
+    }
+
+    /**
+     * Ngắt kết nối giữa client và host
+     */
+    public void disconnect() {
+        try {
+            socket.close();
+        } catch (IOException e) {
+            GameLogger.log("Không thể ngắt kết nối");
+        }
+        socket = null;
     }
 
     @Override

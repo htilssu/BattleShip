@@ -1,14 +1,16 @@
 package com.htilssu.multiplayer;
 
 import com.htilssu.BattleShip;
+import com.htilssu.entity.Ship;
+import com.htilssu.entity.Sprite;
 import com.htilssu.entity.component.Position;
 import com.htilssu.entity.game.GamePlay;
 import com.htilssu.entity.player.Player;
+import com.htilssu.entity.player.PlayerBoard;
 import com.htilssu.event.game.GameAction;
 import com.htilssu.event.player.PlayerJoinEvent;
 import com.htilssu.event.player.PlayerShootEvent;
 import com.htilssu.manager.DifficultyManager;
-import com.htilssu.manager.GameManager;
 import com.htilssu.manager.ScreenManager;
 import com.htilssu.util.GameLogger;
 
@@ -18,6 +20,9 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.Arrays;
 import java.util.List;
+
+import static com.htilssu.event.game.GameAction.RESPONSE_SHOOT;
+import static com.htilssu.manager.GameManager.gamePlayer;
 
 public abstract class MultiHandler {
 
@@ -88,9 +93,9 @@ public abstract class MultiHandler {
                     battleShip.getListenerManager()
                             .callEvent(new PlayerJoinEvent(player, battleShip.getGameManager().getCurrentGamePlay()),
                                        battleShip.getGameManager());
-                    battleShip.changeScreen(ScreenManager.GAME_SCREEN);
+                    battleShip.changeScreen(ScreenManager.PLAY_SCREEN);
                     if (this instanceof Host) {
-                        this.send(GameAction.JOIN, GameManager.gamePlayer.getId(), GameManager.gamePlayer.getName(),
+                        this.send(GameAction.JOIN, gamePlayer.getId(), gamePlayer.getName(),
                                   DifficultyManager.difficulty);
                     }
                     break;
@@ -100,31 +105,31 @@ public abstract class MultiHandler {
                         GameLogger.error("Invalid message (Player Shoot): " + message);
                         return;
                     }
-                    playerId = messageParts.get(1);
-                    Position pos = new Position(
-                            Integer.parseInt(messageParts.get(2)), Integer.parseInt(messageParts.get(3))
-                    );
-                    GamePlay gamePlay = battleShip.getGameManager().getCurrentGamePlay();
-                    if (gamePlay != null) {
-                        Player currentPlayer = gamePlay.getCurrentPlayer();
-                        if (currentPlayer.getId().equals(playerId)) {
-                            battleShip.getListenerManager().callEvent(
-                                    new PlayerShootEvent(currentPlayer, gamePlay.getOpponent().getBoard(), pos),
-                                    battleShip.getGameManager()
-                            );
-                        }
+                    handleShootRequest(messageParts);
+                    break;
+
+                case RESPONSE_SHOOT:
+                    handleResponseShoot(messageParts);
+
+                case PING:
+                    if (this instanceof Host host) {
+                        this.send(PONG, host.getId());
                     }
                     break;
 
-                case PING:
-                    if (this instanceof Host) {
-                        this.send(Integer.toString(PONG));
+                case PONG:
+                    if (messageParts.size() > 1) {
+                        var hostId = messageParts.get(1);
+                        Client client = battleShip.getClient();
+                        if (battleShip.getHost().getId().equals(hostId))
+                            client.getHostList().add(client.socket.getInetAddress());
                     }
                     break;
 
                 case GameAction.START_GAME:
                     if (this instanceof Client) {
                         battleShip.getGameManager().getCurrentGamePlay().setGameMode(GamePlay.PLAY_MODE);
+                        battleShip.getScreenManager().getScreen(ScreenManager.PLAY_SCREEN).repaint();
                     }
 
                 case GameAction.READY:
@@ -147,4 +152,79 @@ public abstract class MultiHandler {
     }
 
     public abstract void send(Object... message);
+
+    private void handleShootRequest(List<String> messageParts) {
+        var playerId = messageParts.get(1);
+        Position pos = new Position(Integer.parseInt(messageParts.get(2)),
+                                    Integer.parseInt(messageParts.get(3)));
+        GamePlay gamePlay = battleShip.getGameManager().getCurrentGamePlay();
+        if (gamePlay != null) {
+            Player currentPlayer = gamePlay.getCurrentPlayer();
+            if (currentPlayer.getId().equals(playerId)) {
+                PlayerBoard playerBoard = gamePlayer.getBoard();
+                var ship = playerBoard.getShipAtPosition(pos);
+                var responseStatus = PlayerBoard.SHOOT_MISS;
+                int shipType = 0;
+                int direction = 0;
+
+                if (ship != null) {
+                    var status = playerBoard.isShipDestroyed(ship);
+                    if (status) {
+                        responseStatus = PlayerBoard.SHOOT_DESTROYED;
+                        shipType = ship.getShipType();
+                        direction = ship.getDirection();
+                    }
+                    else responseStatus = PlayerBoard.SHOOT_HIT;
+                }
+
+                sendResponseShoot(responseStatus, pos.getX(), pos.getY(), ship);
+
+                battleShip.getListenerManager()
+                        .callEvent(
+                                new PlayerShootEvent(currentPlayer, gamePlay.getOpponent().getBoard(), pos),
+                                battleShip.getGameManager());
+            }
+        }
+    }
+
+    private void handleResponseShoot(List<String> messageParts) {
+        var shootStatus = Integer.parseInt(messageParts.get(1));
+        var x = Integer.parseInt(messageParts.get(2));
+        var y = Integer.parseInt(messageParts.get(3));
+        Position pos = new Position(x, y);
+        Ship ship;
+        if (shootStatus == PlayerBoard.SHOOT_DESTROYED) {
+            if (messageParts.size() > 4) {
+                var shipType = Integer.parseInt(messageParts.get(4));
+                var direction = Integer.parseInt(messageParts.get(5));
+                ship = new Ship(direction, new Sprite(GamePlay.sprites.get(shipType)), new Position(x, y), shipType);
+                PlayerBoard playerBoard = battleShip.getGameManager().getCurrentGamePlay().getOpponent().getBoard();
+
+                playerBoard.addShip(ship);
+            }
+        }
+
+        GamePlay gamePlay = battleShip.getGameManager().getCurrentGamePlay();
+        if (gamePlay != null) {
+            Player currentPlayer = gamePlay.getCurrentPlayer();
+            PlayerBoard playerBoard = gamePlay.getOpponent().getBoard();
+            playerBoard.shoot(pos, shootStatus);
+            battleShip.getListenerManager()
+                    .callEvent(
+                            new PlayerShootEvent(currentPlayer, gamePlay.getOpponent().getBoard(), new Position(x, y)),
+                            battleShip.getGameManager());
+        }
+    }
+
+    private void sendResponseShoot(int shootStatus, int x, int y, Ship ship) {
+        send(RESPONSE_SHOOT, shootStatus, x, y);
+        if (shootStatus == PlayerBoard.SHOOT_DESTROYED) {
+            send(RESPONSE_SHOOT, PlayerBoard.SHOOT_DESTROYED, ship.getPosition().x, ship.getPosition().y,
+                 ship.getShipType(), ship.getDirection());
+        }
+    }
+
+    public void sendShoot(Position pos) {
+        send(GameAction.SHOOT, gamePlayer.getId(), pos.getX(), pos.getY());
+    }
 }
