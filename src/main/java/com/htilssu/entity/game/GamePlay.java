@@ -45,7 +45,7 @@ public class GamePlay implements Renderable {
     }
 
     boolean isReady = false;
-    int gameMode = PLAY_MODE;
+    int gameMode = WAITING_MODE;
     Map<Integer, Integer> shipInBoard = new HashMap<>();
     List<Player> playerList;
     int turn;
