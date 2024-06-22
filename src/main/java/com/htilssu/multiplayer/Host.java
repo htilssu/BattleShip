@@ -25,7 +25,6 @@ public class Host extends MultiHandler implements Runnable {
     int ready = 0;
     private String hostName;
 
-
     public Host(BattleShip battleShip) {
         super(battleShip);
         instance = this;
@@ -36,6 +35,7 @@ public class Host extends MultiHandler implements Runnable {
     }
 
     public void start() {
+        if (!isConnected()) return;
         try {
             serverSocket = new ServerSocket(GameSetting.DEFAULT_PORT);
             serverSocket.setSoTimeout(0);
@@ -45,11 +45,15 @@ public class Host extends MultiHandler implements Runnable {
         hostListenThread.start();
     }
 
+    private boolean isConnected() {
+        return serverSocket != null;
+    }
+
     @Override
     public void run() {
         while (canHost) {
             try {
-                socket = serverSocket.accept();
+                socket = serverSocket != null ? serverSocket.accept() : null;
                 setHost(true);
             } catch (IOException e) {
                 GameLogger.error("Có lỗi khi chấp nhận kết nối từ client");
@@ -59,6 +63,7 @@ public class Host extends MultiHandler implements Runnable {
                 readData(socket);
             }
             setHost(false);
+            serverSocket = null;
         }
     }
 

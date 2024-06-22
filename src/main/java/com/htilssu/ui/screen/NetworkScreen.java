@@ -150,14 +150,10 @@ public class NetworkScreen extends GamePanel implements ComponentListener {
         var refreshButton = new GameButton(AssetUtils.getImage(ASSET_BUTTON_2));
         refreshButton.setPreferredSize(new Dimension(64 * 2, 64));
         refreshButton.setText("Refresh");
-        refreshButton.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                super.mouseClicked(e);
-                hostItemPanel.removeAll();
-                repaint();
-                refreshNetwork();
-            }
+        refreshButton.addActionListener(e -> {
+            hostItemPanel.removeAll();
+            repaint();
+            refreshNetwork();
         });
 
         Dimension buttonSize = new Dimension(64 * 3, 64);

@@ -117,8 +117,17 @@ public abstract class MultiHandler {
                     break;
 
                 case PING:
-                    if (this instanceof Host) {
-                        this.send(Integer.toString(PONG));
+                    if (this instanceof Host host) {
+                        this.send(PONG, host.getId());
+                    }
+                    break;
+
+                case PONG:
+                    if (messageParts.size() > 1) {
+                        var hostId = messageParts.get(1);
+                        Client client = battleShip.getClient();
+                        if (battleShip.getHost().getId().equals(hostId))
+                            client.getHostList().add(client.socket.getInetAddress());
                     }
                     break;
 
