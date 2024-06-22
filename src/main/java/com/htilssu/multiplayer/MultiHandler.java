@@ -85,7 +85,7 @@ public abstract class MultiHandler {
                     Player player = new Player(playerId, playerName);
 
 
-                    if (messageParts.size() == 4) {
+                    if (messageParts.size() >= 4) {
                         try {
                             DifficultyManager.difficulty = Integer.parseInt(messageParts.get(3));
                         } catch (NumberFormatException e) {

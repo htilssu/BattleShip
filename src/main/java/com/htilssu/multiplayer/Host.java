@@ -47,7 +47,7 @@ public class Host extends MultiHandler implements Runnable {
         }
     }
 
-    private boolean isConnected() {
+    public boolean isConnected() {
         return socket != null && isRunning;
     }
 
