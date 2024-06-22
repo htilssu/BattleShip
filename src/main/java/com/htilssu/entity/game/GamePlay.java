@@ -434,7 +434,7 @@ public class GamePlay implements Renderable {
                 }
 
                 for (int i = 0; i < sprites.size(); i++) {
-                    Sprite sprite = sprites.get(i);
+                    Sprite sprite = sprites.get(i + 2);
 
                     sprite.setLocation((int) (i * (sprite.getWidth() + shipSpriteMargin) + 32 * GameSetting.SCALE),
                                        yMidPosition - sprite.getHeight() / 2);

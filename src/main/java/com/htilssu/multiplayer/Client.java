@@ -82,6 +82,7 @@ public class Client extends MultiHandler implements Runnable {
 
             for (InetAddress inetAddress : NetworkUtils.find(GameSetting.DEFAULT_PORT)) {
                 connect(inetAddress, GameSetting.DEFAULT_PORT);
+                send(PING);
             }
 
         }).start();
@@ -97,7 +98,6 @@ public class Client extends MultiHandler implements Runnable {
     public void connect(InetAddress ip, short port) {
         try {
             socket = new Socket(ip, port);
-            send(PING);
             new Thread(this).start();
             status = "Đã kết nối đến máy chủ";
         } catch (IOException e) {
