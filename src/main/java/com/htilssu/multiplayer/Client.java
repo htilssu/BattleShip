@@ -4,7 +4,6 @@ import com.htilssu.BattleShip;
 import com.htilssu.event.game.GameAction;
 import com.htilssu.manager.GameManager;
 import com.htilssu.setting.GameSetting;
-import com.htilssu.ui.screen.NetworkScreen;
 import com.htilssu.util.GameLogger;
 import com.htilssu.util.NetworkUtils;
 
@@ -16,16 +15,14 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.htilssu.manager.ScreenManager.NETWORK_SCREEN;
-
 /**
  * Lớp quản lý kết nối giữa client với server
  */
 public class Client extends MultiHandler implements Runnable {
 
     static Client instance;
+    private final List<InetAddress> hostList = new ArrayList<>();
     Socket socket;
-    private List<InetAddress> hostList = new ArrayList<>();
     private String status;
 
     public Client(BattleShip battleShip) {
@@ -58,6 +55,7 @@ public class Client extends MultiHandler implements Runnable {
 
     /**
      * Gửi dữ liệu đến host
+     *
      * @param obj Danh sách object cần gửi
      */
     public void send(Object... obj) {
@@ -84,12 +82,8 @@ public class Client extends MultiHandler implements Runnable {
 
             for (InetAddress inetAddress : NetworkUtils.find(GameSetting.DEFAULT_PORT)) {
                 connect(inetAddress, GameSetting.DEFAULT_PORT);
-                send(PING);
             }
 
-            var networkScreen = (NetworkScreen) battleShip.getScreenManager().getScreen(NETWORK_SCREEN);
-            networkScreen.updateListHost(getHostList());
-            networkScreen.repaint();
         }).start();
     }
 
@@ -101,18 +95,28 @@ public class Client extends MultiHandler implements Runnable {
      * @param port Cổng kết nối
      */
     public void connect(InetAddress ip, short port) {
-        if (isConnected()) disconnect();
         try {
             socket = new Socket(ip, port);
+            send(PING);
             new Thread(this).start();
             status = "Đã kết nối đến máy chủ";
         } catch (IOException e) {
+            disconnect();
             status = "Không thể kết nối đến máy chủ";
         }
     }
 
-    public List<InetAddress> getHostList() {
-        return hostList;
+    /**
+     * Ngắt kết nối giữa client và host
+     */
+    public void disconnect() {
+        try {
+            if (isConnected()) socket.close();
+        } catch (IOException e) {
+            socket = null;
+            GameLogger.log("Không thể ngắt kết nối");
+        }
+        socket = null;
     }
 
     /**
@@ -124,22 +128,15 @@ public class Client extends MultiHandler implements Runnable {
         return socket != null;
     }
 
-    /**
-     * Ngắt kết nối giữa client và host
-     */
-    public void disconnect() {
-        try {
-            socket.close();
-        } catch (IOException e) {
-            GameLogger.log("Không thể ngắt kết nối");
-        }
-        socket = null;
+    public List<InetAddress> getHostList() {
+        return hostList;
     }
 
     @Override
     public void run() {
-        while (socket.isConnected()) {
+        while (isConnected()) {
             readData(socket);
+            socket = null;
         }
     }
 }

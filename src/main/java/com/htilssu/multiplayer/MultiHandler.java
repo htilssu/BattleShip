@@ -12,6 +12,7 @@ import com.htilssu.event.player.PlayerJoinEvent;
 import com.htilssu.event.player.PlayerShootEvent;
 import com.htilssu.manager.DifficultyManager;
 import com.htilssu.manager.ScreenManager;
+import com.htilssu.ui.screen.NetworkScreen;
 import com.htilssu.util.GameLogger;
 
 import java.io.BufferedReader;
@@ -20,9 +21,12 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
+import static com.htilssu.entity.player.PlayerBoard.SHOOT_MISS;
 import static com.htilssu.event.game.GameAction.RESPONSE_SHOOT;
 import static com.htilssu.manager.GameManager.gamePlayer;
+import static com.htilssu.manager.ScreenManager.NETWORK_SCREEN;
 
 public abstract class MultiHandler {
 
@@ -47,7 +51,7 @@ public abstract class MultiHandler {
         try {
             BufferedReader bis = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-            while (socket.isConnected()) {
+            while (true) {
                 String message = bis.readLine();
                 if (message == null) {
                     break;
@@ -88,15 +92,29 @@ public abstract class MultiHandler {
                             GameLogger.error("Invalid difficulty: " + messageParts.get(3));
                         }
                     }
-                    battleShip.getGameManager().addPlayer(player);
-                    battleShip.getGameManager().createNewGamePlay();
+
+                    var gameManager = battleShip.getGameManager();
+                    gameManager.addPlayer(player);
+
+                    if (messageParts.size() == 5) {
+                        try {
+                            battleShip.getGameManager().turn = Integer.parseInt(messageParts.get(4));
+                        } catch (NumberFormatException e) {
+                            GameLogger.error("Invalid turn: " + messageParts.get(4));
+                        }
+                    }
+                    else gameManager.setTurn(new Random().nextInt(1));
+
+
+                    gameManager.createNewGamePlay();
                     battleShip.getListenerManager()
                             .callEvent(new PlayerJoinEvent(player, battleShip.getGameManager().getCurrentGamePlay()),
                                        battleShip.getGameManager());
                     battleShip.changeScreen(ScreenManager.PLAY_SCREEN);
                     if (this instanceof Host) {
+                        int opponentTurn = gameManager.turn == 0 ? 1 : 0;
                         this.send(GameAction.JOIN, gamePlayer.getId(), gamePlayer.getName(),
-                                  DifficultyManager.difficulty);
+                                  DifficultyManager.difficulty, opponentTurn);
                     }
                     break;
 
@@ -121,8 +139,14 @@ public abstract class MultiHandler {
                     if (messageParts.size() > 1) {
                         var hostId = messageParts.get(1);
                         Client client = battleShip.getClient();
-                        if (battleShip.getHost().getId().equals(hostId))
+                        if (!battleShip.getHost().getId().equals(hostId))
                             client.getHostList().add(client.socket.getInetAddress());
+
+                        client.disconnect();
+
+                        var networkScreen = (NetworkScreen) battleShip.getScreenManager().getScreen(NETWORK_SCREEN);
+                        networkScreen.updateListHost(client.getHostList());
+                        networkScreen.repaint();
                     }
                     break;
 
@@ -131,6 +155,7 @@ public abstract class MultiHandler {
                         battleShip.getGameManager().getCurrentGamePlay().setGameMode(GamePlay.PLAY_MODE);
                         battleShip.getScreenManager().getScreen(ScreenManager.PLAY_SCREEN).repaint();
                     }
+                    break;
 
                 case GameAction.READY:
                     if (this instanceof Host) {
@@ -163,7 +188,7 @@ public abstract class MultiHandler {
             if (currentPlayer.getId().equals(playerId)) {
                 PlayerBoard playerBoard = gamePlayer.getBoard();
                 var ship = playerBoard.getShipAtPosition(pos);
-                var responseStatus = PlayerBoard.SHOOT_MISS;
+                var responseStatus = SHOOT_MISS;
                 int shipType = 0;
                 int direction = 0;
 
@@ -205,15 +230,18 @@ public abstract class MultiHandler {
         }
 
         GamePlay gamePlay = battleShip.getGameManager().getCurrentGamePlay();
-        if (gamePlay != null) {
-            Player currentPlayer = gamePlay.getCurrentPlayer();
-            PlayerBoard playerBoard = gamePlay.getOpponent().getBoard();
-            playerBoard.shoot(pos, shootStatus);
-            battleShip.getListenerManager()
-                    .callEvent(
-                            new PlayerShootEvent(currentPlayer, gamePlay.getOpponent().getBoard(), new Position(x, y)),
-                            battleShip.getGameManager());
-        }
+
+        Player currentPlayer = gamePlay.getCurrentPlayer();
+        PlayerBoard playerBoard = gamePlay.getOpponent().getBoard();
+        playerBoard.shoot(pos, shootStatus);
+        if (shootStatus == SHOOT_MISS) gamePlay.endTurn();
+
+
+        battleShip.getListenerManager()
+                .callEvent(
+                        new PlayerShootEvent(currentPlayer, gamePlay.getOpponent().getBoard(), new Position(x, y)),
+                        battleShip.getGameManager());
+
     }
 
     private void sendResponseShoot(int shootStatus, int x, int y, Ship ship) {
