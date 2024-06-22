@@ -128,6 +128,7 @@ public abstract class MultiHandler {
 
                 case RESPONSE_SHOOT:
                     handleResponseShoot(messageParts);
+                    break;
 
                 case PING:
                     if (this instanceof Host host) {
