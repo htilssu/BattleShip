@@ -21,4 +21,5 @@ public final class GameAction {
 
     public static final int UNREADY = 4;
     public static final int START_GAME = 5;
+    public static final int RESPONSE_SHOOT = 6;
 }
