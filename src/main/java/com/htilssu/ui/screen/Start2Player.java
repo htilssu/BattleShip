@@ -61,6 +61,10 @@ public class Start2Player extends JPanel implements GameState {
         });
     }
 
+    private void loadBackground() {
+        backgroundImage = AssetUtils.loadImage("/images/imageStart2game.png");
+    }
+
     public void SetNew()
     {
         SoundManager.playBackGround(SoundManager.BACKGROUND_TEST);
@@ -75,24 +79,21 @@ public class Start2Player extends JPanel implements GameState {
     }
 
     @Override
+    public void player1Turn() {
+        state.player1Turn();
+    }
+
+    @Override
+    public void player2turn() {
+        state.player2turn();
+    }
+
+    @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         if (backgroundImage != null) {
             g.drawImage(backgroundImage, 0, 0, this.getWidth(), this.getHeight(), this);
         }
-    }
-
-    private void loadBackground(){
-        backgroundImage = AssetUtils.loadImage("/imageStart2game.png");
-    }
-
-    @Override
-    public void player1Turn() {
-        state.player1Turn();
-    }
-    @Override
-    public void player2turn() {
-        state.player2turn();
     }
 
     public GameState getMiddleOfTheGame() {
