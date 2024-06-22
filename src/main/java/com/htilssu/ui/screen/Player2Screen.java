@@ -4,6 +4,7 @@ import com.htilssu.entity.component.AttackGrid;
 import com.htilssu.entity.component.SelfGrid;
 import com.htilssu.listener.ButtonClickListener;
 import com.htilssu.setting.GameSetting;
+import com.htilssu.ui.component.GameButton;
 import com.htilssu.util.AssetUtils;
 
 import javax.swing.*;
@@ -41,8 +42,8 @@ public class Player2Screen extends JFrame {
         setContentPane(contentPane); // Sử dụng lớp JPanel mới làm nội dung của JFrame
 
         //full kich thuoc man hinh.
-        //setExtendedState(JFrame.MAXIMIZED_BOTH);
-        setPreferredSize(new Dimension(GameSetting.WIDTH, GameSetting.HEIGHT));  //kich thuoc tu gameSetting
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
+        //setPreferredSize(new Dimension(GameSetting.WIDTH, GameSetting.HEIGHT));  //kich thuoc tu gameSetting
 
         // Thêm các thành phần khác vào contentPane
         SelfGrid selfGrid = new SelfGrid(name, startScreen);
@@ -50,46 +51,50 @@ public class Player2Screen extends JFrame {
         JLabel nameLabel = new JLabel(name);
 
         // Đặt vị trí và kích thước cho các thành phần
-        selfGrid.setBounds(590, 50, 280, 270); //  vị trí và kích thước cho SelfGrid
-        attackGrid.setBounds(20, 50, 320, 320); //  vị trí và kích thước cho AttackGrid
+        selfGrid.setBounds(1000, 50, 360, 360); //  vị trí và kích thước cho SelfGrid
+        attackGrid.setBounds(100, 50, 420, 420); //  vị trí và kích thước cho AttackGrid
         nameLabel.setBounds(350, 10, 100, 30); //  vị trí và kích thước cho nameLabel
 
         contentPane.add(selfGrid);
         contentPane.add(attackGrid);
         contentPane.add(nameLabel);
 
-        JButton next = new JButton("next");
-        JButton rotateButton = new JButton("Đặt Dọc");
-        JButton toggleSelfGridButton = new JButton("Hide SelfGrid"); // Thêm nút ẩn/hiện SelfGrid
+        GameButton btnNext = new GameButton(AssetUtils.getImage(AssetUtils.ASSET_BUTTON_1),1); //truyen hinh nen duoc
+        btnNext.setBounds(700, 290, 100, 30); //xet vi tri
+        btnNext.setText("Next");
 
-        // Đặt vị trí và kích thước cho các nút
-        next.setBounds(350, 400, 100, 30); // vị trí và kích thước cho nút next
-        rotateButton.setBounds(600, 360, 100, 30); // vị trí và kích thước cho nút rotateButton
-        toggleSelfGridButton.setBounds(750, 360, 100, 30); // Đặt vị trí và kích thước cho nút toggleSelfGridButton
+        GameButton btnRotate = new GameButton(AssetUtils.getImage(AssetUtils.ASSET_BUTTON_2),1);
+        btnRotate.setBounds(1000, 420, 170, 40);
+        btnRotate.setText("Horizontal");
+        //Nut an hien Luoi dat thuyen
+        GameButton btnHideSelfGrid = new GameButton(AssetUtils.getImage(AssetUtils.ASSET_BUTTON_1),1);
+        btnHideSelfGrid.setBounds(1190, 420, 210, 40);
+        btnHideSelfGrid.setText("Hide SelfGrid");
 
-        contentPane.add(next);
-        contentPane.add(rotateButton);
-        contentPane.add(toggleSelfGridButton);
+        contentPane.add(btnNext);
+        contentPane.add(btnRotate);
+        contentPane.add(btnHideSelfGrid);
 
         setInforBox(contentPane, name);
 
-        rotateButton.addActionListener(e -> {
+        btnRotate.addActionListener(e -> {
             selfGrid.rotateShip();
-            if (rotateButton.getText().equals("Đặt Dọc")) {
-                rotateButton.setText("Đặt Ngang");
+            if (btnRotate.getText().equals("Vertical")) {
+                btnRotate.setText("Horizontal");
             } else {
-                rotateButton.setText("Đặt Dọc");
+                btnRotate.setText("Vertical");
             }
         });
 
-        toggleSelfGridButton.addActionListener(e -> {
+        btnHideSelfGrid.addActionListener(e -> {
             isSelfGridVisible = !isSelfGridVisible;
             selfGrid.setVisible(isSelfGridVisible);
-            toggleSelfGridButton.setText(isSelfGridVisible ? "Hide SelfGrid" : "Show SelfGrid");
+            btnHideSelfGrid.setText(isSelfGridVisible ? "Hide SelfGrid" : "Show SelfGrid");
         });
 
         ButtonClickListener buttonClickListener = new ButtonClickListener(name, startScreen, shipBeginning, isbeginningOfTheGameOfPlayer1, this);
-        next.addActionListener(buttonClickListener);
+        btnNext.setActionCommand("next");
+        btnNext.addActionListener(buttonClickListener);
 
         pack();
         setVisible(show);
@@ -104,7 +109,7 @@ public class Player2Screen extends JFrame {
     //am thanh
 
     private void loadBackgroundImage() {
-        backgroundImage = AssetUtils.loadImage("/sea1.png");
+        backgroundImage = AssetUtils.loadImage("/images/sea1.png");
     }
 
     private void setInforBox(JPanel contentPane, String name) {
@@ -118,13 +123,13 @@ public class Player2Screen extends JFrame {
         enemyShipSunk = new JLabel("" + Integer.toString(size));
 
         // Đặt vị trí và kích thước cho các thông tin
-        statusLabel.setBounds(350, 50, 200, 30);
-        ownShipsLabel.setBounds(350, 90, 100, 30);
-        shipBeginning.setBounds(460, 90, 50, 30);
-        ownShipsSunkLabel.setBounds(350, 130, 100, 30);
-        ownShipSunk.setBounds(460, 130, 50, 30);
-        enemyShipsSunkLabel.setBounds(350, 170, 100, 30);
-        enemyShipSunk.setBounds(460, 170, 50, 30);
+        statusLabel.setBounds(650, 490, 300, 30);
+        ownShipsLabel.setBounds(650, 510, 300, 30);
+        shipBeginning.setBounds(650, 530, 300, 30);
+        ownShipsSunkLabel.setBounds(650, 550, 300, 30);
+        ownShipSunk.setBounds(650, 570, 300, 30);
+        enemyShipsSunkLabel.setBounds(650, 590, 300, 30);
+        enemyShipSunk.setBounds(650, 610, 300, 30);
 
         // Thêm các thông tin vào contentPane
         contentPane.add(statusLabel);
@@ -134,6 +139,8 @@ public class Player2Screen extends JFrame {
         contentPane.add(ownShipSunk);
         contentPane.add(enemyShipsSunkLabel);
         contentPane.add(enemyShipSunk);
+
+        contentPane.setBackground(Color.BLUE);
     }
 
     public void showScreen(){

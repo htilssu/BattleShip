@@ -33,9 +33,8 @@ public class AttackGrid extends BattleGrid {
     protected JPanel getCell()
     {
         JPanel panel = new JPanel();
-        //panel.setBackground(Color.black);
         panel.setBorder(BorderFactory.createLineBorder(Color.red, 1));
-        panel.setPreferredSize(new Dimension(30, 30));
+        panel.setPreferredSize(new Dimension(38, 38));
 
         panel.setBackground(new Color(0, 0, 0, 0)); // Đặt màu nền trong suốt
 
@@ -44,9 +43,9 @@ public class AttackGrid extends BattleGrid {
             public void mouseClicked(MouseEvent e) {
                 if(isAttackGridListener) {
                     Point i = panel.getLocation();
-                    double xPos = (i.getX() / 30 + 1); // cập nhật phép tính theo kích thước mới
+                    double xPos = (i.getX() / 38 + 1); // cập nhật phép tính theo kích thước mới
                     int x = (int) xPos;
-                    double yPos = (i.getY() / 30 + 1); // cập nhật phép tính theo kích thước mới
+                    double yPos = (i.getY() / 38 + 1); // cập nhật phép tính theo kích thước mới
                     int y = (int) yPos;
 
                     if (name.equals("Player1")) {
@@ -175,7 +174,7 @@ public class AttackGrid extends BattleGrid {
     }
 
     public int numberToPanel(int s){
-        int temp = (s-1)*30;
+        int temp = (s-1)*38;
         return temp;
     }
 }

@@ -7,6 +7,7 @@ import com.htilssu.entity.player.Player;
 import com.htilssu.entity.player.PlayerBoard;
 import com.htilssu.event.game.GameAction;
 import com.htilssu.manager.GameManager;
+import com.htilssu.manager.SoundManager;
 import com.htilssu.multiplayer.Client;
 import com.htilssu.multiplayer.Host;
 import com.htilssu.render.Renderable;
@@ -239,6 +240,7 @@ public class GamePlay implements Renderable {
         return count.get() == 0;
     }
 
+    //Dat thuyen thanh cong ?
     private void handleAddShipToBoard(PlayerBoard playerBoard) {
         Position mousePos = playerBoard.getBoardRowCol(setUpSprite.getX() + 1, setUpSprite.getY() + 1);
         float ratio = (float) setUpSprite.getHeight() / setUpSprite.getWidth();
@@ -246,10 +248,13 @@ public class GamePlay implements Renderable {
             ratio = 1 / ratio;
         }
         Ship ship = new Ship(direction, new Sprite(setUpSprite), mousePos, (int) ratio);
-        if (!playerBoard.canAddShip(ship)) return;
+        if (!playerBoard.canAddShip(ship)) {
+            SoundManager.playSound(SoundManager.ERROR_SOUND);
+            return;
+        }
         int count = shipInBoard.get((int) ratio);
         if (count == 0) return;
-
+        SoundManager.playSound(SoundManager.PUT_SHIP_SOUND);
         playerBoard.addShip(ship);
         count--;
         shipInBoard.replace((int) ratio, count);
