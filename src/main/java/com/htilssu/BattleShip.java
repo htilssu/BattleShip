@@ -81,7 +81,6 @@ public class BattleShip extends JFrame implements Runnable, KeyListener, Compone
         setExtendedState(Frame.MAXIMIZED_BOTH);
 
         screenManager.updateScreenSize();
-        gameManager.createTestGamePlay();
     }
 
     /**

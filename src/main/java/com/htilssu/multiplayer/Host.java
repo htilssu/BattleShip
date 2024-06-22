@@ -22,7 +22,6 @@ public class Host extends MultiHandler implements Runnable {
     ServerSocket serverSocket;
     Socket socket;
     Thread hostListenThread = new Thread(this);
-    boolean canHost = true;
     int ready = 0;
     private String hostName;
     private boolean isRunning;
@@ -49,7 +48,7 @@ public class Host extends MultiHandler implements Runnable {
     }
 
     private boolean isConnected() {
-        return serverSocket != null;
+        return socket != null && isRunning;
     }
 
     @Override
@@ -57,7 +56,6 @@ public class Host extends MultiHandler implements Runnable {
         while (isRunning) {
             try {
                 socket = serverSocket != null ? serverSocket.accept() : null;
-                setHost(true);
             } catch (IOException e) {
                 GameLogger.error(e.getMessage());
             }
@@ -65,7 +63,6 @@ public class Host extends MultiHandler implements Runnable {
             if (socket != null) {
                 readData(socket);
             }
-            setHost(false);
         }
     }
 
@@ -78,9 +75,6 @@ public class Host extends MultiHandler implements Runnable {
 
     public void ready() {
         ready += 1;
-        if (ready > 2) {
-            ready = 2;
-        }
 
         if (ready == 2) {
             GamePlay gamePlay = battleShip.getGameManager().getCurrentGamePlay();
@@ -108,9 +102,12 @@ public class Host extends MultiHandler implements Runnable {
     public void stop() {
         isRunning = false;
         try {
-            serverSocket.close();
+            if (socket != null) {
+                socket.close();
+                socket = null;
+            }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            GameLogger.error(e.getMessage());
         }
     }
 
