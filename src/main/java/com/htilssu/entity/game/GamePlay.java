@@ -481,4 +481,7 @@ public class GamePlay implements Renderable {
         setDirection((direction + 1) % 2);
     }
 
+    public Component getScreen() {
+        return battleShip.getScreenManager().getCurrentScreen();
+    }
 }

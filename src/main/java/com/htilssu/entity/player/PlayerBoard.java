@@ -215,6 +215,8 @@ public class PlayerBoard extends Collision implements Renderable {
     public void shoot(Position position, int status) {
         if (canShoot(position)) {
             shotBoard[position.x][position.y] = (byte) status;
+            //repaint
+            gamePlay.getScreen().repaint();
         }
     }
 
@@ -250,7 +252,20 @@ public class PlayerBoard extends Collision implements Renderable {
         return true;
     }
 
+    public void markShipDestroyed(Ship ship) {
+        Position pos = ship.getPosition();
 
+        for (int i = 0; i < ship.getShipType(); i++) {
+            switch (ship.getDirection()) {
+                case Ship.HORIZONTAL -> {
+                    shotBoard[pos.x][pos.y + i] = (byte) SHOOT_DESTROYED;
+                }
+                case Ship.VERTICAL -> {
+                    shotBoard[pos.x + i][pos.y] = (byte) SHOOT_DESTROYED;
+                }
+            }
+        }
+    }
 }
 
 
