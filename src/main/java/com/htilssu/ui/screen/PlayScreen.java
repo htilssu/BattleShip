@@ -79,7 +79,7 @@ public class PlayScreen extends JPanel
 
     @Override
     public void componentShown(ComponentEvent e) {
-        // empty
+        repaint();
     }
 
     @Override

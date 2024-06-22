@@ -138,8 +138,6 @@ public class GamePlay implements Renderable {
                 GameLogger.log("Player " + getCurrentPlayer().getName() + " shoot at " + pos);
 
                 shoot(pos);
-
-                endTurn();
             }
             case WAITING_MODE -> {
                 PlayerBoard playerBoard = GameManager.gamePlayer.getBoard();
@@ -195,13 +193,6 @@ public class GamePlay implements Renderable {
 
         battleShip.getListenerManager()
                 .callEvent(new PlayerShootEvent(getCurrentPlayer(), getOpponent().getBoard(), pos), gameManager);
-    }
-
-    /**
-     * Kết thúc lượt chơi của người chơi hiện tại
-     */
-    public void endTurn() {
-        turn = (turn + 1) % playerList.size();
     }
 
     private void handleReadyButtonOnClick(Point position) {
@@ -293,6 +284,13 @@ public class GamePlay implements Renderable {
     }
 
     /**
+     * Kết thúc lượt chơi của người chơi hiện tại
+     */
+    public void endTurn() {
+        turn = (turn + 1) % playerList.size();
+    }
+
+    /**
      * Lấy {@link GameManager} của game
      *
      * @return {@link GameManager} của game
@@ -364,7 +362,7 @@ public class GamePlay implements Renderable {
 
     private void renderWaitingMode(Graphics g) {
 
-        PlayerBoard playerBoard = GameManager.gamePlayer.getBoard();
+        PlayerBoard playerBoard = playerList.getFirst().getBoard();
 
 
         for (Map.Entry<Integer, Sprite> entry : sprites.entrySet()) {

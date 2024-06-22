@@ -59,17 +59,28 @@ public class Client extends MultiHandler implements Runnable {
      * @param obj Danh sách object cần gửi
      */
     public void send(Object... obj) {
-        try {
-            OutputStream os = socket.getOutputStream();
-            PrintWriter pw = new PrintWriter(os, true);
-            StringBuilder data = new StringBuilder();
-            for (Object o : obj) {
-                data.append(o.toString()).append("|");
+        if (isConnected()) {
+            try {
+                OutputStream os = socket.getOutputStream();
+                PrintWriter pw = new PrintWriter(os, true);
+                StringBuilder data = new StringBuilder();
+                for (Object o : obj) {
+                    data.append(o.toString()).append("|");
+                }
+                pw.println(data);
+            } catch (IOException e) {
+                GameLogger.error("Có lỗi khi gửi dữ liệu");
             }
-            pw.println(data);
-        } catch (IOException e) {
-            GameLogger.error("Có lỗi khi gửi dữ liệu");
         }
+    }
+
+    /**
+     * Kiểm tra xem client có đang kết nối với host không
+     *
+     * @return Trả về {@code true} nếu client đang kết nối với host, ngược lại trả về {@code false}
+     */
+    public boolean isConnected() {
+        return socket != null;
     }
 
     public void join() {
@@ -119,15 +130,6 @@ public class Client extends MultiHandler implements Runnable {
         socket = null;
     }
 
-    /**
-     * Kiểm tra xem client có đang kết nối với host không
-     *
-     * @return Trả về {@code true} nếu client đang kết nối với host, ngược lại trả về {@code false}
-     */
-    public boolean isConnected() {
-        return socket != null;
-    }
-
     public List<InetAddress> getHostList() {
         return hostList;
     }
@@ -136,7 +138,7 @@ public class Client extends MultiHandler implements Runnable {
     public void run() {
         while (isConnected()) {
             readData(socket);
-            socket = null;
+            disconnect();
         }
     }
 }
