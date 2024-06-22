@@ -186,7 +186,7 @@ public class GamePlay implements Renderable {
 
     private void shoot(Position pos) {
 
-        if (battleShip.getHost().isHost()) {
+        if (battleShip.getHost().isConnected()) {
             battleShip.getHost().sendShoot(pos);
         }
         else {
@@ -387,7 +387,7 @@ public class GamePlay implements Renderable {
     }
 
     public void renderShootBoard(Graphics g) {
-        getCurrentPlayer().getBoard().render(g);
+        getOpponent().getBoard().render(g);
     }
 
     public int getGameMode() {
