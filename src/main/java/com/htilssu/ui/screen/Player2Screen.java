@@ -5,6 +5,7 @@ import com.htilssu.entity.component.SelfGrid;
 import com.htilssu.listener.ButtonClickListener;
 import com.htilssu.setting.GameSetting;
 import com.htilssu.ui.component.GameButton;
+import com.htilssu.ui.component.GamePanel;
 import com.htilssu.util.AssetUtils;
 
 import javax.swing.*;
@@ -31,13 +32,7 @@ public class Player2Screen extends JFrame {
         loadBackgroundImage();
 
         // Tạo lớp JPanel mới để chứa các thành phần khác và vẽ hình nền
-        JPanel contentPane = new JPanel() {
-            @Override
-            protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
-            }
-        };
+        GamePanel contentPane = new GamePanel(backgroundImage);
         contentPane.setLayout(null);
         setContentPane(contentPane); // Sử dụng lớp JPanel mới làm nội dung của JFrame
 
@@ -48,29 +43,27 @@ public class Player2Screen extends JFrame {
         // Thêm các thành phần khác vào contentPane
         SelfGrid selfGrid = new SelfGrid(name, startScreen);
         AttackGrid attackGrid = new AttackGrid(name, startScreen, this);
-        JLabel nameLabel = new JLabel(name);
 
         // Đặt vị trí và kích thước cho các thành phần
-        selfGrid.setBounds(1000, 50, 360, 360); //  vị trí và kích thước cho SelfGrid
-        attackGrid.setBounds(100, 50, 420, 420); //  vị trí và kích thước cho AttackGrid
-        nameLabel.setBounds(350, 10, 100, 30); //  vị trí và kích thước cho nameLabel
+        selfGrid.setBounds(1000, 70, 360, 360); //  vị trí và kích thước cho SelfGrid
+        attackGrid.setBounds(100, 70, 420, 420); //  vị trí và kích thước cho AttackGrid
 
-        contentPane.add(selfGrid);
-        contentPane.add(attackGrid);
-        contentPane.add(nameLabel);
 
         GameButton btnNext = new GameButton(AssetUtils.getImage(AssetUtils.ASSET_BUTTON_1),1); //truyen hinh nen duoc
         btnNext.setBounds(700, 290, 100, 30); //xet vi tri
         btnNext.setText("Next");
 
         GameButton btnRotate = new GameButton(AssetUtils.getImage(AssetUtils.ASSET_BUTTON_2),1);
-        btnRotate.setBounds(1000, 420, 170, 40);
+        btnRotate.setBounds(1000, 470, 170, 40);
         btnRotate.setText("Horizontal");
         //Nut an hien Luoi dat thuyen
         GameButton btnHideSelfGrid = new GameButton(AssetUtils.getImage(AssetUtils.ASSET_BUTTON_1),1);
-        btnHideSelfGrid.setBounds(1190, 420, 210, 40);
+        btnHideSelfGrid.setBounds(1190, 470, 210, 40);
         btnHideSelfGrid.setText("Hide SelfGrid");
 
+        //Add cac phan tu vao GamePanel
+        contentPane.add(selfGrid);
+        contentPane.add(attackGrid);
         contentPane.add(btnNext);
         contentPane.add(btnRotate);
         contentPane.add(btnHideSelfGrid);
@@ -112,35 +105,60 @@ public class Player2Screen extends JFrame {
         backgroundImage = AssetUtils.loadImage("/images/sea1.png");
     }
 
-    private void setInforBox(JPanel contentPane, String name) {
+    private void setInforBox(GamePanel gamePanel, String name) {
+        GamePanel gamePanelBox = new GamePanel();
         // Tạo các hộp chứa thông tin
-        JLabel statusLabel = new JLabel("Status for: " + name);
-        JLabel ownShipsLabel = new JLabel("Own ships: ");
-        shipBeginning = new JLabel("" + Integer.toString(size));
-        JLabel ownShipsSunkLabel = new JLabel("Tau da bi danh ");
-        ownShipSunk = new JLabel("" + Integer.toString(size));
-        JLabel enemyShipsSunkLabel = new JLabel("Tau dich da bi danh ");
-        enemyShipSunk = new JLabel("" + Integer.toString(size));
+        JLabel statusLabel = new JLabel("Status for " + name);
+        statusLabel.setFont(new Font("Roboto", Font.BOLD, 20));
+        statusLabel.setForeground(Color.RED);
 
-        // Đặt vị trí và kích thước cho các thông tin
-        statusLabel.setBounds(650, 490, 300, 30);
-        ownShipsLabel.setBounds(650, 510, 300, 30);
-        shipBeginning.setBounds(650, 530, 300, 30);
-        ownShipsSunkLabel.setBounds(650, 550, 300, 30);
-        ownShipSunk.setBounds(650, 570, 300, 30);
-        enemyShipsSunkLabel.setBounds(650, 590, 300, 30);
-        enemyShipSunk.setBounds(650, 610, 300, 30);
+        JLabel ownShipsLabel = new JLabel("So tau cua minh : ");
+        shipBeginning = new JLabel("" + Integer.toString(size));
+        setTypeText(ownShipsLabel);
+        setTypeText(shipBeginning);
+
+        JLabel ownShipsSunkLabel = new JLabel("Tau da bi chim : ");
+        ownShipSunk = new JLabel("" + Integer.toString(size));
+        setTypeText(ownShipsSunkLabel);
+        setTypeText(ownShipSunk);
+
+        JLabel enemyShipsSunkLabel = new JLabel("Tau dich da bi chim : ");
+        enemyShipSunk = new JLabel("" + size);
+        setTypeText(enemyShipsSunkLabel);
+        setTypeText(enemyShipSunk);
 
         // Thêm các thông tin vào contentPane
-        contentPane.add(statusLabel);
-        contentPane.add(ownShipsLabel);
-        contentPane.add(shipBeginning);
-        contentPane.add(ownShipsSunkLabel);
-        contentPane.add(ownShipSunk);
-        contentPane.add(enemyShipsSunkLabel);
-        contentPane.add(enemyShipSunk);
+        gamePanelBox.add(createCenteredPanel(statusLabel));
+        gamePanelBox.add(Box.createVerticalStrut(10));
 
-        contentPane.setBackground(Color.BLUE);
+        gamePanelBox.add(createCenteredPanel(ownShipsLabel, shipBeginning));
+        gamePanelBox.add(Box.createVerticalStrut(2));
+
+        gamePanelBox.add(createCenteredPanel(ownShipsSunkLabel, ownShipSunk));
+        gamePanelBox.add(Box.createVerticalStrut(2));
+
+        gamePanelBox.add(createCenteredPanel(enemyShipsSunkLabel, enemyShipSunk));
+
+        gamePanelBox.setBackground(new Color(0, 0, 0, 0.5f));
+        gamePanelBox.setBounds(600, 460, 300, 300);
+        gamePanelBox.setLayout(new BoxLayout(gamePanelBox, BoxLayout.Y_AXIS));
+
+        gamePanel.add(gamePanelBox);
+    }
+    private static JPanel createCenteredPanel(JComponent... components) {
+        JPanel panel = new JPanel();
+        //panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+        panel.setOpaque(false);
+        panel.add(Box.createHorizontalGlue());
+        for (JComponent component : components) {
+            panel.add(component);
+            panel.add(Box.createHorizontalGlue());
+        }
+        return panel;
+    }
+    private void setTypeText(JLabel label) {
+        label.setFont(new Font("Roboto", Font.BOLD, 15));
+        label.setForeground(Color.RED);
     }
 
     public void showScreen(){
@@ -171,16 +189,5 @@ public class Player2Screen extends JFrame {
         }
         return null;
     }
-    public JButton getNextButton(){
-        for(Component child : this.getContentPane().getComponents()){
-            if(child instanceof JButton ){
-                return (JButton) child;
-            }
 
-        }
-        return null;
-    }
-    public boolean getIsbeginningOfTheGameOfPlayer2() {
-        return isbeginningOfTheGameOfPlayer2;
-    }
 }

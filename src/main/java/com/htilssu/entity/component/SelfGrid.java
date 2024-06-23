@@ -2,7 +2,9 @@ package com.htilssu.entity.component;
 
 import com.htilssu.dataPlayer.PlayerData;
 import com.htilssu.manager.SoundManager;
+import com.htilssu.ui.component.GamePanel;
 import com.htilssu.ui.screen.Start2Player;
+import com.htilssu.util.AssetUtils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -64,7 +66,7 @@ public class SelfGrid extends BattleGrid {
   // Khi một ô được nhấp chuột, nó sẽ tính toán các tọa độ và đặt các tàu lên lưới.
   @Override
   protected JPanel getCell() {
-    JPanel firstCell = new JPanel();
+    GamePanel firstCell = new GamePanel();
     firstCell.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
     firstCell.setPreferredSize(new Dimension(34, 34));
 
@@ -152,11 +154,11 @@ public class SelfGrid extends BattleGrid {
       int x = isHorizontal ? startX + i : startX;
       int y = isHorizontal ? startY : startY + i;
 
-      JPanel cell = (JPanel) self.getComponentAt(new Point(x * 34, y * 34));
+      GamePanel cell = (GamePanel) self.getComponentAt(new Point(x * 34, y * 34));
       if (cell != null) {
         if (!Color.RED.equals(cell.getBackground())) {
-          cell.setBackground(Color.BLUE); // Đặt màu cho ô mẫu
-          cell.setOpaque(true);
+          cell.setBackground(Color.BLUE);
+          cell.setBackgroundImage(AssetUtils.getImage(AssetUtils.ASSET_SELECT)); // Đặt màu cho ô mẫu
         }
       }
     }
@@ -166,16 +168,15 @@ public class SelfGrid extends BattleGrid {
   private void clearHighlight() {
     for (Component comp : self.getComponents()) {
       if (comp instanceof JPanel) {
-        JPanel cell = (JPanel) comp;
+        GamePanel cell = (GamePanel) comp;
         if (!Color.RED.equals(cell.getBackground())) {
           cell.setBackground(new Color(0, 0, 0, 0));
           cell.setOpaque(false);
+          cell.setBackgroundImage(null); // Xóa hình ảnh nền
         }
       }
     }
   }
-
-
 
   public void draw() {
     int[][] temp = null;
@@ -215,12 +216,10 @@ public class SelfGrid extends BattleGrid {
     }
   }
 
-
   //Hàm numberToPanel(int s) chuyển đổi giá trị s từ hệ tọa độ dữ liệu (0-10) thành hệ tọa độ giao diện đồ họa.
   public int numberToPanel(int s) {
     return (s - 1) * 34;
   }
-
 
   // Phương thức để xoay tàu
   public void rotateShip() {
