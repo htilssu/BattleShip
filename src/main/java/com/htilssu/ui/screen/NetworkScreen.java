@@ -281,7 +281,7 @@ public class NetworkScreen extends GamePanel implements ComponentListener {
         return timer;
     }
 
-    public void updateListHost(List<InetAddress> hostList) {
+    public synchronized void updateListHost(List<InetAddress> hostList) {
 
         hostItemList.clear();
         //remove all child in hostListPanel

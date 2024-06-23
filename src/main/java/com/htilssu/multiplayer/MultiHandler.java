@@ -191,15 +191,18 @@ public abstract class MultiHandler {
             var responseStatus = SHOOT_MISS;
 
             if (ship != null) {
+                responseStatus = PlayerBoard.SHOOT_HIT;
+                playerBoard.shoot(pos, responseStatus);
                 var status = playerBoard.isShipDestroyed(ship);
                 if (status) {
                     responseStatus = PlayerBoard.SHOOT_DESTROYED;
                     playerBoard.markShipDestroyed(ship);
                 }
-                else responseStatus = PlayerBoard.SHOOT_HIT;
+            }
+            else {
+                playerBoard.shoot(pos, responseStatus);
             }
 
-            playerBoard.shoot(pos, responseStatus);
             sendResponseShoot(responseStatus, pos.getX(), pos.getY(), ship);
             if (responseStatus == SHOOT_MISS) gamePlay.endTurn();
 
@@ -221,7 +224,6 @@ public abstract class MultiHandler {
 
         Player currentPlayer = gamePlay.getCurrentPlayer();
         PlayerBoard playerBoard = gamePlay.getOpponent().getBoard();
-        playerBoard.shoot(pos, shootStatus);
 
         Ship ship;
         if (shootStatus == PlayerBoard.SHOOT_DESTROYED) {
@@ -230,9 +232,16 @@ public abstract class MultiHandler {
                 var direction = Integer.parseInt(messageParts.get(5));
                 ship = new Ship(direction, new Sprite(GamePlay.sprites.get(shipType)), new Position(x, y), shipType);
 
+                playerBoard.markShipDestroyed(ship);
+
                 playerBoard.addShip(ship);
+
             }
+
+            return;
         }
+
+        playerBoard.shoot(pos, shootStatus);
 
         if (shootStatus == SHOOT_MISS) gamePlay.endTurn();
 
