@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static com.htilssu.entity.Ship.VERTICAL;
+
 /**
  * Mỗi {@link GamePlay} là 1 trận đấu giữa 2 người chơi
  */
@@ -52,7 +54,7 @@ public class GamePlay implements Renderable {
     private boolean isReady = false;
     private int gameMode = WAITING_MODE;
     private int turn;
-    private int direction = Ship.HORIZONTAL;
+    private int direction = VERTICAL;
     private Sprite setUpSprite;
     private boolean isMultiPlayer = false;
     private GameManager gameManager;
@@ -105,7 +107,7 @@ public class GamePlay implements Renderable {
 
         if (setUpSprite != null) {
             PlayerBoard playerBoard = GameManager.gamePlayer.getBoard();
-            if (direction == Ship.VERTICAL) {
+            if (direction == VERTICAL) {
                 setUpSprite.setAsset(AssetUtils.rotate90(setUpSprite.getAsset()));
             }
             else {
@@ -250,6 +252,7 @@ public class GamePlay implements Renderable {
         count--;
         shipInBoard.replace((int) ratio, count);
         if (count == 0) {
+            direction = VERTICAL;
             setUpSprite = null;
         }
     }
