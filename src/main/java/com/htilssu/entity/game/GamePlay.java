@@ -15,7 +15,6 @@ import com.htilssu.multiplayer.Host;
 import com.htilssu.render.Renderable;
 import com.htilssu.setting.GameSetting;
 import com.htilssu.util.AssetUtils;
-import com.htilssu.util.GameLogger;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -138,7 +137,7 @@ public class GamePlay implements Renderable {
                 if (!board.isInside(position)) return;
                 Position pos = board.getBoardRowCol(position);
 
-                GameLogger.log("Player " + getCurrentPlayer().getName() + " shoot at " + pos);
+                if (!board.canShoot(pos)) return;
 
                 shoot(pos);
             }
@@ -228,6 +227,7 @@ public class GamePlay implements Renderable {
 
             playerBoard.removeShip(clickShip);
             setUpSprite = clickShip.getSprite();
+            direction = clickShip.getDirection();
             int count = shipInBoard.get(clickShip.getShipType());
             shipInBoard.replace(clickShip.getShipType(), ++count);
         }
