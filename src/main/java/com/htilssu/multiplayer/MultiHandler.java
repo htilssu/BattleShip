@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
+import static com.htilssu.entity.player.PlayerBoard.SHOOT_HIT;
 import static com.htilssu.entity.player.PlayerBoard.SHOOT_MISS;
 import static com.htilssu.event.game.GameAction.RESPONSE_SHOOT;
 import static com.htilssu.manager.GameManager.gamePlayer;
@@ -235,7 +236,7 @@ public abstract class MultiHandler {
                 playerBoard.markShipDestroyed(ship);
 
                 playerBoard.addShip(ship);
-
+                gamePlay.getScreen().repaint();
             }
 
             return;
@@ -254,11 +255,14 @@ public abstract class MultiHandler {
     }
 
     private void sendResponseShoot(int shootStatus, int x, int y, Ship ship) {
-        send(RESPONSE_SHOOT, shootStatus, x, y);
+
         if (shootStatus == PlayerBoard.SHOOT_DESTROYED) {
+            send(RESPONSE_SHOOT, SHOOT_HIT, x, y);
             send(RESPONSE_SHOOT, PlayerBoard.SHOOT_DESTROYED, ship.getPosition().x, ship.getPosition().y,
                  ship.getShipType(), ship.getDirection());
         }
+        else
+            send(RESPONSE_SHOOT, shootStatus, x, y);
     }
 
     public void sendShoot(Position pos) {
