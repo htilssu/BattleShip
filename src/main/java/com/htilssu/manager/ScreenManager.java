@@ -1,7 +1,6 @@
 package com.htilssu.manager;
 
 import com.htilssu.BattleShip;
-import com.htilssu.ui.screen.Start2Player;
 import com.htilssu.ui.screen.*;
 
 import javax.swing.*;
@@ -21,7 +20,7 @@ public final class ScreenManager {
     /**
      * Màn hình chơi game
      */
-    public static final int GAME_SCREEN = 2;
+    public static final int PLAY_SCREEN = 2;
 
     /**
      * Màn hình cài đặt
@@ -49,7 +48,7 @@ public final class ScreenManager {
     public ScreenManager(BattleShip battleShip) {
         this.battleShip = battleShip;
         screenMap.put(MENU_SCREEN, new MenuScreen(battleShip));
-        screenMap.put(GAME_SCREEN, new PlayScreen(battleShip));
+        screenMap.put(PLAY_SCREEN, new PlayScreen(battleShip));
         screenMap.put(SETTING_SCREEN, new SettingScreen(battleShip));
         screenMap.put(NETWORK_SCREEN, new NetworkScreen(battleShip));
         screenMap.put(PICK_SCREEN, new PickScreen(battleShip));
@@ -87,7 +86,7 @@ public final class ScreenManager {
     }
 
     /**
-     * Đặt màn hình hiện tại ex: {@link #GAME_SCREEN} là màn hình chơi game hoặc {@link #MENU_SCREEN}
+     * Đặt màn hình hiện tại ex: {@link #PLAY_SCREEN} là màn hình chơi game hoặc {@link #MENU_SCREEN}
      * là màn hình chính
      *
      * @param currentScreen số nguyên biểu diễn loại màn hình

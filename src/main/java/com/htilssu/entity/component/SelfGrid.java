@@ -2,7 +2,9 @@ package com.htilssu.entity.component;
 
 import com.htilssu.dataPlayer.PlayerData;
 import com.htilssu.manager.SoundManager;
+import com.htilssu.ui.component.GamePanel;
 import com.htilssu.ui.screen.Start2Player;
+import com.htilssu.util.AssetUtils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -64,9 +66,9 @@ public class SelfGrid extends BattleGrid {
   // Khi một ô được nhấp chuột, nó sẽ tính toán các tọa độ và đặt các tàu lên lưới.
   @Override
   protected JPanel getCell() {
-    JPanel firstCell = new JPanel();
+    GamePanel firstCell = new GamePanel();
     firstCell.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
-    firstCell.setPreferredSize(new Dimension(25, 25));
+    firstCell.setPreferredSize(new Dimension(34, 34));
 
     firstCell.setBackground(com.htilssu.util.Color.TRANSPARENT); // Đặt màu nền trong suốt
 
@@ -76,8 +78,8 @@ public class SelfGrid extends BattleGrid {
         if (isSelfGridListener) {
 
           Point firstPoint = firstCell.getLocation();
-          int x = (int) (firstPoint.getX() / 25 + 1);
-          int y = (int) (firstPoint.getY() / 25 + 1);
+          int x = (int) (firstPoint.getX() / 34 + 1);
+          int y = (int) (firstPoint.getY() / 34 + 1);
           System.out.println("Clicked at (" + x + "," + y + ")");
 
           // Kiểm tra xem tọa độ đã được đặt thuyền chưa và số lượng tàu đủ chưa
@@ -131,8 +133,8 @@ public class SelfGrid extends BattleGrid {
         PlayerData playerData = name.equals("Player1") ? battleShip.getPlayer1Data() : battleShip.getPlayer2Data();
         if (isSelfGridListener) {
           Point firstPoint = firstCell.getLocation();
-          int x = (int) (firstPoint.getX() / 25 );
-          int y = (int) (firstPoint.getY() / 25 );
+          int x = (int) (firstPoint.getX() / 34 );
+          int y = (int) (firstPoint.getY() / 34 );
 
           // Hiển thị ô mẫu cho thuyền
           highlightCells(x, y, playerData.getFleet().size() + 2);
@@ -152,11 +154,11 @@ public class SelfGrid extends BattleGrid {
       int x = isHorizontal ? startX + i : startX;
       int y = isHorizontal ? startY : startY + i;
 
-      JPanel cell = (JPanel) self.getComponentAt(new Point(x * 25, y * 25));
+      GamePanel cell = (GamePanel) self.getComponentAt(new Point(x * 34, y * 34));
       if (cell != null) {
         if (!Color.RED.equals(cell.getBackground())) {
-          cell.setBackground(Color.BLUE); // Đặt màu cho ô mẫu
-          cell.setOpaque(true);
+          cell.setBackground(Color.BLUE);
+          cell.setBackgroundImage(AssetUtils.getImage(AssetUtils.ASSET_SELECT)); // Đặt màu cho ô mẫu
         }
       }
     }
@@ -166,16 +168,15 @@ public class SelfGrid extends BattleGrid {
   private void clearHighlight() {
     for (Component comp : self.getComponents()) {
       if (comp instanceof JPanel) {
-        JPanel cell = (JPanel) comp;
+        GamePanel cell = (GamePanel) comp;
         if (!Color.RED.equals(cell.getBackground())) {
           cell.setBackground(new Color(0, 0, 0, 0));
           cell.setOpaque(false);
+          cell.setBackgroundImage(null); // Xóa hình ảnh nền
         }
       }
     }
   }
-
-
 
   public void draw() {
     int[][] temp = null;
@@ -215,12 +216,10 @@ public class SelfGrid extends BattleGrid {
     }
   }
 
-
   //Hàm numberToPanel(int s) chuyển đổi giá trị s từ hệ tọa độ dữ liệu (0-10) thành hệ tọa độ giao diện đồ họa.
   public int numberToPanel(int s) {
-    return (s - 1) * 25;
+    return (s - 1) * 34;
   }
-
 
   // Phương thức để xoay tàu
   public void rotateShip() {

@@ -4,11 +4,11 @@ import com.htilssu.entity.component.Position;
 import com.htilssu.entity.player.PlayerBoard;
 import com.htilssu.render.Collision;
 import com.htilssu.render.Renderable;
-import java.awt.*;
-import java.lang.reflect.Field;
-
 import com.htilssu.util.GameLogger;
 import org.jetbrains.annotations.NotNull;
+
+import java.awt.*;
+import java.lang.reflect.Field;
 
 // Lớp Ship đại diện cho một con TÀU
 public class Ship extends Collision implements Renderable {
@@ -45,18 +45,17 @@ public class Ship extends Collision implements Renderable {
     }
   }
 
-  public Ship(int direction, Sprite sprite, Position position, int shipType) {
+  public Ship(
+          int direction, Sprite sprite, Position position, int shipType, PlayerBoard playerBoard) {
+    this(direction, sprite, position, shipType);
+    this.playerBoard = playerBoard;
+  }
 
+  public Ship(int direction, Sprite sprite, Position position, int shipType) {
     this.direction = direction;
     this.position = position;
     this.shipType = shipType;
     this.sprite = sprite;
-  }
-
-  public Ship(
-      int direction, Sprite sprite, Position position, int shipType, PlayerBoard playerBoard) {
-    this(direction, sprite, position, shipType);
-    this.playerBoard = playerBoard;
   }
 
   public int getDirection() {
@@ -95,6 +94,7 @@ public class Ship extends Collision implements Renderable {
 
   public void setBoard(PlayerBoard board) {
     this.playerBoard = board;
+    update();
   }
 
   public void update() {

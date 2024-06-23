@@ -10,7 +10,6 @@ import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.awt.image.ConvolveOp;
 import java.awt.image.Kernel;
 import java.io.BufferedInputStream;
@@ -19,10 +18,6 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import javax.imageio.ImageIO;
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.UnsupportedAudioFileException;
 
 public class AssetUtils {
     public static final int ASSET_BOARD_FRAME = 1;
@@ -44,6 +39,7 @@ public class AssetUtils {
     public static final int ASSET_BUTTON_2 = 17;
     public static final int ASSET_BUTTON_3 = 18;
     public static final int ASSET_BUTTON_4 = 19;
+    public static final int ASSET_SELECT = 20;
 
     public static Font gameFont;
 
@@ -101,6 +97,8 @@ public class AssetUtils {
         assetMap.put(ASSET_BUTTON_2, loadImage("/images/button_2.png"));
         assetMap.put(ASSET_BUTTON_3, loadImage("/images/button_3.png"));
         assetMap.put(ASSET_BUTTON_4, loadImage("/images/button_4.png"));
+        assetMap.put(ASSET_SELECT, loadImage("/images/select_2.png"));
+
     }
 
     /**

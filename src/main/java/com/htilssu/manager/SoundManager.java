@@ -17,6 +17,7 @@ public final class SoundManager {
     public static final int BACKGROUND_TEST = 5;
     public static final int START_SOUND = 6;
     public static final int ERROR_SOUND = 7;
+    public static final int NOTIFY_SOUND = 8;
     private static final Map<Integer, String> soundMap = new HashMap<>();
     static boolean isBackgroundPlaying = false;
     private static Clip backgroundClip;
@@ -29,6 +30,7 @@ public final class SoundManager {
         soundMap.put(BACKGROUND_TEST, "/sounds/A_SoundNen.wav");
         soundMap.put(START_SOUND, "/sounds/A_SoundStart.wav");
         soundMap.put(ERROR_SOUND, "/sounds/A_ErrorSound.wav");
+        soundMap.put(NOTIFY_SOUND, "/sounds/A_NotifySound.wav");
     }
 
     public static synchronized void playSound(int soundName) {

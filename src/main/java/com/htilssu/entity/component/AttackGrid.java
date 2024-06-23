@@ -1,9 +1,12 @@
 package com.htilssu.entity.component;
 
+import com.htilssu.dataPlayer.PlayerData;
 import com.htilssu.manager.SoundManager;
 
+import com.htilssu.ui.component.GamePanel;
 import com.htilssu.ui.screen.Player2Screen;
 import com.htilssu.ui.screen.Start2Player;
+import com.htilssu.util.AssetUtils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -25,6 +28,32 @@ public class AttackGrid extends BattleGrid {
         this.name = name;
         this.player = player;
         this.battleShip = startScreen;
+
+        isInsideGrid();
+    }
+
+    //theo dõi khi chuột ra khỏi lưới
+    private void isInsideGrid() {
+        //chỉ xóa các ô mẫu khi chuột di chuyển ra khỏi lưới.
+        this.addMouseMotionListener(new MouseMotionAdapter() {
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                if (!isInsideGrid(e.getPoint())) {
+                    clearHighlight();
+                }
+            }
+        });
+        //xóa tất cả các ô mẫu ngay khi chuột rời khỏi lưới, không cần phải kiểm tra vị trí cụ thể của chuột.
+        this.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseExited(MouseEvent e) {
+                clearHighlight();
+            }
+        });
+    }
+    // Kiểm tra xem chuột có đang nằm trong khu vực lưới không(nam ngoai tra ve false)
+    private boolean isInsideGrid(Point p) {
+        return p.x >= 0 && p.x < self.getWidth() && p.y >= 0 && p.y < self.getHeight();
     }
 
     //Khi người chơi nhấp vào một ô, nó sẽ kiểm tra xem lưới tấn công có đang hoạt động hay không (isAttackGridListener),
@@ -32,10 +61,9 @@ public class AttackGrid extends BattleGrid {
     @Override
     protected JPanel getCell()
     {
-        JPanel panel = new JPanel();
-        //panel.setBackground(Color.black);
+        GamePanel panel = new GamePanel();
         panel.setBorder(BorderFactory.createLineBorder(Color.red, 1));
-        panel.setPreferredSize(new Dimension(30, 30));
+        panel.setPreferredSize(new Dimension(38, 38));
 
         panel.setBackground(new Color(0, 0, 0, 0)); // Đặt màu nền trong suốt
 
@@ -44,9 +72,9 @@ public class AttackGrid extends BattleGrid {
             public void mouseClicked(MouseEvent e) {
                 if(isAttackGridListener) {
                     Point i = panel.getLocation();
-                    double xPos = (i.getX() / 30 + 1); // cập nhật phép tính theo kích thước mới
+                    double xPos = (i.getX() / 38 + 1); // cập nhật phép tính theo kích thước mới
                     int x = (int) xPos;
-                    double yPos = (i.getY() / 30 + 1); // cập nhật phép tính theo kích thước mới
+                    double yPos = (i.getY() / 38 + 1); // cập nhật phép tính theo kích thước mới
                     int y = (int) yPos;
 
                     if (name.equals("Player1")) {
@@ -72,7 +100,7 @@ public class AttackGrid extends BattleGrid {
                             if (isSunk) {
                                 enemyShipSunkPlayer1++;
                                 battleShip.getPlayer1().enemyShipSunk.setText(Integer.toString(enemyShipSunkPlayer1));
-                                JOptionPane.showMessageDialog(panel, "Chuc mung! Thuyen da duoc danh chim!\nnhan OK chuyen sang man hinh player2");
+                                JOptionPane.showMessageDialog(panel, "Thuyen dich bi danh chim!\nnhan OK chuyen sang man hinh player2");
                                 player.hideScreen();
                                 battleShip.getPlayer2().showScreen();
                                 String ownShipSunkPlayer2 = Integer.toString(battleShip.getPlayer2Data().getNumberOfOwnShipSunk());
@@ -126,12 +154,57 @@ public class AttackGrid extends BattleGrid {
                         }
                     }
                 }
-
-
             }
         });
+        // MouseMotionListener để xử lý sự kiện di chuyển chuột
+        panel.addMouseMotionListener(new MouseMotionAdapter() {
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                // Kiểm tra xem tọa độ đã được đặt thuyền chưa và số lượng tàu đủ chưa
+                PlayerData playerData = name.equals("Player1") ? battleShip.getPlayer1Data() : battleShip.getPlayer2Data();
+                if (isAttackGridListener) {
+                    Point firstPoint = panel.getLocation();
+                    int x = (int) (firstPoint.getX() / 38 );
+                    int y = (int) (firstPoint.getY() / 38 );
+
+                    // Hiển thị ô mẫu cho thuyền
+                    highlightCells(x, y);
+                }
+            }
+        });
+
         return panel;
     }
+    // Phương thức để hiển thị các ô mẫu
+    private void highlightCells(int startX, int startY) {
+        // Xóa các ô mẫu hiện tại
+        clearHighlight();
+            int x =  startX;
+            int y =  startY;
+
+            GamePanel cell = (GamePanel) self.getComponentAt(new Point(x * 38, y * 38));
+            if (cell != null) {
+                if (!Color.WHITE.equals(cell.getBackground()) && !Color.RED.equals(cell.getBackground())) {
+                    cell.setBackground(Color.BLUE);
+                    cell.setBackgroundImage(AssetUtils.getImage(AssetUtils.ASSET_SELECT)); // Đặt màu cho ô mẫu
+                }
+            }
+    }
+
+    // Phương thức để xóa các ô mẫu
+    private void clearHighlight() {
+        for (Component comp : self.getComponents()) {
+            if (comp instanceof JPanel) {
+                GamePanel cell = (GamePanel) comp;
+                if (!Color.WHITE.equals(cell.getBackground()) && !Color.RED.equals(cell.getBackground())) {
+                    cell.setBackground(new Color(0, 0, 0, 0));
+                    cell.setOpaque(false);
+                    cell.setBackgroundImage(null); // Xóa hình ảnh nền
+                }
+            }
+        }
+    }
+
     public void setAttackGridListener (boolean attackGridListener){
         this.isAttackGridListener = attackGridListener;
 
@@ -160,6 +233,9 @@ public class AttackGrid extends BattleGrid {
                     Point p = new Point(x,y);
                     getJpanel(p);
                     thePanel.setBackground(Color.RED);
+                    if (thePanel instanceof GamePanel gamePanel) {
+                        gamePanel.setBackgroundImage(AssetUtils.getImage(AssetUtils.ASSET_SHOOT_MISS));
+                    }
                 }
                 //khong trung tau
                 if(temp[i][j]==2){
@@ -169,13 +245,16 @@ public class AttackGrid extends BattleGrid {
                     Point p = new Point(x,y);
                     getJpanel(p);
                     thePanel.setBackground(Color.WHITE);
+                    if (thePanel instanceof GamePanel gamePanel) {
+                        gamePanel.setBackgroundImage(AssetUtils.getImage(AssetUtils.ASSET_SHOOT_MISS));
+                    }
                 }
             }
         }
     }
 
     public int numberToPanel(int s){
-        int temp = (s-1)*30;
+        int temp = (s-1)*38;
         return temp;
     }
 }

@@ -22,6 +22,10 @@ public class NetworkUtils {
             while (interfaces.hasMoreElements()) {
                 NetworkInterface networkInterface = interfaces.nextElement();
 
+                if (networkInterface.getDisplayName().contains("Hyper-V")) {
+                    continue;
+                }
+
                 if (!networkInterface.isUp() || networkInterface.isLoopback()) {
                     continue;
                 }

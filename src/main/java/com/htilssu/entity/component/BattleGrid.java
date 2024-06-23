@@ -15,7 +15,8 @@ public abstract class BattleGrid extends JPanel {
     self = new JPanel();
     self.setLayout(new GridLayout(10,10));
     self.setOpaque(false); // Đảm bảo các ô trong suốt
-      backgroundImage = AssetUtils.loadImage("/images/sea.png");
+
+    backgroundImage = AssetUtils.loadImage("/images/backgroundgame2.png");
 
     for (int i = 0; i < 10; i++) {
       for (int j = 0; j < 10; j++) {

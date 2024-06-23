@@ -65,6 +65,7 @@ public class Player {
 
   public void setGamePlay(GamePlay gamePlay) {
     this.gamePlay = gamePlay;
+    if (playerBoard != null) playerBoard.setGamePlay(gamePlay);
   }
 
   /*  public boolean canShoot(Position position) {
