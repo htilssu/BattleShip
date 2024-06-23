@@ -7,6 +7,7 @@ import com.htilssu.state.BeginGame2;
 import com.htilssu.state.EndGame2;
 import com.htilssu.state.GameState;
 import com.htilssu.state.MidGame2;
+import com.htilssu.ui.component.GameButton;
 import com.htilssu.util.AssetUtils;
 
 import javax.swing.*;
@@ -37,16 +38,17 @@ public class Start2Player extends JPanel implements GameState {
         loadBackground();
         SoundManager.playBackGround(SoundManager.BACKGROUND_TEST);
 
-        JButton playButton = new JButton("Bắt Đầu");
-        playButton.setPreferredSize(new Dimension(100, 50)); // Kích thước cụ thể cho JButton
+        GameButton btnStart = new GameButton(AssetUtils.getImage(AssetUtils.ASSET_BUTTON_1), 1);
+        btnStart.setPreferredSize(new Dimension(100, 50));
+        btnStart.setText("Start");
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.CENTER; // Căn giữa JButton
-        add(playButton, gbc); // Thêm JButton vào Start2Player
+        add(btnStart, gbc); // Thêm JButton vào Start2Player
 
-        playButton.addActionListener(new ActionListener() {
+        btnStart.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 SoundManager.playSound(SoundManager.START_SOUND);

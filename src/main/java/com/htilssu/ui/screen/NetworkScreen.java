@@ -2,6 +2,7 @@ package com.htilssu.ui.screen;
 
 import com.htilssu.BattleShip;
 import com.htilssu.manager.ScreenManager;
+import com.htilssu.manager.SoundManager;
 import com.htilssu.multiplayer.Client;
 import com.htilssu.setting.GameSetting;
 import com.htilssu.ui.component.GameButton;
@@ -292,7 +293,7 @@ public class NetworkScreen extends GamePanel implements ComponentListener {
             hostItemPanel.add(Box.createVerticalStrut(20));
             hostItemPanel.add(hostItem);
         }
-
+        SoundManager.playSound(SoundManager.NOTIFY_SOUND);
         updateUI();
     }
 
