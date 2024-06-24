@@ -11,13 +11,16 @@ import java.util.Map;
 public final class SoundManager {
 
     public static final int BOOM_SOUND = 1;
+    private static int currentVolume = 100; // Giá trị âm lượng mặc định (0-100)
+
     public static final int DUCK_SOUND = 2;
     public static final int PUT_SHIP_SOUND = 3;
     public static final int ATTACK_SOUND = 4;
     public static final int BACKGROUND_TEST = 5;
-    public static final int START_SOUND = 6;
-    public static final int ERROR_SOUND = 7;
-    public static final int NOTIFY_SOUND = 8;
+    public static final int BACKGROUND_MENU = 6;
+    public static final int START_SOUND = 7;
+    public static final int ERROR_SOUND = 8;
+    public static final int NOTIFY_SOUND = 9;
     private static final Map<Integer, String> soundMap = new HashMap<>();
     static boolean isBackgroundPlaying = false;
     private static Clip backgroundClip;
@@ -31,6 +34,7 @@ public final class SoundManager {
         soundMap.put(START_SOUND, "/sounds/A_SoundStart.wav");
         soundMap.put(ERROR_SOUND, "/sounds/A_ErrorSound.wav");
         soundMap.put(NOTIFY_SOUND, "/sounds/A_NotifySound.wav");
+        soundMap.put(BACKGROUND_MENU, "/sounds/Action_4.wav");
     }
 
     public static synchronized void playSound(int soundName) {
@@ -49,6 +53,7 @@ một AudioInputStream mới sẽ được tạo và sử dụng, am thanh co th
 
             Clip clip = AudioSystem.getClip();
             clip.open(audioInputStream);
+            setVolume(clip, currentVolume); //  Đặt âm lượng cho hiệu ứng âm thanh
             clip.start();
 
             clip.addLineListener(event -> {
@@ -82,6 +87,7 @@ một AudioInputStream mới sẽ được tạo và sử dụng, am thanh co th
 
             backgroundClip = AudioSystem.getClip();
             backgroundClip.open(audioInputStream);
+            setVolume(backgroundClip, currentVolume); //  Đặt âm lượng cho nhạc nền
             backgroundClip.start();
             backgroundClip.loop(Clip.LOOP_CONTINUOUSLY);
             isBackgroundPlaying = true;
@@ -92,6 +98,34 @@ một AudioInputStream mới sẽ được tạo và sử dụng, am thanh co th
         }
     }
 
+    public static void setVolume(Clip clip, int volume) {
+        if (clip != null) {
+            FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+            float minVol = gainControl.getMinimum();
+            float maxVolume = gainControl.getMaximum();
+            float newVolume = -30 + Math.abs(-30 - maxVolume) * volume / 100;
+            gainControl.setValue(newVolume);
+        }
+    }
+
+    public static void setBackgroundVolume(int volume) {
+        currentVolume = volume;
+        if (backgroundClip != null) {
+            setVolume(backgroundClip, volume);
+        }
+    }
+
+    public static int getCurrentVolume() {
+        return currentVolume;
+    }
+
+    public static boolean isBackgroundPlaying() {
+        return isBackgroundPlaying;
+    }
+
+    public static Clip getBackgroundClip() {
+        return backgroundClip;
+    }
     ///ham delay
     public static void wait_Giay(int milliseconds) {
         try {
