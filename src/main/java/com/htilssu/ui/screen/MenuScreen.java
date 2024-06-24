@@ -3,29 +3,24 @@ package com.htilssu.ui.screen;
 import com.htilssu.BattleShip;
 import com.htilssu.component.CustomButton;
 import com.htilssu.manager.ScreenManager;
+import com.htilssu.manager.SoundManager;
 import com.htilssu.setting.GameSetting;
 import com.htilssu.util.AssetUtils;
-import com.htilssu.util.GameLogger;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import javax.sound.sampled.*;
 import javax.swing.*;
 
 public class MenuScreen extends JPanel {
-  private static MenuScreen instance; // Tham chiếu tĩnh
   private BufferedImage backgroundImage, menuImage, cursorImage;
   private BattleShip window;
-  private Clip backgroundMusicClip;
   private List<CustomButton> buttons;
+  private int currentVolume = 100; // Giả định giá trị ban đầu của âm lượng
 
   public MenuScreen(BattleShip battleShip) {
-    instance = this; // Gán tham chiếu tĩnh
     window = battleShip;
 
     setLayout(null); // We will use absolute positioning
@@ -34,29 +29,31 @@ public class MenuScreen extends JPanel {
     setPreferredSize(new Dimension(GameSetting.WIDTH, GameSetting.HEIGHT));
     buttons = new ArrayList<>();
     createButtons();
-    //  playBackgroundMusic();
+    playBackgroundMusic();
 
     loadCursorImage();
     setCustomCursor(); // Ensure this method is called
 
-    // Thêm listener để phát hiện khi cửa sổ thay đổi kích thước
     addComponentListener(
-        new ComponentAdapter() {
-          @Override
-          public void componentResized(ComponentEvent e) {
-            repositionButtons();
-          }
-        });
+            new ComponentAdapter() {
+              @Override
+              public void componentResized(ComponentEvent e) {
+                repositionButtons();
+              }
+            }
+    );
   }
 
-  public static MenuScreen getInstance() {
-    return instance;
+
+  public void setVolume(int volume) {
+    if (volume < 0) volume = 0;
+    if (volume > 100) volume = 100;
+    currentVolume = volume;
+    SoundManager.setBackgroundVolume(volume);
   }
 
   private void loadBackgroundImage() {
-
     backgroundImage = AssetUtils.loadImage("/sea1.png");
-    // Load background image
   }
 
   private void loadCursorImage() {
@@ -64,10 +61,9 @@ public class MenuScreen extends JPanel {
   }
 
   private void setCustomCursor() {
-
     Cursor customCursor =
-        Toolkit.getDefaultToolkit()
-            .createCustomCursor(cursorImage, new Point(0, 0), "Custom Cursor");
+            Toolkit.getDefaultToolkit()
+                    .createCustomCursor(cursorImage, new Point(0, 0), "Custom Cursor");
     setCursor(customCursor);
   }
 
@@ -75,28 +71,7 @@ public class MenuScreen extends JPanel {
     menuImage = AssetUtils.loadImage("/MENU2.png"); // Tải hình ảnh biểu tượng menu
   }
 
-  public Clip getBackgroundMusicClip() {
-    return backgroundMusicClip;
-  }
-
-  public void setBackgroundMusicClip(Clip clip) {
-    this.backgroundMusicClip = clip;
-  }
-
-  public void setVolume(int volume) {
-    if (backgroundMusicClip != null) {
-      FloatControl volumeControl =
-          (FloatControl) backgroundMusicClip.getControl(FloatControl.Type.MASTER_GAIN);
-      float minVol = volumeControl.getMinimum();
-      float maxVolume = volumeControl.getMaximum();
-      float newVolume = -30 + Math.abs(-30 - maxVolume) * volume / 100;
-      GameLogger.log(newVolume + "");
-      volumeControl.setValue(newVolume);
-    }
-  }
-
   private void createButtons() {
-
     addButton("/play2.png", "PLAY");
     addButton("/Multiplayer.png", "Multiplayer");
     addButton("/continue.png", "Continue");
@@ -124,7 +99,6 @@ public class MenuScreen extends JPanel {
       case "Multiplayer":
         window.changeScreen(ScreenManager.PICK_SCREEN);
         break;
-
       case "QUIT":
         System.exit(0);
         break;
@@ -148,44 +122,9 @@ public class MenuScreen extends JPanel {
   }
 
   private void playBackgroundMusic() {
-    try {
-      URL musicURL = getClass().getResource("/Action_4.wav"); // nhac nen
-      if (musicURL != null) { // neu tim dc nhac nen
-        System.out.println(
-            "Music file found at: "
-                + musicURL.getPath()); // in ra tep am thanh tim thay xem co dung k
-        AudioInputStream audioInputStream =
-            AudioSystem.getAudioInputStream(
-                musicURL); // Đoạn này tạo một AudioInputStream từ đường dẫn của tệp
-        // âm thanh. AudioInputStream là một luồng dữ liệu âm
-        // thanh có thể được sử dụng để đọc dữ liệu từ tệp âm
-        // thanh.
-        backgroundMusicClip =
-            AudioSystem.getClip(); // òng này tạo một đối tượng Clip mới. Clip là một loại
-        // đối tượng trong Java Sound API được sử dụng để phát
-        // lại các tệp âm thanh ngắn.
-        backgroundMusicClip.open(
-            audioInputStream); // Dòng này mở Clip với AudioInputStream đã được tạo
-        // trước đó, nạp dữ liệu âm thanh từ tệp vào bộ nhớ để
-        // chuẩn bị cho việc phát.
-        backgroundMusicClip.loop(
-            Clip.LOOP_CONTINUOUSLY); // òng này thực hiện việc phát lại âm thanh lặp
-        // đi lặp lại không ngừng. Điều này có nghĩa là
-        // khi âm thanh kết thúc, nó sẽ tự động phát
-        // lại từ đầu.
-        System.out.println("Background music started.");
-      } else {
-        System.err.println("Music file not found: /Action_4.wav");
-      }
-      // cac dong case la cac ngoai le khi xay ra loi
-    } catch (UnsupportedAudioFileException e) {
-      System.err.println("Unsupported audio file format: " + e.getMessage());
-    } catch (IOException e) {
-      System.err.println("Error reading the audio file: " + e.getMessage());
-    } catch (LineUnavailableException e) {
-      System.err.println("Audio line unavailable: " + e.getMessage());
-    } catch (Exception e) {
-      e.printStackTrace();
+    if (!SoundManager.isBackgroundPlaying()) {
+      SoundManager.playBackGround(SoundManager.BACKGROUND_MENU);
+      setVolume(currentVolume); // Đặt âm lượng ban đầu cho nhạc nền
     }
   }
 

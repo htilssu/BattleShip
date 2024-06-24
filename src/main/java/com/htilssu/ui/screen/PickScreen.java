@@ -58,7 +58,7 @@ public class PickScreen extends JPanel {
     }
 
     private void handleMouseClick(int mouseX, int mouseY) {
-        if (isInsideImage(mouseX, mouseY, normalImageX, normalImageY, newNormalImageWidth, newImageHeight)) {
+        if (isInsideImage(mouseX, mouseY, normalImageX, normalImageY, newNormalImageWidth, newImageHeight)) {//kiểm tra nếu chuột nằm trong phạm vi ảnh bấm vào se chuyển màn hình bằng transition screen
             transitionToGameScreen();
         }
     }
@@ -74,7 +74,7 @@ public class PickScreen extends JPanel {
         }
     }
 
-    private boolean isInsideImage(int mouseX, int mouseY, int imageX, int imageY, int imageWidth, int imageHeight) {
+    private boolean isInsideImage(int mouseX, int mouseY, int imageX, int imageY, int imageWidth, int imageHeight) {// Kiểm tra xem chuột có nằm trong phạm vi ảnh kooong
         return mouseX >= imageX && mouseX <= imageX + imageWidth && mouseY >= imageY && mouseY <= imageY + imageHeight;
     }
 
