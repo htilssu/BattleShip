@@ -4,14 +4,17 @@ import com.htilssu.BattleShip;
 import com.htilssu.manager.ScreenManager;
 import com.htilssu.manager.SoundManager;
 import com.htilssu.setting.GameSetting;
+import com.htilssu.ui.component.CustomButton;
 import com.htilssu.util.AssetUtils;
+
+import javax.sound.sampled.Clip;
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.*;
 
 public class MenuScreen extends JPanel {
   private BufferedImage backgroundImage, menuImage, cursorImage;
@@ -30,15 +33,13 @@ public class MenuScreen extends JPanel {
     createButtons();
     playBackgroundMusic();
 
-        loadCursorImage();
-        setCustomCursor(); // Ensure this method is called
-
     addComponentListener(
             new ComponentAdapter() {
-              @Override
-              public void componentResized(ComponentEvent e) {
-                repositionButtons();
-              }
+                @Override
+                public void componentResized(ComponentEvent e) {
+                    super.componentResized(e);
+                    repositionButtons();
+                }
             }
     );
   }
@@ -52,7 +53,22 @@ public class MenuScreen extends JPanel {
   }
 
   private void loadBackgroundImage() {
-    backgroundImage = AssetUtils.loadImage("/sea1.png");
+    backgroundImage = AssetUtils.loadImage("/images/sea1.png");
+  }
+    private void repositionButtons() { // định hinh cac nut khi thay doi kich thuoc man hinh
+        int buttonWidth = 200;
+        int buttonHeight = 60;
+        int centerX = (getWidth() - buttonWidth) / 2;
+        int totalButtons = buttons.size();
+        int spacing = 20;
+        int totalHeight = (buttonHeight * totalButtons) + (spacing * (totalButtons - 1));
+        int menuImageHeight = (menuImage != null) ? menuImage.getHeight() : 0;
+        int startY = (getHeight() - totalHeight) / 2 + menuImageHeight - 10;
+
+        for (int i = 0; i < buttons.size(); i++) {
+            CustomButton button = buttons.get(i);
+            button.setBounds(centerX, startY + i * (buttonHeight + spacing), buttonWidth, buttonHeight);
+        }
   }
 
     private void loadMenu() {
@@ -73,25 +89,8 @@ public class MenuScreen extends JPanel {
       cursorImage = AssetUtils.loadImage("/images/Layer2.png"); // Load cursor image
   }
 
-  private void setCustomCursor() {
-    Cursor customCursor =
-            Toolkit.getDefaultToolkit()
-                    .createCustomCursor(cursorImage, new Point(0, 0), "Custom Cursor");
-    setCursor(customCursor);
-  }
 
-  private void loadMenu() {
-    menuImage = AssetUtils.loadImage("/MENU2.png"); // Tải hình ảnh biểu tượng menu
-  }
 
-  private void createButtons() {
-    addButton("/play2.png", "PLAY");
-    addButton("/Multiplayer.png", "Multiplayer");
-    addButton("/continue.png", "Continue");
-    addButton("/setting2.png", "SETTING");
-    addButton("/exit.png", "QUIT");
-    repositionButtons();
-  }
 
     private void addButton(String imagePath, String actionCommand) {
         CustomButton button = new CustomButton(imagePath);
@@ -100,6 +99,8 @@ public class MenuScreen extends JPanel {
         buttons.add(button);
         add(button);
     }
+
+
 
   private void handleButtonClick(String actionCommand) {
     switch (actionCommand) {
@@ -110,7 +111,7 @@ public class MenuScreen extends JPanel {
         window.changeScreen(ScreenManager.SETTING_SCREEN);
         break;
       case "Multiplayer":
-        window.changeScreen(ScreenManager.PICK_SCREEN);
+        window.changeScreen(ScreenManager.NETWORK_SCREEN);
         break;
       case "QUIT":
         System.exit(0);
@@ -118,34 +119,10 @@ public class MenuScreen extends JPanel {
     }
   }
 
-    public static MenuScreen getInstance() {
-        return instance;
-    }
-
-    public Clip getBackgroundMusicClip() {
-        return backgroundMusicClip;
-    }
-
-    public void setBackgroundMusicClip(Clip clip) {
-        this.backgroundMusicClip = clip;
-    }
-
-    public void setVolume(int volume) {
-        if (backgroundMusicClip != null) {
-            FloatControl volumeControl =
-                    (FloatControl) backgroundMusicClip.getControl(FloatControl.Type.MASTER_GAIN);
-            float minVol = volumeControl.getMinimum();
-            float maxVolume = volumeControl.getMaximum();
-            float newVolume = -30 + Math.abs(-30 - maxVolume) * volume / 100;
-            GameLogger.log(newVolume + "");
-            volumeControl.setValue(newVolume);
-        }
-    }
 
   private void playBackgroundMusic() {
     if (!SoundManager.isBackgroundPlaying()) {
       SoundManager.playBackGround(SoundManager.BACKGROUND_MENU);
-      setVolume(currentVolume); // Đặt âm lượng ban đầu cho nhạc nền
     }
   }
 
