@@ -24,6 +24,7 @@ public class Client extends MultiHandler implements Runnable {
     private final List<InetAddress> hostList = new ArrayList<>();
     Socket socket;
     private String status;
+    private Thread scanThread;
 
     public Client(BattleShip battleShip) {
         super(battleShip);
@@ -47,10 +48,8 @@ public class Client extends MultiHandler implements Runnable {
         this.status = status;
     }
 
-    public int getPing() {
-        long time = System.currentTimeMillis();
-        send(MultiHandler.PING + "");
-        return (int) (System.currentTimeMillis() - time);
+    public void join() {
+        send(GameAction.JOIN, GameManager.gamePlayer.getId(), GameManager.gamePlayer.getName());
     }
 
     /**
@@ -83,12 +82,11 @@ public class Client extends MultiHandler implements Runnable {
         return socket != null;
     }
 
-    public void join() {
-        send(GameAction.JOIN, GameManager.gamePlayer.getId(), GameManager.gamePlayer.getName());
-    }
-
     public synchronized void scanHost() {
-        new Thread(() -> {
+
+        if (scanThread != null && scanThread.isAlive()) scanThread.interrupt();
+
+        scanThread = new Thread(() -> {
             hostList.clear();
 
             for (InetAddress inetAddress : NetworkUtils.find(GameSetting.DEFAULT_PORT)) {
@@ -96,7 +94,9 @@ public class Client extends MultiHandler implements Runnable {
                 send(PING);
             }
 
-        }).start();
+        });
+
+        scanThread.start();
     }
 
     /**
@@ -128,6 +128,10 @@ public class Client extends MultiHandler implements Runnable {
             GameLogger.log("Không thể ngắt kết nối");
         }
         socket = null;
+    }
+
+    public void stopScan() {
+
     }
 
     public List<InetAddress> getHostList() {
