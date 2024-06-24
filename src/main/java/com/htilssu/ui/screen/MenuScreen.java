@@ -1,7 +1,6 @@
 package com.htilssu.ui.screen;
 
 import com.htilssu.BattleShip;
-import com.htilssu.component.CustomButton;
 import com.htilssu.manager.ScreenManager;
 import com.htilssu.manager.SoundManager;
 import com.htilssu.setting.GameSetting;
@@ -31,8 +30,8 @@ public class MenuScreen extends JPanel {
     createButtons();
     playBackgroundMusic();
 
-    loadCursorImage();
-    setCustomCursor(); // Ensure this method is called
+        loadCursorImage();
+        setCustomCursor(); // Ensure this method is called
 
     addComponentListener(
             new ComponentAdapter() {
@@ -56,8 +55,22 @@ public class MenuScreen extends JPanel {
     backgroundImage = AssetUtils.loadImage("/sea1.png");
   }
 
+    private void loadMenu() {
+        menuImage = AssetUtils.loadImage("/images/MENU2.png"); // Tải hình ảnh biểu tượng menu
+    }
+
+    private void createButtons() {
+
+        addButton("/images/play2.png", "PLAY");
+        addButton("/images/MultiPlayer.png", "Multiplayer");
+        addButton("/images/continue.png", "Continue");
+        addButton("/images/setting2.png", "SETTING");
+        addButton("/images/exit.png", "QUIT");
+        repositionButtons();
+    }
+
   private void loadCursorImage() {
-    cursorImage = AssetUtils.loadImage("/Layer2.png"); // Load cursor image
+      cursorImage = AssetUtils.loadImage("/images/Layer2.png"); // Load cursor image
   }
 
   private void setCustomCursor() {
@@ -80,13 +93,13 @@ public class MenuScreen extends JPanel {
     repositionButtons();
   }
 
-  private void addButton(String imagePath, String actionCommand) {
-    CustomButton button = new CustomButton(imagePath);
-    button.setActionCommand(actionCommand);
-    button.addActionListener(e -> handleButtonClick(e.getActionCommand()));
-    buttons.add(button);
-    add(button);
-  }
+    private void addButton(String imagePath, String actionCommand) {
+        CustomButton button = new CustomButton(imagePath);
+        button.setActionCommand(actionCommand);
+        button.addActionListener(e -> handleButtonClick(e.getActionCommand()));
+        buttons.add(button);
+        add(button);
+    }
 
   private void handleButtonClick(String actionCommand) {
     switch (actionCommand) {
@@ -105,21 +118,29 @@ public class MenuScreen extends JPanel {
     }
   }
 
-  private void repositionButtons() { // định hinh cac nut khi thay doi kich thuoc man hinh
-    int buttonWidth = 200;
-    int buttonHeight = 60;
-    int centerX = (getWidth() - buttonWidth) / 2;
-    int totalButtons = buttons.size();
-    int spacing = 20;
-    int totalHeight = (buttonHeight * totalButtons) + (spacing * (totalButtons - 1));
-    int menuImageHeight = (menuImage != null) ? menuImage.getHeight() : 0;
-    int startY = (getHeight() - totalHeight) / 2 + menuImageHeight - 10;
-
-    for (int i = 0; i < buttons.size(); i++) {
-      CustomButton button = buttons.get(i);
-      button.setBounds(centerX, startY + i * (buttonHeight + spacing), buttonWidth, buttonHeight);
+    public static MenuScreen getInstance() {
+        return instance;
     }
-  }
+
+    public Clip getBackgroundMusicClip() {
+        return backgroundMusicClip;
+    }
+
+    public void setBackgroundMusicClip(Clip clip) {
+        this.backgroundMusicClip = clip;
+    }
+
+    public void setVolume(int volume) {
+        if (backgroundMusicClip != null) {
+            FloatControl volumeControl =
+                    (FloatControl) backgroundMusicClip.getControl(FloatControl.Type.MASTER_GAIN);
+            float minVol = volumeControl.getMinimum();
+            float maxVolume = volumeControl.getMaximum();
+            float newVolume = -30 + Math.abs(-30 - maxVolume) * volume / 100;
+            GameLogger.log(newVolume + "");
+            volumeControl.setValue(newVolume);
+        }
+    }
 
   private void playBackgroundMusic() {
     if (!SoundManager.isBackgroundPlaying()) {
@@ -128,17 +149,17 @@ public class MenuScreen extends JPanel {
     }
   }
 
-  @Override
-  protected void paintComponent(Graphics g) {
-    super.paintComponent(g);
-    if (backgroundImage != null) {
-      g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        if (backgroundImage != null) {
+            g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
+        }
+        if (menuImage != null) {
+            // Vẽ biểu tượng menu tại vị trí mong muốn
+            int iconX = (getWidth() - menuImage.getWidth()) / 2;
+            int iconY = 60;
+            g.drawImage(menuImage, iconX, iconY, this);
+        }
     }
-    if (menuImage != null) {
-      // Vẽ biểu tượng menu tại vị trí mong muốn
-      int iconX = (getWidth() - menuImage.getWidth()) / 2;
-      int iconY = 60;
-      g.drawImage(menuImage, iconX, iconY, this);
-    }
-  }
 }

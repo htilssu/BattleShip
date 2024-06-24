@@ -1,4 +1,4 @@
-package com.htilssu.component;
+package com.htilssu.ui.component;
 
 import com.htilssu.util.AssetUtils;
 
@@ -8,11 +8,11 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 
 public class CustomSliderUI extends BasicSliderUI {
-    private BufferedImage thumbImage;
-    private BufferedImage trackImage;
     private static final int THUMB_WIDTH = 8; // Chiều rộng của thumb
     private static final int THUMB_HEIGHT = 16; // Chiều cao của thumb
     private static final int TRACK_HEIGHT = 12; // Chiều cao của track
+    private BufferedImage thumbImage;
+    private BufferedImage trackImage;
 
     public CustomSliderUI(JSlider b) {
         super(b);
@@ -21,11 +21,39 @@ public class CustomSliderUI extends BasicSliderUI {
     }
 
     private void loadThumbImage() {
-        thumbImage = AssetUtils.loadImage("/track.png"); // Thay đổi đường dẫn tới ảnh thumb
+        thumbImage = AssetUtils.loadImage("/images/track.png"); // Thay đổi đường dẫn tới ảnh thumb
     }
 
     private void loadTrackImage() {
-        trackImage = AssetUtils.loadImage("/sider.png"); // Thay đổi đường dẫn tới ảnh track
+        trackImage = AssetUtils.loadImage("/images/sider.png"); // Thay đổi đường dẫn tới ảnh track
+    }
+
+    @Override
+    public void installUI(JComponent c) {
+        super.installUI(c);
+        // Đảm bảo JSlider sử dụng double buffering
+        c.setDoubleBuffered(true);
+    }
+
+    @Override
+    protected Dimension getThumbSize() {
+        return new Dimension(THUMB_WIDTH, THUMB_HEIGHT); // Kích thước của thumb
+    }
+
+    @Override
+    public void paint(Graphics g, JComponent c) {
+        // Đảm bảo thanh trượt không vẽ lại nền
+        if (c.isOpaque()) {
+            c.setOpaque(false);
+        }
+
+        ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        super.paint(g, c);
+    }
+
+    @Override
+    public void paintFocus(Graphics g) {
+        // Không vẽ focus, để loại bỏ viền focus
     }
 
     @Override
@@ -55,33 +83,5 @@ public class CustomSliderUI extends BasicSliderUI {
 
             g2d.dispose();
         }
-    }
-
-    @Override
-    public void paintFocus(Graphics g) {
-        // Không vẽ focus, để loại bỏ viền focus
-    }
-
-    @Override
-    public void paint(Graphics g, JComponent c) {
-        // Đảm bảo thanh trượt không vẽ lại nền
-        if (c.isOpaque()) {
-            c.setOpaque(false);
-        }
-
-        ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        super.paint(g, c);
-    }
-
-    @Override
-    public void installUI(JComponent c) {
-        super.installUI(c);
-        // Đảm bảo JSlider sử dụng double buffering
-        c.setDoubleBuffered(true);
-    }
-
-    @Override
-    protected Dimension getThumbSize() {
-        return new Dimension(THUMB_WIDTH, THUMB_HEIGHT); // Kích thước của thumb
     }
 }

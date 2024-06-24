@@ -3,77 +3,79 @@ package com.htilssu.manager;
 import com.htilssu.BattleShip;
 import com.htilssu.entity.game.GamePlay;
 import com.htilssu.entity.player.Player;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public final class GameManager {
 
-  public static final int MAX_PLAYER = 2;
-  public static final int MIN_PLAYER = 1;
-  public static final Player gamePlayer = new Player();
+    public static final int MAX_PLAYER = 2;
+    public static final int MIN_PLAYER = 1;
+    public static final Player gamePlayer = new Player();
+    public int turn = 0;
+    BattleShip battleShip;
+    List<Player> players;
+    GamePlay currentGamePlay;
+    private boolean multiPlayer;
 
-  BattleShip battleShip;
-  List<Player> players;
-  GamePlay currentGamePlay;
-  int turn = 0;
-  private boolean multiPlayer;
-
-  public GameManager(BattleShip battleShip) {
-    this.battleShip = battleShip;
-    initPlayerList();
-  }
-
-  public BattleShip getBattleShip() {
-    return battleShip;
-  }
-
-  public void setTurn(int turn) {
-    this.turn = turn;
-  }
-
-  public void addPlayer(Player player) {
-    if (players.size() < MAX_PLAYER) {
-      players.add(player);
-    }
-  }
-
-  public GamePlay createNewGamePlay() {
-    if (players.isEmpty()) {
-      return null;
+    public GameManager(BattleShip battleShip) {
+        this.battleShip = battleShip;
+        initPlayerList();
     }
 
-    GamePlay newGamePlay = new GamePlay(players, turn, DifficultyManager.difficulty, multiPlayer);
-    newGamePlay.setGameManager(this);
+    private void initPlayerList() {
+        players = new ArrayList<>();
+        players.add(gamePlayer);
+    }
 
-    initPlayerList();
-    setCurrentGamePlay(newGamePlay);
-    return currentGamePlay;
-  }
+    public BattleShip getBattleShip() {
+        return battleShip;
+    }
 
-  private void initPlayerList() {
-    players = new ArrayList<>();
-    players.add(gamePlayer);
-  }
+    public void setTurn(int turn) {
+        this.turn = turn;
+    }
 
-  public GamePlay getCurrentGamePlay() {
-    return currentGamePlay;
-  }
+    public void addPlayer(Player player) {
+        if (players.size() < MAX_PLAYER) {
+            players.add(player);
+        }
+    }
 
-  private void setCurrentGamePlay(GamePlay currentGamePlay) {
-    this.currentGamePlay = currentGamePlay;
-    this.currentGamePlay.setGameManager(this);
-  }
+    public synchronized void createNewGamePlay() {
+        if (players.isEmpty()) {
+            return;
+        }
 
-  public void createTestGamePlay() {
-    List<Player> testPlayers = new ArrayList<>();
-    testPlayers.add(GameManager.gamePlayer);
-    testPlayers.add(new Player());
-    setCurrentGamePlay(
-        new GamePlay(
-            testPlayers, 0, DifficultyManager.getGameBoardSize(DifficultyManager.difficulty)));
-  }
+        GamePlay newGamePlay = new GamePlay(players, turn, DifficultyManager.getGameBoardSize(DifficultyManager.difficulty), multiPlayer);
+        newGamePlay.setGameManager(this);
 
-  public void setMultiPlayer(boolean multiPlayer) {
-    this.multiPlayer = multiPlayer;
-  }
+        initPlayerList();
+        setCurrentGamePlay(newGamePlay);
+    }
+
+    @NotNull
+    public GamePlay getCurrentGamePlay() {
+        return currentGamePlay;
+    }
+
+    private void setCurrentGamePlay(GamePlay currentGamePlay) {
+        this.currentGamePlay = currentGamePlay;
+        this.currentGamePlay.setGameManager(this);
+    }
+
+    public void createTestGamePlay() {
+        List<Player> testPlayers = new ArrayList<>();
+        testPlayers.add(GameManager.gamePlayer);
+        testPlayers.add(new Player());
+
+        setCurrentGamePlay(
+                new GamePlay(
+                        testPlayers, 0, DifficultyManager.getGameBoardSize(DifficultyManager.difficulty)));
+    }
+
+    public void setMultiPlayer(boolean multiPlayer) {
+        this.multiPlayer = multiPlayer;
+    }
 }

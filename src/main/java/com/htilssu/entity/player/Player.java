@@ -40,6 +40,7 @@ public class Player {
 
   public void setPlayerBoard(PlayerBoard playerBoard) {
     this.playerBoard = playerBoard;
+    this.playerBoard.player = this;
   }
 
   public String getName() {
@@ -64,6 +65,7 @@ public class Player {
 
   public void setGamePlay(GamePlay gamePlay) {
     this.gamePlay = gamePlay;
+    if (playerBoard != null) playerBoard.setGamePlay(gamePlay);
   }
 
   /*  public boolean canShoot(Position position) {

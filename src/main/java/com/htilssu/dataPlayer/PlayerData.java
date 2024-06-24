@@ -3,6 +3,7 @@ package com.htilssu.dataPlayer;
 import com.htilssu.entity.component.Coordinate;
 import com.htilssu.entity.component.Ship2;
 //import com.htilssu.setting.SoundPlayer;
+import com.htilssu.manager.SoundManager;
 import com.htilssu.ui.screen.Player2Screen;
 
 import java.awt.*;
@@ -26,10 +27,11 @@ public class PlayerData {
     public void addShip(ArrayList<Coordinate> coords) {
         // Kiểm tra xem tàu có bị chồng chéo không hoặc Kiểm tra xem tàu có nằm ở biên của lưới không
         if (isEdge(coords) || isOverlap(coords)  ) {
+            SoundManager.playSound(SoundManager.ERROR_SOUND);
             System.out.println("DAT TAU KHONG HOP LE! DAT LAI.");
             return;
         } else {
-            //soundPlayer.playSound_PutShip();
+            SoundManager.playSound(SoundManager.PUT_SHIP_SOUND);
             // Nếu không có tàu nào chồng lên nhau và danh sách tàu chưa đầy, thêm tàu mới
             fleet.add(new Ship2(coords));
             setSelfData(coords);

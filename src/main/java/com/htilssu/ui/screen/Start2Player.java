@@ -1,4 +1,4 @@
-package com.htilssu.screen;
+package com.htilssu.ui.screen;
 
 import com.htilssu.BattleShip;
 import com.htilssu.dataPlayer.PlayerData;
@@ -7,7 +7,7 @@ import com.htilssu.state.BeginGame2;
 import com.htilssu.state.EndGame2;
 import com.htilssu.state.GameState;
 import com.htilssu.state.MidGame2;
-import com.htilssu.ui.screen.Player2Screen;
+import com.htilssu.ui.component.GameButton;
 import com.htilssu.util.AssetUtils;
 
 import javax.swing.*;
@@ -38,33 +38,38 @@ public class Start2Player extends JPanel implements GameState {
         loadBackground();
         SoundManager.playBackGround(SoundManager.BACKGROUND_TEST);
 
-        JButton playButton = new JButton("Bắt Đầu");
-        playButton.setPreferredSize(new Dimension(100, 50)); // Kích thước cụ thể cho JButton
+        GameButton btnStart = new GameButton(AssetUtils.getImage(AssetUtils.ASSET_BUTTON_1), 1);
+        btnStart.setPreferredSize(new Dimension(100, 50));
+        btnStart.setText("Start");
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.CENTER; // Căn giữa JButton
-        add(playButton, gbc); // Thêm JButton vào Start2Player
+        add(btnStart, gbc); // Thêm JButton vào Start2Player
 
-        playButton.addActionListener(new ActionListener() {
+        btnStart.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                //Dang bi loi am thanh cho nay
-                //soundPlayer.playSound_Start();
+                SoundManager.playSound(SoundManager.START_SOUND);
                 // Đóng màn hình hiện tại
                 SwingUtilities.getWindowAncestor(Start2Player.this).dispose();
                 SetNew();
-
+                //time delay
+                SoundManager.wait_Giay(200);
                 player1Turn();
                 player2turn();
             }
         });
     }
 
+    private void loadBackground() {
+        backgroundImage = AssetUtils.loadImage("/images/imageStart2game.png");
+    }
+
     public void SetNew()
     {
-
+        SoundManager.playBackGround(SoundManager.BACKGROUND_TEST);
         player1 = new Player2Screen("Player1", true,this);
         player2 = new Player2Screen("Player2", false,this);
         player1Data = new PlayerData(player1);
@@ -76,24 +81,21 @@ public class Start2Player extends JPanel implements GameState {
     }
 
     @Override
+    public void player1Turn() {
+        state.player1Turn();
+    }
+
+    @Override
+    public void player2turn() {
+        state.player2turn();
+    }
+
+    @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         if (backgroundImage != null) {
             g.drawImage(backgroundImage, 0, 0, this.getWidth(), this.getHeight(), this);
         }
-    }
-
-    private void loadBackground(){
-        backgroundImage = AssetUtils.loadImage("/player2game.png");
-    }
-
-    @Override
-    public void player1Turn() {
-        state.player1Turn();
-    }
-    @Override
-    public void player2turn() {
-        state.player2turn();
     }
 
     public GameState getMiddleOfTheGame() {
@@ -108,12 +110,12 @@ public class Start2Player extends JPanel implements GameState {
         this.state = state;
     }
 
-    public void setTakeTurnAttack(boolean isPlayerTurn) {
-        this.takeTurnAttack = isPlayerTurn;
-    }
-
     public boolean getTakeTurnAttack() {
         return takeTurnAttack;
+    }
+
+    public void setTakeTurnAttack(boolean isPlayerTurn) {
+        this.takeTurnAttack = isPlayerTurn;
     }
 
     public PlayerData getPlayer2Data() {

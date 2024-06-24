@@ -6,16 +6,13 @@ import com.htilssu.entity.component.Position;
 import com.htilssu.entity.game.GamePlay;
 import com.htilssu.render.Collision;
 import com.htilssu.render.Renderable;
-import com.htilssu.setting.GameSetting;
 import com.htilssu.util.AssetUtils;
+import org.jetbrains.annotations.NotNull;
+
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.awt.image.ConvolveOp;
-import java.awt.image.Kernel;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * Lớp chứa thông tin bảng của người chơi Bảng này lưu trữ các ô mà người chơi đã bắn và chứa các
@@ -23,172 +20,262 @@ import org.jetbrains.annotations.NotNull;
  */
 public class PlayerBoard extends Collision implements Renderable {
 
-  List<Ship> ships = new ArrayList<>();
+    public static final int SHOOT_MISS = 1;
+    public static final int SHOOT_HIT = 2;
+    public static final int SHOOT_DESTROYED = 3;
+    private final BufferedImage bg;
+    private final byte[][] shotBoard;
+    Player player;
+    List<Ship> ships = new ArrayList<>();
+    int size;
+    int cellSize;
+    private GamePlay gamePlay;
 
-  int size;
-  int cellSize;
-  private GamePlay gamePlay;
-
-  /**
-   * Khởi tạo bảng người chơi Bảng sẽ có size là size x size ô
-   *
-   * @param size Kích thước của bảng
-   */
-  public PlayerBoard(int size) {
-    this.size = size;
-    update();
-  }
-
-  public int getCellSize() {
-    return cellSize;
-  }
-
-  /** Cập nhật kích thước của bảng người chơi */
-  public void update() {
-    cellSize = (int) Math.ceil(GameSetting.TILE_SIZE * GameSetting.SCALE + 16);
-    setSize(cellSize * size, cellSize * size);
-    for (Ship ship : ships) {
-      ship.update();
-    }
-  }
-
-  @Override
-  public void render(@NotNull Graphics g) {
-
-    // Vẽ bảng người chơi
-    Graphics2D g2d = (Graphics2D) g;
-    g2d.setColor(Color.BLACK);
-    for (int i = 0; i <= Math.pow(size, 2); i++) {
-      g2d.setColor(Color.white);
-      if (i < Math.pow(size, 2)) {
-        g2d.fill(
-            new Rectangle(
-                getX() + i % size * cellSize,
-                (getY() + cellSize * (i / size)),
-                cellSize,
-                cellSize));
-        // TODO: Vẽ tàu khi ở chế độ MODE_SETUP
-
-        //        g2d.drawImage(
-        //            asset_shoot_miss,
-        //            position.x + i % size * cellSize,
-        //            position.y + cellSize * (i / size),
-        //            cellSize,
-        //            cellSize,
-        //            null);
-      }
+    /**
+     * Khởi tạo bảng người chơi Bảng sẽ có size là size x size ô
+     *
+     * @param size Kích thước của bảng
+     */
+    public PlayerBoard(int size, Player player) {
+        this.size = size;
+        this.player = player;
+        shotBoard = new byte[size][size];
+        update();
+        this.bg = AssetUtils.getImage(AssetUtils.ASSET_BACK_SEA);
     }
 
-    AlphaComposite aC = AlphaComposite.getInstance(AlphaComposite.SRC_OUT, 0.7f);
-    BufferedImage bg = AssetUtils.getImage(AssetUtils.ASSET_BACK_SEA);
-    BufferedImage opaBg =
-        new BufferedImage(bg.getWidth(), bg.getHeight(), BufferedImage.TYPE_INT_ARGB);
-
-    float[] a = new float[3 * 3];
-    Arrays.fill(a, 0.1111f);
-    Kernel kernel = new Kernel(3, 3, a);
-
-    ConvolveOp cOP = new ConvolveOp(kernel, ConvolveOp.EDGE_NO_OP, null);
-
-    Graphics2D g2dd = opaBg.createGraphics();
-
-    g2dd.setComposite(aC);
-    g2dd.drawImage(bg, 0, 0, opaBg.getWidth(), opaBg.getHeight(), null);
-    g2dd.dispose();
-    opaBg = cOP.filter(opaBg, null);
-
-    g2d.drawImage(opaBg, getX(), getY(), getWidth(), getHeight(), null);
-
-    for (Ship ship : ships) {
-      ship.render(g);
+    /**
+     * Cập nhật kích thước của bảng người chơi
+     */
+    public void update() {
+        cellSize = getHeight() / size;
+        setSize(cellSize * size, cellSize * size);
+        for (Ship ship : ships) {
+            ship.update();
+        }
     }
 
-    for (int i = 0; i < size; i++) {
-      g2d.setColor(Color.black);
-
-      g2d.drawLine(getX(), getY() + i * cellSize, getX() + getWidth(), getY() + i * cellSize);
-      g2d.drawLine(getX() + i * cellSize, getY(), getX() + i * cellSize, getY() + getHeight());
-    }
-  }
-
-  /**
-   * Lấy vị trí của bảng người chơi so với panel chứa nó (vị trí tướng đối)
-   *
-   * @return vị trí của bảng
-   */
-  public Position getBoardRowCol(Point point) {
-    return getBoardRowCol(point.x, point.y);
-  }
-
-  public Position getBoardRowCol(int x, int y) {
-    int row = (x - getX()) / cellSize;
-    int col = (y - getY()) / cellSize;
-    if (row >= size) {
-      row = size - 1;
-    }
-    if (col >= size) {
-      col = size - 1;
-    }
-    if (row < 0) {
-      row = 0;
-    }
-    if (col < 0) {
-      col = 0;
-    }
-    return new Position(row, col);
-  }
-
-  public void addShip(Ship ship) {
-    if (canAddShip(
-        ship.getSprite().getX(),
-        ship.getSprite().getY(),
-        ship.getSprite().getWidth(),
-        ship.getSprite().getHeight())) {
-      ships.add(ship);
-      ship.setBoard(this);
-    }
-  }
-
-  public boolean canAddShip(int x, int y, int width, int height) {
-    int xMax = x + width;
-    int yMax = y + height;
-    for (Ship s : ships) {
-      Sprite sp = s.getSprite();
-      if (xMax > sp.getX()
-          && sp.getX() + sp.getWidth() > x
-          && yMax > sp.getY()
-          && y < sp.getY() + sp.getHeight()) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  public void removeShip(Ship ship) {
-    ships.remove(ship);
-  }
-
-  public Ship getShip(Point point) {
-    for (Ship ship : ships) {
-      if (ship.isInside(point.x, point.y)) return ship;
+    @Override
+    public void setSize(int width, int height) {
+        //noinspection SuspiciousNameCombination
+        super.setSize(height, height);
     }
 
-    return null;
-  }
+    public int getCellSize() {
+        return cellSize;
+    }
 
-  public GamePlay getGamePlay() {
-    return gamePlay;
-  }
+    @Override
+    public void render(@NotNull Graphics g) {
 
-  public void setGamePlay(GamePlay gamePlay) {
-    this.gamePlay = gamePlay;
-  }
+        // Vẽ bảng người chơi
+        Graphics2D g2d = (Graphics2D) g.create();
+        g2d.setColor(Color.white);
+        Rectangle rect = new Rectangle(getX(), getY(), getWidth(), getHeight());
 
-  public boolean canAddShip(Ship ship) {
-    return canAddShip(
-        ship.getSprite().getX(),
-        ship.getSprite().getY(),
-        ship.getSprite().getWidth(),
-        ship.getSprite().getHeight());
-  }
+        //vẽ ô
+        for (int i = 0; i <= Math.pow(size, 2); i++) {
+            if (i < Math.pow(size, 2)) {
+
+                rect.setLocation(getX() + i % size * cellSize, (getY() + cellSize * (i / size)));
+                rect.setSize(cellSize, cellSize);
+                g2d.fill(rect);
+            }
+        }
+
+
+        g2d.drawImage(bg, getX(), getY(), getWidth(), getHeight(), null);
+        //vẽ tàu
+        for (Ship ship : ships) {
+            ship.render(g);
+        }
+
+        //vẽ đường kẻ
+        g2d.setColor(Color.black);
+        for (int i = 0; i < size; i++) {
+
+            g2d.drawLine(getX(), getY() + i * cellSize, getX() + getWidth(), getY() + i * cellSize);
+            g2d.drawLine(getX() + i * cellSize, getY(), getX() + i * cellSize, getY() + getHeight());
+        }
+
+
+        //render shoot mark
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                renderShot(g, i, j);
+            }
+        }
+
+        g2d.dispose();
+
+    }
+
+    private void renderShot(Graphics g, int row, int col) {
+        if (canShoot(row, col)) return;
+
+        int x = getX() + col * cellSize;
+        int y = getY() + row * cellSize;
+
+        switch (shotBoard[row][col]) {
+            case (byte) SHOOT_MISS:
+                g.drawImage(AssetUtils.getImage(AssetUtils.ASSET_SHOOT_MISS), x, y, cellSize, cellSize, null);
+                break;
+            case (byte) SHOOT_HIT:
+                g.drawImage(AssetUtils.getImage(AssetUtils.ASSET_SHOOT_HIT), x, y, cellSize, cellSize, null);
+                break;
+        }
+
+    }
+
+    public boolean canShoot(int row, int col) {
+        return shotBoard[row][col] == 0;
+    }
+
+    /**
+     * Lấy vị trí của bảng người chơi so với panel chứa nó (vị trí tướng đối)
+     *
+     * @return vị trí của bảng
+     */
+    public Position getBoardRowCol(Point point) {
+        return getBoardRowCol(point.x, point.y);
+    }
+
+    public Position getBoardRowCol(int x, int y) {
+        int row = (x - getX()) / cellSize;
+        int col = (y - getY()) / cellSize;
+        if (row >= size) {
+            row = size - 1;
+        }
+        if (col >= size) {
+            col = size - 1;
+        }
+        if (row < 0) {
+            row = 0;
+        }
+        if (col < 0) {
+            col = 0;
+        }
+        return new Position(row, col);
+    }
+
+    public void addShip(Ship ship) {
+        if (canAddShip(ship.getSprite().getX(), ship.getSprite().getY(), ship.getSprite().getWidth(),
+                       ship.getSprite().getHeight())) {
+            ships.add(ship);
+            ship.setBoard(this);
+        }
+    }
+
+    public boolean canAddShip(int x, int y, int width, int height) {
+        int xMax = x + width;
+        int yMax = y + height;
+        for (Ship s : ships) {
+            Sprite sp = s.getSprite();
+            if (xMax > sp.getX() && sp.getX() + sp.getWidth() > x && yMax > sp.getY() && y < sp.getY() + sp.getHeight()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public void removeShip(Ship ship) {
+        ships.remove(ship);
+    }
+
+    public Ship getShip(Point point) {
+        for (Ship ship : ships) {
+            if (ship.isInside(point.x, point.y)) return ship;
+        }
+
+        return null;
+    }
+
+    public GamePlay getGamePlay() {
+        return gamePlay;
+    }
+
+    public void setGamePlay(GamePlay gamePlay) {
+        this.gamePlay = gamePlay;
+    }
+
+    public boolean canAddShip(Ship ship) {
+        return canAddShip(ship.getSprite().getX(), ship.getSprite().getY(), ship.getSprite().getWidth(),
+                          ship.getSprite().getHeight());
+    }
+
+    public Ship getShipAtPosition(Position position) {
+        for (Ship ship : ships) {
+            Position pos = ship.getPosition();
+            switch (ship.getDirection()) {
+                case Ship.HORIZONTAL -> {
+                    if (pos.x <= position.x && position.x < pos.x + ship.getShipType() && pos.y == position.y) {
+                        return ship;
+                    }
+                }
+                case Ship.VERTICAL -> {
+                    if (pos.y <= position.y && position.y < pos.y + ship.getShipType() && pos.x == position.x) {
+                        return ship;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    public void shoot(Position position, int status) {
+        if (canShoot(position)) {
+            shotBoard[position.y][position.x] = (byte) status;
+            //repaint
+            gamePlay.getScreen().repaint();
+        }
+    }
+
+    /**
+     * Kiểm tra xem người chơi có thể bắn vào ô này không
+     * vị trí sẽ là hai số nguyên {@code x}, {@code y} đại diện cho hàng và cột
+     *
+     * @param position vị trí cần bắn
+     *
+     * @return {@code true} nếu có thể bắn, {@code false} nếu không thể bắn
+     */
+    public boolean canShoot(Position position) {
+        return canShoot(position.y, position.x);
+    }
+
+    public boolean isShipDestroyed(Ship ship) {
+        Position pos = ship.getPosition();
+
+        for (int i = 0; i < ship.getShipType(); i++) {
+            switch (ship.getDirection()) {
+                case Ship.HORIZONTAL -> {
+                    if (shotBoard[pos.y][pos.x + i] != SHOOT_HIT) {
+                        return false;
+                    }
+                }
+                case Ship.VERTICAL -> {
+                    if (shotBoard[pos.y + i][pos.x] != SHOOT_HIT) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+    public void markShipDestroyed(Ship ship) {
+        Position pos = ship.getPosition();
+
+        for (int i = 0; i < ship.getShipType(); i++) {
+            switch (ship.getDirection()) {
+                case Ship.HORIZONTAL -> {
+                    shotBoard[pos.y][pos.x + i] = (byte) SHOOT_DESTROYED;
+                }
+                case Ship.VERTICAL -> {
+                    shotBoard[pos.y + i][pos.x] = (byte) SHOOT_DESTROYED;
+                }
+            }
+        }
+    }
 }
+
+
