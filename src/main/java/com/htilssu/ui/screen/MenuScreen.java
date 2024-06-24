@@ -20,11 +20,8 @@ public class MenuScreen extends JPanel {
   private BufferedImage backgroundImage, menuImage, cursorImage;
   private BattleShip window;
   private List<CustomButton> buttons;
-  private int currentVolume = 100; // Giả định giá trị ban đầu của âm lượng
-
   public MenuScreen(BattleShip battleShip) {
     window = battleShip;
-
     setLayout(null); // We will use absolute positioning
     loadBackgroundImage();
     loadMenu();
@@ -42,14 +39,6 @@ public class MenuScreen extends JPanel {
                 }
             }
     );
-  }
-
-
-  public void setVolume(int volume) {
-    if (volume < 0) volume = 0;
-    if (volume > 100) volume = 100;
-    currentVolume = volume;
-    SoundManager.setBackgroundVolume(volume);
   }
 
   private void loadBackgroundImage() {
@@ -84,14 +73,6 @@ public class MenuScreen extends JPanel {
         addButton("/images/exit.png", "QUIT");
         repositionButtons();
     }
-
-  private void loadCursorImage() {
-      cursorImage = AssetUtils.loadImage("/images/Layer2.png"); // Load cursor image
-  }
-
-
-
-
     private void addButton(String imagePath, String actionCommand) {
         CustomButton button = new CustomButton(imagePath);
         button.setActionCommand(actionCommand);
@@ -99,10 +80,7 @@ public class MenuScreen extends JPanel {
         buttons.add(button);
         add(button);
     }
-
-
-
-  private void handleButtonClick(String actionCommand) {
+    private void handleButtonClick(String actionCommand) {
     switch (actionCommand) {
       case "PLAY":
         window.changeScreen(ScreenManager.PICK_SCREEN);
@@ -118,8 +96,6 @@ public class MenuScreen extends JPanel {
         break;
     }
   }
-
-
   private void playBackgroundMusic() {
     if (!SoundManager.isBackgroundPlaying()) {
       SoundManager.playBackGround(SoundManager.BACKGROUND_MENU);
