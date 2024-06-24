@@ -194,6 +194,7 @@ public class BattleShip extends JFrame implements Runnable, KeyListener, Compone
             case KeyEvent.VK_R:
                 GamePlay cP = gameManager.getCurrentGamePlay();
                 cP.changeDirection();
+                repaint();
                 break;
             default:
         }
