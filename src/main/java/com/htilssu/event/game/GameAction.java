@@ -19,7 +19,20 @@ public final class GameAction {
      */
     public static final int READY = 3;
 
+    /**
+     * Người chơi hủy sẵn sàng
+     */
     public static final int UNREADY = 4;
+    /**
+     * Bắt đầu trò chơi
+     */
     public static final int START_GAME = 5;
+    /**
+     * Trả về thông tin sau khi gửi thông tin vị trí bắn đến đôi phương
+     */
     public static final int RESPONSE_SHOOT = 6;
+    /**
+     * Kết thúc trò chơi, người nhận được sự kiện {@link #END_GAME} từ {@link #RESPONSE_SHOOT} sẽ là người chiến thắng
+     */
+    public static final int END_GAME = 7;
 }
