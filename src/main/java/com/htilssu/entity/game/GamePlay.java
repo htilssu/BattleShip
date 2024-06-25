@@ -32,26 +32,19 @@ import static com.htilssu.entity.Ship.VERTICAL;
  */
 public class GamePlay implements Renderable {
 
-    public static final int WAITING_MODE = 0;
+    public static final int SETUP_MODE = 0;
     public static final int PLAY_MODE = 1;
-    public static final Map<Integer, Sprite> sprites = new HashMap<>();
+    public static final int END_MODE = 2;
     private static final int MARGIN = 30;
-
-    static {
-        sprites.put(Ship.SHIP_2, new Sprite(AssetUtils.getImage(AssetUtils.ASSET_SHIP_2)));
-        sprites.put(Ship.SHIP_3, new Sprite(AssetUtils.getImage(AssetUtils.ASSET_SHIP_3)));
-        sprites.put(Ship.SHIP_4, new Sprite(AssetUtils.getImage(AssetUtils.ASSET_SHIP_4)));
-        sprites.put(Ship.SHIP_5, new Sprite(AssetUtils.getImage(AssetUtils.ASSET_SHIP_5)));
-
-    }
-
+    public final Map<Integer, Sprite> sprites = new HashMap<>();
     private final Map<Integer, Integer> shipInBoard = new HashMap<>();
     private final List<Player> playerList;
     private final int size;
     private final Sprite selectSprite;
     private final Sprite readyButton = new Sprite(AssetUtils.getImage(AssetUtils.ASSET_READY_BUTTON));
+    private int winner = -1;
     private boolean isReady = false;
-    private int gameMode = WAITING_MODE;
+    private int gameMode = SETUP_MODE;
     private int turn;
     private int direction = VERTICAL;
     private Sprite setUpSprite;
@@ -59,6 +52,14 @@ public class GamePlay implements Renderable {
     private GameManager gameManager;
     private boolean isSelectSpriteInBoard;
     private BattleShip battleShip;
+
+    {
+        sprites.put(Ship.SHIP_2, new Sprite(AssetUtils.getImage(AssetUtils.ASSET_SHIP_2)));
+        sprites.put(Ship.SHIP_3, new Sprite(AssetUtils.getImage(AssetUtils.ASSET_SHIP_3)));
+        sprites.put(Ship.SHIP_4, new Sprite(AssetUtils.getImage(AssetUtils.ASSET_SHIP_4)));
+        sprites.put(Ship.SHIP_5, new Sprite(AssetUtils.getImage(AssetUtils.ASSET_SHIP_5)));
+
+    }
 
     {
         shipInBoard.put(Ship.SHIP_2, 1);
@@ -95,25 +96,26 @@ public class GamePlay implements Renderable {
         return size;
     }
 
+    public int getWinner() {
+        return winner;
+    }
+
+    public void setWinner(int winner) {
+        this.winner = winner;
+    }
+
     public int getDirection() {
         return direction;
     }
 
     public void setDirection(int direction) {
-        if (this.direction == direction || gameMode != WAITING_MODE) return;
+        if (this.direction == direction || gameMode != SETUP_MODE) return;
         this.direction = direction;
 
 
         if (setUpSprite != null) {
             PlayerBoard playerBoard = GameManager.gamePlayer.getBoard();
-            if (direction == VERTICAL) {
-                setUpSprite.setAsset(AssetUtils.rotate90(setUpSprite.getAsset()));
-            }
-            else {
-                setUpSprite.setAsset(AssetUtils.rotate90(setUpSprite.getAsset()));
-                setUpSprite.setAsset(AssetUtils.rotate90(setUpSprite.getAsset()));
-                setUpSprite.setAsset(AssetUtils.rotate90(setUpSprite.getAsset()));
-            }
+            setUpSprite.setAsset(AssetUtils.rotate90(setUpSprite.getAsset()));
 
             float ratio = (float) setUpSprite.getHeight() / setUpSprite.getWidth();
             if (ratio < 1 && ratio > 0) {
@@ -141,7 +143,7 @@ public class GamePlay implements Renderable {
 
                 shoot(pos);
             }
-            case WAITING_MODE -> {
+            case SETUP_MODE -> {
                 PlayerBoard playerBoard = GameManager.gamePlayer.getBoard();
 
                 handleReadyButtonOnClick(position);
@@ -241,6 +243,7 @@ public class GamePlay implements Renderable {
             ratio = 1 / ratio;
         }
         Ship ship = new Ship(direction, new Sprite(setUpSprite), mousePos, (int) ratio);
+        ship.setDirection(direction);
         if (!playerBoard.canAddShip(ship)) {
             SoundManager.playSound(SoundManager.ERROR_SOUND);
             return;
@@ -291,35 +294,9 @@ public class GamePlay implements Renderable {
         }
     }
 
-    /**
-     * Kết thúc lượt chơi của người chơi hiện tại
-     */
-    public void endTurn() {
-        turn = (turn + 1) % playerList.size();
-    }
-
-    /**
-     * Lấy {@link GameManager} của game
-     *
-     * @return {@link GameManager} của game
-     */
-    public GameManager getGameManager() {
-        return gameManager;
-    }
-
-    /**
-     * Set {@link GameManager} cho game
-     *
-     * @param gameManager {@link GameManager} của game
-     */
-    public void setGameManager(GameManager gameManager) {
-        this.gameManager = gameManager;
-        battleShip = gameManager.getBattleShip();
-    }
-
     public void handleMouseMoved(Point point) {
         switch (gameMode) {
-            case WAITING_MODE -> {
+            case SETUP_MODE -> {
                 handleReadyButtonOnHover(point);
                 if (setUpSprite == null) return;
                 PlayerBoard playerBoard = GameManager.gamePlayer.getBoard();
@@ -356,11 +333,37 @@ public class GamePlay implements Renderable {
         readyButton.handleHover(point.x, point.y);
     }
 
+    /**
+     * Kết thúc lượt chơi của người chơi hiện tại
+     */
+    public void endTurn() {
+        turn = (turn + 1) % playerList.size();
+    }
+
+    /**
+     * Lấy {@link GameManager} của game
+     *
+     * @return {@link GameManager} của game
+     */
+    public GameManager getGameManager() {
+        return gameManager;
+    }
+
+    /**
+     * Set {@link GameManager} cho game
+     *
+     * @param gameManager {@link GameManager} của game
+     */
+    public void setGameManager(GameManager gameManager) {
+        this.gameManager = gameManager;
+        battleShip = gameManager.getBattleShip();
+    }
+
     @Override
     public void render(@NotNull Graphics g) {
 
-        if (gameMode == WAITING_MODE) {
-            renderWaitingMode(g);
+        if (gameMode == SETUP_MODE) {
+            renderSetupMode(g);
             if (setUpSprite != null) setUpSprite.render(g);
         }
         else if (gameMode == PLAY_MODE) {
@@ -368,7 +371,11 @@ public class GamePlay implements Renderable {
         }
     }
 
-    private void renderWaitingMode(Graphics g) {
+    /**
+     * Vẽ màn hình đặt thuyền, hàm này sẽ được gọi và vẽ khi
+     * {@link #gameMode} = {@link #SETUP_MODE}
+     */
+    private void renderSetupMode(Graphics g) {
 
         PlayerBoard playerBoard = playerList.getFirst().getBoard();
 
@@ -385,15 +392,30 @@ public class GamePlay implements Renderable {
         playerBoard.render(g);
     }
 
+    /**
+     * Vẽ màn hình chơi game khi game bắt đầu, hàm này sẽ được gọi và vẽ khi
+     * {@link #gameMode} = {@link #PLAY_MODE}
+     */
     private void renderPlayMode(Graphics g) {
         renderShootBoard(g);
+        renderSelfBoard(g);
 
         //render select sprite
-        if (isSelectSpriteInBoard) selectSprite.render(g);
+        if (isSelectSpriteInBoard && getCurrentPlayer().getId().equals(GameManager.gamePlayer.getId()))
+            selectSprite.render(g);
     }
 
+    /**
+     * Vẽ bảng chơi của đối phương để người chơi hiện tại có thể thực hiện bắn
+     */
     public void renderShootBoard(Graphics g) {
         getOpponent().getBoard().render(g);
+    }
+
+    /**
+     * Vẽ bảng người chơi hiện tại đang đến lượt chơi
+     */
+    private void renderSelfBoard(Graphics g) {
     }
 
     public int getGameMode() {
@@ -402,7 +424,7 @@ public class GamePlay implements Renderable {
 
     /**
      * Set trạng thái của {@link GamePlay}
-     * trạng thái có thể là {@link #WAITING_MODE} hoặc {@link #PLAY_MODE}
+     * trạng thái có thể là {@link #SETUP_MODE} hoặc {@link #PLAY_MODE}
      *
      * @param gameMode trạng thái của {@link GamePlay}
      */
@@ -418,7 +440,7 @@ public class GamePlay implements Renderable {
 
         JPanel currentScreen = gameManager.getBattleShip().getScreenManager().getCurrentScreen();
         switch (gameMode) {
-            case WAITING_MODE -> {
+            case SETUP_MODE -> {
                 PlayerBoard playerBoard = GameManager.gamePlayer.getBoard();
 
                 int shipSpriteMargin = MARGIN * Math.round(GameSetting.SCALE);
@@ -478,7 +500,7 @@ public class GamePlay implements Renderable {
      * nếu hướng hiện tại là {@link Ship#HORIZONTAL} thì chuyển thành {@link Ship#VERTICAL} và ngược lại
      */
     public void changeDirection() {
-        if (gameMode != WAITING_MODE) return;
+        if (gameMode != SETUP_MODE) return;
         setDirection((direction + 1) % 2);
     }
 

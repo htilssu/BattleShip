@@ -29,6 +29,7 @@ public class PlayerBoard extends Collision implements Renderable {
     List<Ship> ships = new ArrayList<>();
     int size;
     int cellSize;
+    private int remainingShips;
     private GamePlay gamePlay;
 
     /**
@@ -88,6 +89,18 @@ public class PlayerBoard extends Collision implements Renderable {
         //vẽ tàu
         for (Ship ship : ships) {
             ship.render(g);
+        }
+
+        //set màu cho ô đã bắn
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                if (shotBoard[i][j] != 0) {
+                    g2d.setColor(new Color(243, 35, 35, 148));
+                    int x = getX() + j * cellSize;
+                    int y = getY() + i * cellSize;
+                    g2d.fill(new Rectangle(x, y, cellSize, cellSize));
+                }
+            }
         }
 
         //vẽ đường kẻ
@@ -159,16 +172,27 @@ public class PlayerBoard extends Collision implements Renderable {
     }
 
     public void addShip(Ship ship) {
-        if (canAddShip(ship.getSprite().getX(), ship.getSprite().getY(), ship.getSprite().getWidth(),
-                       ship.getSprite().getHeight())) {
+        if (canAddShip(ship.getSprite().getX(), ship.getSprite().getY(), ship.getDirection(), ship.getShipType())) {
             ships.add(ship);
+            remainingShips++;
             ship.setBoard(this);
         }
     }
 
-    public boolean canAddShip(int x, int y, int width, int height) {
-        int xMax = x + width;
-        int yMax = y + height;
+    public boolean canAddShip(int row, int col, int direction, int shipType) {
+        int xMax = cellSize;
+        int yMax = cellSize;
+        int x = getX() + col * cellSize;
+        int y = getY() + row * cellSize;
+
+        if (direction == Ship.HORIZONTAL) {
+            xMax = x + shipType * cellSize;
+        }
+        else {
+            yMax = y + shipType * cellSize;
+        }
+
+
         for (Ship s : ships) {
             Sprite sp = s.getSprite();
             if (xMax > sp.getX() && sp.getX() + sp.getWidth() > x && yMax > sp.getY() && y < sp.getY() + sp.getHeight()) {
@@ -199,8 +223,8 @@ public class PlayerBoard extends Collision implements Renderable {
     }
 
     public boolean canAddShip(Ship ship) {
-        return canAddShip(ship.getSprite().getX(), ship.getSprite().getY(), ship.getSprite().getWidth(),
-                          ship.getSprite().getHeight());
+        return canAddShip(ship.getPosition().x, ship.getPosition().getY(), ship.getDirection(),
+                          ship.getShipType());
     }
 
     public Ship getShipAtPosition(Position position) {
@@ -264,6 +288,7 @@ public class PlayerBoard extends Collision implements Renderable {
 
     public void markShipDestroyed(Ship ship) {
         Position pos = ship.getPosition();
+        remainingShips--;
 
         for (int i = 0; i < ship.getShipType(); i++) {
             switch (ship.getDirection()) {
@@ -275,6 +300,10 @@ public class PlayerBoard extends Collision implements Renderable {
                 }
             }
         }
+    }
+
+    public boolean isAllShipsDestroyed() {
+        return remainingShips == 0;
     }
 }
 
