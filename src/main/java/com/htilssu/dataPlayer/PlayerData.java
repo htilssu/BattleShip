@@ -2,22 +2,20 @@ package com.htilssu.dataPlayer;
 
 import com.htilssu.entity.component.Coordinate;
 import com.htilssu.entity.component.Ship2;
-//import com.htilssu.setting.SoundPlayer;
 import com.htilssu.manager.SoundManager;
 import com.htilssu.ui.screen.Player2Screen;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.ArrayList;
 
 public class PlayerData {
-    private Player2Screen player;
-    private int[][] attackData = new int[11][11];
-    private int[][] selfData = new int[11][11];
-    private int numberOfShipSunk = 0;
-    private ArrayList<Ship2> fleet = new ArrayList<>();
+
     private static final int MAX_SHIPS = 4;
+    private final int[][] attackData = new int[11][11];
+    private final int[][] selfData = new int[11][11];
+    private final ArrayList<Ship2> fleet = new ArrayList<>();
+    private Player2Screen player;
+    private int numberOfShipSunk = 0;
 
     public PlayerData(Player2Screen player) {
         this.player = player;
@@ -62,16 +60,6 @@ public class PlayerData {
         return false;
     }
 
-
-    //Cập nhật dữ liệu tàu vào lưới tự bảo vệ
-    public void setSelfData(ArrayList<Coordinate> coords) {
-        for (Coordinate coord : coords) {
-            int x = coord.getX();
-            int y = coord.getY();
-            selfData[x][y] = 1;
-        }
-    }
-
     // returns number of ships count
     public int shipsCount(){
         int temp = fleet.size();
@@ -86,6 +74,15 @@ public class PlayerData {
     // Trả về dữ liệu tự bảo vệ của người chơi
     public int[][] getSelfData() {
         return selfData;
+    }
+
+    //Cập nhật dữ liệu tàu vào lưới tự bảo vệ
+    public void setSelfData(ArrayList<Coordinate> coords) {
+        for (Coordinate coord : coords) {
+            int x = coord.getX();
+            int y = coord.getY();
+            selfData[x][y] = 1;
+        }
     }
 
     //Tấn công tàu

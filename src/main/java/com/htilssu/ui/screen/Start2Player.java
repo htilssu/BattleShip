@@ -38,8 +38,8 @@ public class Start2Player extends JPanel implements GameState {
         loadBackground();
         SoundManager.playBackGround(SoundManager.BACKGROUND_TEST);
 
-        GameButton btnStart = new GameButton(AssetUtils.getImage(AssetUtils.ASSET_BUTTON_1), 1);
-        btnStart.setPreferredSize(new Dimension(100, 50));
+        GameButton btnStart = new GameButton(AssetUtils.getImage(AssetUtils.ASSET_BG_ATTACK), 1);
+        btnStart.setPreferredSize(new Dimension(120, 60));
         btnStart.setText("Start");
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -64,7 +64,7 @@ public class Start2Player extends JPanel implements GameState {
     }
 
     private void loadBackground() {
-        backgroundImage = AssetUtils.loadImage("/images/imageStart2game.png");
+        backgroundImage = AssetUtils.loadImage("/images/sea_of_thief.png");
     }
 
     public void SetNew()

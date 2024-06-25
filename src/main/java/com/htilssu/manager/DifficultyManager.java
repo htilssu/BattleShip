@@ -9,7 +9,7 @@ public final class DifficultyManager {
             Map.of(
                     NORMAL, 10,
                     HARD, 15);
-    public static int difficulty = DifficultyManager.NORMAL;
+    public static int difficulty = DifficultyManager.HARD;
 
     /**
      * Lấy kích thước bảng hiện tại của game dựa vào {@link #difficulty}

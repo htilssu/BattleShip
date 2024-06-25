@@ -1,5 +1,6 @@
 package com.htilssu.entity.component;
 
+import com.htilssu.ui.component.GamePanel;
 import com.htilssu.util.AssetUtils;
 
 import javax.swing.*;
@@ -7,12 +8,12 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 
 public abstract class BattleGrid extends JPanel {
-  JPanel self;
-    private JPanel temp;
+  GamePanel self;
+  private JPanel temp;
   private BufferedImage backgroundImage;
 
   public BattleGrid() {
-    self = new JPanel();
+    self = new GamePanel();
     self.setLayout(new GridLayout(10,10));
     self.setOpaque(false); // Đảm bảo các ô trong suốt
 
