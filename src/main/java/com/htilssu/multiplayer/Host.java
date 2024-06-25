@@ -82,7 +82,9 @@ public class Host extends MultiHandler implements Runnable {
             gamePlay.setGameMode(GamePlay.PLAY_MODE);
             battleShip.getScreenManager().getScreen(ScreenManager.PLAY_SCREEN).repaint();
             send(GameAction.START_GAME);
+            ready = 0;
         }
+
     }
 
     public void send(Object... obj) {
