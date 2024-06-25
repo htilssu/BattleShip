@@ -8,11 +8,16 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 
 public class Sprite extends Collision implements Renderable {
+
     static int hoverOffset = 6;
     BufferedImage asset;
     boolean isHover = false;
     int hoverWidth;
     int hoverHeight;
+
+    public Sprite(BufferedImage asset) {
+        this(0, 0, asset.getWidth(), asset.getHeight(), asset);
+    }
 
     /**
      * Khởi tạo {@code Sprite} với vị trí, kích thước và asset cho trước
@@ -30,8 +35,11 @@ public class Sprite extends Collision implements Renderable {
         this.asset = asset;
     }
 
-    public Sprite(BufferedImage asset) {
-        this(0, 0, asset.getWidth(), asset.getHeight(), asset);
+    @Override
+    public void setSize(int width, int height) {
+        super.setSize(width, height);
+        hoverWidth = width - hoverOffset;
+        hoverHeight = height - hoverOffset;
     }
 
     public Sprite(String filePath) {
@@ -52,10 +60,13 @@ public class Sprite extends Collision implements Renderable {
     }
 
     @Override
-    public void setSize(int width, int height) {
-        super.setSize(width, height);
-        hoverWidth = width - hoverOffset;
-        hoverHeight = height - hoverOffset;
+    public void render(Graphics g) {
+        if (isHover) {
+            g.drawImage(asset, getX() + hoverOffset / 2, getY() + hoverOffset / 2, hoverWidth, hoverHeight, null);
+        }
+        else {
+            g.drawImage(asset, getX(), getY(), getWidth(), getHeight(), null);
+        }
     }
 
     public BufferedImage getAsset() {
@@ -73,13 +84,9 @@ public class Sprite extends Collision implements Renderable {
         setHeight(asset.getHeight());
     }
 
-    @Override
-    public void render(Graphics g) {
-        if (isHover) {
-            g.drawImage(asset, getX() + hoverOffset / 2, getY() + hoverOffset / 2, hoverWidth, hoverHeight, null);
-        } else {
-            g.drawImage(asset, getX(), getY(), getWidth(), getHeight(), null);
-        }
+    public void rotate() {
+        asset = AssetUtils.rotate90(asset);
+        this.setSize(asset.getWidth(), asset.getHeight());
     }
 
     /**
