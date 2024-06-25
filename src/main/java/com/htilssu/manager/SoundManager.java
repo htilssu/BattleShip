@@ -19,6 +19,7 @@ public final class SoundManager {
     public static final int BACKGROUND_TEST = 5;
     public static final int BACKGROUND_MENU = 6;
     public static final int START_SOUND = 7;
+    public static boolean flagVolumeplaySound = true;
     public static final int ERROR_SOUND = 8;
     public static final int NOTIFY_SOUND = 9;
     private static final Map<Integer, String> soundMap = new HashMap<>();

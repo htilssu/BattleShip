@@ -22,6 +22,8 @@ public class Player2Screen extends JFrame implements ComponentListener {
     int size;
     boolean isbeginningOfTheGameOfPlayer1 = true;
     boolean isbeginningOfTheGameOfPlayer2 = true;
+    public static boolean flagVolumeplaySound = true;
+
     Start2Player battleShip;
     JLabel shipBeginning;
     private BufferedImage backgroundImage;
