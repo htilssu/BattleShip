@@ -40,6 +40,11 @@ public class AssetUtils {
     public static final int ASSET_BUTTON_3 = 18;
     public static final int ASSET_BUTTON_4 = 19;
     public static final int ASSET_SELECT = 20;
+    public static final int ASSET_BG_START = 21;
+    public static final int ASSET_BG_NEXT = 22;
+    public static final int ASSET_BG_ATTACK = 23;
+    public static final int ASSET_BG_SELFGRID = 24;
+    public static final int ASSET_BG_BTNLISTENER = 25;
 
     public static Font gameFont;
 
@@ -98,6 +103,11 @@ public class AssetUtils {
         assetMap.put(ASSET_BUTTON_3, loadImage("/images/button_3.png"));
         assetMap.put(ASSET_BUTTON_4, loadImage("/images/button_4.png"));
         assetMap.put(ASSET_SELECT, loadImage("/images/select_2.png"));
+        assetMap.put(ASSET_BG_START, loadImage("/images/BackgroundStart.png"));
+        assetMap.put(ASSET_BG_NEXT, loadImage("/images/BackgroundNext.png"));
+        assetMap.put(ASSET_BG_ATTACK, loadImage("/images/BackgroundAttack.png"));
+        assetMap.put(ASSET_BG_SELFGRID, loadImage("/images/BackgroundAttack.png"));
+        assetMap.put(ASSET_BG_BTNLISTENER, loadImage("/images/btnListener.png"));
 
     }
 

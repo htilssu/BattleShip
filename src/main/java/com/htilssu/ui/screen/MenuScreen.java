@@ -130,57 +130,6 @@ public class MenuScreen extends JPanel {
         return backgroundMusicClip;
     }
 
-    public void setBackgroundMusicClip(Clip clip) {
-        this.backgroundMusicClip = clip;
-    }
-
-    public void setVolume(int volume) {
-        if (backgroundMusicClip != null) {
-            FloatControl volumeControl =
-                    (FloatControl) backgroundMusicClip.getControl(FloatControl.Type.MASTER_GAIN);
-            float minVol = volumeControl.getMinimum();
-            float maxVolume = volumeControl.getMaximum();
-            float newVolume = -30 + Math.abs(-30 - maxVolume) * volume / 100;
-            GameLogger.log(newVolume + "");
-            volumeControl.setValue(newVolume);
-        }
-    }
-
-    private void playBackgroundMusic() {
-        try {
-            URL musicURL = getClass().getResource("/sounds/Action_4.wav"); // nhac nen
-            if (musicURL != null) { // neu tim dc nhac nen
-                AudioInputStream audioInputStream =
-                        AudioSystem.getAudioInputStream(
-                                musicURL); // Đoạn này tạo một AudioInputStream từ đường dẫn của tệp
-                // âm thanh. AudioInputStream là một luồng dữ liệu âm
-                // thanh có thể được sử dụng để đọc dữ liệu từ tệp âm
-                // thanh.
-                backgroundMusicClip =
-                        AudioSystem.getClip(); // òng này tạo một đối tượng Clip mới. Clip là một loại
-                // đối tượng trong Java Sound API được sử dụng để phát
-                // lại các tệp âm thanh ngắn.
-                backgroundMusicClip.open(
-                        audioInputStream); // Dòng này mở Clip với AudioInputStream đã được tạo
-                // trước đó, nạp dữ liệu âm thanh từ tệp vào bộ nhớ để
-                // chuẩn bị cho việc phát.
-                backgroundMusicClip.loop(
-                        Clip.LOOP_CONTINUOUSLY); // òng này thực hiện việc phát lại âm thanh lặp
-                // đi lặp lại không ngừng. Điều này có nghĩa là
-                // khi âm thanh kết thúc, nó sẽ tự động phát
-                // lại từ đầu.
-            }
-            // cac dong case la cac ngoai le khi xay ra loi
-        } catch (UnsupportedAudioFileException e) {
-            System.err.println("Unsupported audio file format: " + e.getMessage());
-        } catch (IOException e) {
-            System.err.println("Error reading the audio file: " + e.getMessage());
-        } catch (LineUnavailableException e) {
-            System.err.println("Audio line unavailable: " + e.getMessage());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
     @Override
     protected void paintComponent(Graphics g) {
