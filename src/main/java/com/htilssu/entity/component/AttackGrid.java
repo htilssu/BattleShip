@@ -62,7 +62,7 @@ public class AttackGrid extends BattleGrid {
     protected JPanel getCell()
     {
         GamePanel panel = new GamePanel();
-        panel.setBorder(BorderFactory.createLineBorder(Color.red, 1));
+        panel.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
         panel.setPreferredSize(new Dimension(38, 38));
 
         panel.setBackground(new Color(0, 0, 0, 0)); // Đặt màu nền trong suốt
