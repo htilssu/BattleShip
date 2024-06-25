@@ -120,7 +120,7 @@ public class Client extends MultiHandler implements Runnable {
     /**
      * Ngắt kết nối giữa client và host
      */
-    public void disconnect() {
+    public synchronized void disconnect() {
         try {
             if (isConnected()) socket.close();
         } catch (IOException e) {

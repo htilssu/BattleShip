@@ -51,6 +51,15 @@ public class Ship extends Collision implements Renderable {
         this.sprite = sprite;
     }
 
+    public Ship(Ship ship) {
+        super();
+        this.direction = ship.direction;
+        this.sprite = new Sprite(ship.sprite);
+        this.position = new Position(ship.position.x, ship.position.y);
+        this.shipType = ship.shipType;
+        this.playerBoard = ship.playerBoard;
+    }
+
     public int getDirection() {
         return direction;
     }

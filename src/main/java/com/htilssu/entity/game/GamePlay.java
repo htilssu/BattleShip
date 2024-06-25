@@ -132,8 +132,10 @@ public class GamePlay implements Renderable {
     public void handleClick(Point position) {
         switch (gameMode) {
             case PLAY_MODE -> {
+
                 //check if it's not current player turn
                 if (!getCurrentPlayer().getId().equals(GameManager.gamePlayer.getId())) return;
+
                 PlayerBoard board = getOpponent().getBoard();
 
                 if (!board.isInside(position)) return;
@@ -235,7 +237,11 @@ public class GamePlay implements Renderable {
         }
     }
 
-    //Dat thuyen thanh cong ?
+    /**
+     * Xử lý việc thêm tàu vào bảng
+     *
+     * @param playerBoard bảng của người chơi
+     */
     private void handleAddShipToBoard(PlayerBoard playerBoard) {
         Position mousePos = playerBoard.getBoardRowCol(setUpSprite.getX() + 1, setUpSprite.getY() + 1);
         float ratio = (float) setUpSprite.getHeight() / setUpSprite.getWidth();
@@ -244,16 +250,21 @@ public class GamePlay implements Renderable {
         }
         Ship ship = new Ship(direction, new Sprite(setUpSprite), mousePos, (int) ratio);
         ship.setDirection(direction);
+
         if (!playerBoard.canAddShip(ship)) {
             SoundManager.playSound(SoundManager.ERROR_SOUND);
             return;
         }
+
+        //Dat thuyen thanh cong
         int count = shipInBoard.get((int) ratio);
         if (count == 0) return;
         SoundManager.playSound(SoundManager.PUT_SHIP_SOUND);
         playerBoard.addShip(ship);
         count--;
         shipInBoard.replace((int) ratio, count);
+
+        //reset status if ship placed
         if (count == 0) {
             direction = VERTICAL;
             setUpSprite = null;
@@ -263,7 +274,12 @@ public class GamePlay implements Renderable {
     private void unReady() {
         isReady = false;
         readyButton.setAsset(AssetUtils.getImage(AssetUtils.ASSET_READY_BUTTON), null);
-        Client.getInstance().send(GameAction.UNREADY);
+        if (Host.getInstance().isConnected()) {
+            Host.getInstance().unReady();
+        }
+        else {
+            Client.getInstance().send(GameAction.UNREADY);
+        }
     }
 
     /**
@@ -398,7 +414,7 @@ public class GamePlay implements Renderable {
      */
     private void renderPlayMode(Graphics g) {
         renderShootBoard(g);
-        renderSelfBoard(g);
+        renderPreviewBoard(g);
 
         //render select sprite
         if (isSelectSpriteInBoard && getCurrentPlayer().getId().equals(GameManager.gamePlayer.getId()))
@@ -413,9 +429,10 @@ public class GamePlay implements Renderable {
     }
 
     /**
-     * Vẽ bảng người chơi hiện tại đang đến lượt chơi
+     * Vẽ bảng của đối thủ của người chơi hiện tại
      */
-    private void renderSelfBoard(Graphics g) {
+    private void renderPreviewBoard(Graphics g) {
+        var tempBoard = new PlayerBoard(getCurrentPlayer().getBoard());
     }
 
     public int getGameMode() {

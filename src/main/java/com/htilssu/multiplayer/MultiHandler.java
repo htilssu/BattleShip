@@ -13,7 +13,6 @@ import com.htilssu.manager.DifficultyManager;
 import com.htilssu.manager.GameManager;
 import com.htilssu.manager.ScreenManager;
 import com.htilssu.manager.ShipManager;
-import com.htilssu.ui.component.GamePanel;
 import com.htilssu.ui.screen.NetworkScreen;
 import com.htilssu.util.GameLogger;
 
@@ -70,7 +69,6 @@ public abstract class MultiHandler {
     private void handle(String message) {
         List<String> messageParts = Arrays.asList(message.split("\\|"));
         GameManager gameManager = battleShip.getGameManager();
-        GamePanel screen = (GamePanel) gameManager.getCurrentGamePlay().getScreen();
         Integer action = null;
         try {
             action = Integer.parseInt(messageParts.getFirst());
