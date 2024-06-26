@@ -56,7 +56,7 @@ public class GamePlay implements Renderable {
     private int timeCountDown;
     private int winner = -1;
     private boolean isReady = false;
-    private int gameMode = PLAY_MODE;
+    private int gameMode = SETUP_MODE;
     private int turn;
     private int direction = VERTICAL;
     private Sprite setUpSprite;

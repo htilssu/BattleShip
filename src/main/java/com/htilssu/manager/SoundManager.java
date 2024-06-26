@@ -17,11 +17,10 @@ public final class SoundManager {
     public static final int BACKGROUND_TEST = 5;
     public static final int BACKGROUND_MENU = 6;
     public static final int START_SOUND = 7;
-    public static boolean flagVolumeplaySound = true;
     public static final int ERROR_SOUND = 8;
     public static final int NOTIFY_SOUND = 9;
     private static final Map<Integer, String> soundMap = new HashMap<>();
-
+    public static boolean flagVolumeplaySound = true;
     static boolean isBackgroundPlaying = false;
     private static int currentVolume = 100; // Giá trị âm lượng mặc định (0-100)
     private static Clip backgroundClip;
@@ -71,6 +70,16 @@ một AudioInputStream mới sẽ được tạo và sử dụng, am thanh co th
         }
     }
 
+    public static void setVolume(Clip clip, int volume) {
+        if (clip != null) {
+            FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+            float minVol = gainControl.getMinimum();
+            float maxVolume = gainControl.getMaximum();
+            float newVolume = -30 + Math.abs(-30 - maxVolume) * volume / 100;
+            gainControl.setValue(newVolume);
+        }
+    }
+
     ///ham nay dung de lap lai am thanh
     public static synchronized void playBackGround(int backgroundSound) {
 
@@ -101,32 +110,6 @@ một AudioInputStream mới sẽ được tạo và sử dụng, am thanh co th
         } catch (LineUnavailableException | IOException e) {
             GameLogger.log(e.getMessage());
 
-        }
-    }
-    //Tắt âm thanh nền
-    public static void muteBackGround() {
-        if (backgroundVolumeControl != null) {
-            backgroundVolumeControl.setValue(backgroundVolumeControl.getMinimum());
-        }
-    }
-    //Bật âm thanh nền:
-    public static void unmuteBackGround() {
-        if (backgroundVolumeControl != null) {
-            backgroundVolumeControl.setValue(0);  // Đặt âm lượng về mức bình thường
-        }
-    }
-
-    //Tắt âm thanh nền
-    public static void muteBackGround() {
-        if (backgroundVolumeControl != null) {
-            backgroundVolumeControl.setValue(backgroundVolumeControl.getMinimum());
-        }
-    }
-
-    //Bật âm thanh nền:
-    public static void unmuteBackGround() {
-        if (backgroundVolumeControl != null) {
-            backgroundVolumeControl.setValue(0);  // Đặt âm lượng về mức bình thường
         }
     }
 
