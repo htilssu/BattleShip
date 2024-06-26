@@ -5,6 +5,7 @@ import com.htilssu.util.AssetUtils;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 
 public abstract class BattleGrid extends JPanel {
@@ -35,7 +36,26 @@ public abstract class BattleGrid extends JPanel {
   protected void paintComponent(Graphics g) {
     super.paintComponent(g);
     if (backgroundImage != null) {
-      g.drawImage(backgroundImage, 0, 0, this.getWidth(), this.getHeight(), this);
+      Graphics2D g2 = (Graphics2D) g.create();
+      g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+      int arc = 20; // Bán kính góc bo tròn
+      int borderWidth = 5; // Độ rộng viền
+      int width = getWidth() - borderWidth;
+      int height = getHeight() - borderWidth;
+
+      // Vẽ viền
+      RoundRectangle2D border = new RoundRectangle2D.Float(borderWidth / 2, borderWidth / 2, width, height, arc, arc);
+      g2.setColor(Color.BLACK);
+      g2.setStroke(new BasicStroke(borderWidth));
+      g2.draw(border);
+
+      // Vẽ nền với góc bo tròn
+      RoundRectangle2D background = new RoundRectangle2D.Float(borderWidth / 2, borderWidth / 2, width, height, arc, arc);
+      g2.setClip(background);
+      g2.drawImage(backgroundImage, borderWidth / 2, borderWidth / 2, width, height, this);
+
+      g2.dispose();
     }
   }
 

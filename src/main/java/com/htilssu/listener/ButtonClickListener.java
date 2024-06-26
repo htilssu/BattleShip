@@ -6,8 +6,7 @@ import com.htilssu.ui.screen.Player2Screen;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.JButton;
-import javax.swing.JLabel;
+import javax.swing.*;
 
 public class ButtonClickListener implements ActionListener {
     private String name;
@@ -27,8 +26,21 @@ public class ButtonClickListener implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getActionCommand().equals("next")) {
+            int size = 0;
             if (name.equals("Player1")) {
-                int size = battleShip.getPlayer1Data().getFleet().size();
+                size = battleShip.getPlayer1Data().getFleet().size();
+            } else if (name.equals("Player2")) {
+                size = battleShip.getPlayer2Data().getFleet().size();
+            }
+
+            //loi
+            if (size < 1) {
+                JOptionPane JOptionPane = new JOptionPane();
+                JOptionPane.showMessageDialog(null, "Vui long dat Tau!.");
+                return; // Stop further execution
+            }
+
+            if (name.equals("Player1")) {
                 if (isbeginningOfTheGameOfPlayer1) {
                     shipBeginning.setText(Integer.toString(size));
                     isbeginningOfTheGameOfPlayer1 = false;
@@ -40,7 +52,7 @@ public class ButtonClickListener implements ActionListener {
                 battleShip.getPlayer2().showScreen();
             }
             if (name.equals("Player2")) {
-                int size = battleShip.getPlayer2Data().getFleet().size();
+                size = battleShip.getPlayer2Data().getFleet().size();
                 if (isbeginningOfTheGameOfPlayer1) {
                     shipBeginning.setText(Integer.toString(size));
                     isbeginningOfTheGameOfPlayer1 = false;
@@ -50,13 +62,6 @@ public class ButtonClickListener implements ActionListener {
                 }
                 player.hideScreen();
                 battleShip.getPlayer1().showScreen();
-            }
-        } else if (e.getActionCommand().equals("Đặt Dọc")) {
-            JButton button = (JButton) e.getSource();
-            if (button.getText().equals("Đặt Dọc")) {
-                button.setText("Đặt Ngang");
-            } else {
-                button.setText("Đặt Dọc");
             }
         }
     }
