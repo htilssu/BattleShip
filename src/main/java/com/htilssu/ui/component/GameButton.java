@@ -1,6 +1,7 @@
 package com.htilssu.ui.component;
 
 import com.htilssu.util.AssetUtils;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -16,6 +17,16 @@ public class GameButton extends JButton {
         this();
         this.backgroundImage = bufferedImage;
     }
+
+    public GameButton() {
+        super();
+        setFont(AssetUtils.gameFont.deriveFont(20f));
+        setBorderPainted(false);
+        setContentAreaFilled(false);
+        setOpaque(false);
+        setFocusPainted(false);
+    }
+
     //dung de xet su kien re chuot de thay doi background
     public GameButton(BufferedImage normalImage, int a) throws HeadlessException {
         this();
@@ -39,15 +50,6 @@ public class GameButton extends JButton {
         });
     }
 
-    public GameButton() {
-        super();
-        setFont(AssetUtils.gameFont.deriveFont(20f));
-        setBorderPainted(false);
-        setContentAreaFilled(false);
-        setOpaque(false);
-        setFocusPainted(false);
-    }
-
     public void setBackgroundImage(BufferedImage backgroundImage) {
         this.backgroundImage = backgroundImage;
     }
@@ -64,4 +66,7 @@ public class GameButton extends JButton {
         }
     }
 
+    protected void setTextSize(int size) {
+        this.setFont(getFont().deriveFont((float) size));
+    }
 }

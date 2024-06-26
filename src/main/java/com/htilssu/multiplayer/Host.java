@@ -62,6 +62,7 @@ public class Host extends MultiHandler implements Runnable {
 
             if (socket != null) {
                 readData(socket);
+                socket = null;
             }
         }
     }

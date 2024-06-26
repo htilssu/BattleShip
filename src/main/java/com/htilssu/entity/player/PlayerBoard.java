@@ -73,6 +73,9 @@ public class PlayerBoard extends Collision implements Renderable {
             addShip(new Ship(ship));
         }
         this.shotBoard = new byte[size][size];
+        for (int i = 0; i < size; i++) {
+            System.arraycopy(board.shotBoard[i], 0, shotBoard[i], 0, size);
+        }
         this.bg = AssetUtils.getImage(AssetUtils.ASSET_BACK_SEA);
     }
 

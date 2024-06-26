@@ -11,8 +11,8 @@ import java.util.List;
 public final class GameManager {
 
     public static final int MAX_PLAYER = 2;
-    public static final int MIN_PLAYER = 1;
     public static final Player gamePlayer = new Player();
+    public static final int TIME_PER_TURN = 35;
     public int turn = 0;
     BattleShip battleShip;
     List<Player> players;

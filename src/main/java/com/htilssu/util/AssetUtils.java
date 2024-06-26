@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class AssetUtils {
+
     public static final int ASSET_BOARD_FRAME = 1;
     public static final int ASSET_SHOOT_MISS = 2;
     public static final int ASSET_SHOOT_HIT = 3;
@@ -45,9 +46,12 @@ public class AssetUtils {
     public static final int ASSET_BG_ATTACK = 23;
     public static final int ASSET_BG_SELFGRID = 24;
     public static final int ASSET_BG_BTNLISTENER = 25;
+    public static final int ASSET_TEXT_FIELD_2 = 26;
+    public static final int ASSET_PROGRESS_BACKGROUND = 27;
+    public static final int ASSET_PROGRESS = 28;
+    public static final int ASSET_HOLDER = 29;
 
     public static Font gameFont;
-
 
     static Map<Integer, BufferedImage> assetMap = new HashMap<>();
 
@@ -108,13 +112,17 @@ public class AssetUtils {
         assetMap.put(ASSET_BG_ATTACK, loadImage("/images/BackgroundAttack.png"));
         assetMap.put(ASSET_BG_SELFGRID, loadImage("/images/BackgroundAttack.png"));
         assetMap.put(ASSET_BG_BTNLISTENER, loadImage("/images/btnListener.png"));
-
+        assetMap.put(ASSET_TEXT_FIELD_2, loadImage("/images/text_bg.png"));
+        assetMap.put(ASSET_PROGRESS, loadImage("/images/healthbarProgress.png"));
+        assetMap.put(ASSET_PROGRESS_BACKGROUND, loadImage("/images/healthbarUnder.png"));
+        assetMap.put(ASSET_HOLDER, loadImage("/images/holder.png"));
     }
 
     /**
      * Phương thức load asset từ resources folder. Nếu không load được sẽ trả về null
      *
      * @param path đường dẫn file phải bắt đầu bằng /
+     *
      * @return trả về {@link BufferedImage} nếu load thành công, ngược lại trả về {@code null}
      */
     public static BufferedImage loadImage(String path) {
@@ -133,6 +141,7 @@ public class AssetUtils {
      * Phương thức làm mờ ảnh
      *
      * @param image ảnh cần làm mờ
+     *
      * @return ảnh đã được làm mờ
      */
     public static BufferedImage blur(@Nullable BufferedImage image) {
@@ -162,6 +171,7 @@ public class AssetUtils {
      * AssetUtils#initAsset()}
      *
      * @param assetBoardFrame id của asset cần lấy
+     *
      * @return trả về {@link BufferedImage} nếu asset tồn tại, ngược lại trả về {@code null}
      */
     public static BufferedImage getImage(int assetBoardFrame) {
