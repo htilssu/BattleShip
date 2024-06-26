@@ -2,12 +2,10 @@ package com.htilssu.entity.component;
 
 import com.htilssu.dataPlayer.PlayerData;
 import com.htilssu.manager.SoundManager;
-
 import com.htilssu.ui.component.GamePanel;
 import com.htilssu.ui.screen.Player2Screen;
 import com.htilssu.ui.screen.Start2Player;
 import com.htilssu.util.AssetUtils;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -62,7 +60,7 @@ public class AttackGrid extends BattleGrid {
     protected JPanel getCell()
     {
         GamePanel panel = new GamePanel();
-        panel.setBorder(BorderFactory.createLineBorder(Color.red, 1));
+        panel.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
         panel.setPreferredSize(new Dimension(38, 38));
 
         panel.setBackground(new Color(0, 0, 0, 0)); // Đặt màu nền trong suốt
@@ -98,20 +96,22 @@ public class AttackGrid extends BattleGrid {
 
                             boolean isSunk = battleShip.getPlayer2Data().isSunk(hit);
                             if (isSunk) {
+                                //kiem tra chien thang truoc
+                                boolean lost = battleShip.getPlayer2Data().isPlayerLost();
+                                if (lost) {
+                                    battleShip.setState(battleShip.getEndOfTheGame());
+                                    JOptionPane.showMessageDialog(null, "You(player 1) WON! Congratulations!\nClick OK will Exit the game");
+                                    battleShip.player1Turn();
+                                }
+
                                 enemyShipSunkPlayer1++;
                                 battleShip.getPlayer1().enemyShipSunk.setText(Integer.toString(enemyShipSunkPlayer1));
-                                JOptionPane.showMessageDialog(panel, "Thuyen dich bi danh chim!\nnhan OK chuyen sang man hinh player2");
+                                JOptionPane.showMessageDialog(null,"Thuyen dich bi danh chim!\nnhan OK chuyen sang man hinh player2");
                                 player.hideScreen();
                                 battleShip.getPlayer2().showScreen();
                                 String ownShipSunkPlayer2 = Integer.toString(battleShip.getPlayer2Data().getNumberOfOwnShipSunk());
                                 battleShip.getPlayer2().ownShipSunk.setText(ownShipSunkPlayer2);
                             }
-                        }
-                        boolean lost = battleShip.getPlayer2Data().isPlayerLost();
-                        if (lost) {
-                            battleShip.setState(battleShip.getEndOfTheGame());
-                            JOptionPane.showMessageDialog(panel, "You(player 1) WON! Congratulations!\nClick OK will Exit the game");
-                            battleShip.player1Turn();
                         }
 
                     }
@@ -137,20 +137,22 @@ public class AttackGrid extends BattleGrid {
 
                             boolean isSunk = battleShip.getPlayer1Data().isSunk(hit);
                             if (isSunk) {
+                                //kiem tra chien thang truoc
+                                boolean lost = battleShip.getPlayer1Data().isPlayerLost();
+                                if (lost) {
+                                    battleShip.setState(battleShip.getEndOfTheGame());
+                                    JOptionPane.showMessageDialog(null, "You(player 2) WON! Congratulations!\nClick OK will Exit the game");
+                                    battleShip.player2turn();
+                                }
+
                                 enemyShipSunkPlayer2++;
                                 battleShip.getPlayer2().enemyShipSunk.setText(Integer.toString(enemyShipSunkPlayer2));
-                                JOptionPane.showMessageDialog(panel, "Chuc mung! Thuyen da duoc danh chim!\nnhan OK chuyen sang man hinh player1");
+                                JOptionPane.showMessageDialog(null, "Chuc mung! Thuyen da duoc danh chim!\nnhan OK chuyen sang man hinh player1");
                                 player.hideScreen();
                                 battleShip.getPlayer1().showScreen();
                                 String ownShipSunkPlayer1 = Integer.toString(battleShip.getPlayer1Data().getNumberOfOwnShipSunk());
                                 battleShip.getPlayer1().ownShipSunk.setText(ownShipSunkPlayer1);
                             }
-                        }
-                        boolean lost = battleShip.getPlayer1Data().isPlayerLost();
-                        if (lost) {
-                            battleShip.setState(battleShip.getEndOfTheGame());
-                            JOptionPane.showMessageDialog(panel, "You(player 2) WON! Congratulations!\nClick OK will Exit the game");
-                            battleShip.player2turn();
                         }
                     }
                 }
@@ -207,7 +209,6 @@ public class AttackGrid extends BattleGrid {
 
     public void setAttackGridListener (boolean attackGridListener){
         this.isAttackGridListener = attackGridListener;
-
     }
     public void getJpanel(Point newPoint){
         thePanel = this.getComponentAt(newPoint);
