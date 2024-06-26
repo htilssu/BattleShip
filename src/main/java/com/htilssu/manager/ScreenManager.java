@@ -53,13 +53,6 @@ public final class ScreenManager {
         screenMap.put(NETWORK_SCREEN, new NetworkScreen(battleShip));
         screenMap.put(PICK_SCREEN, new PickScreen(battleShip));
         screenMap.put(START2_PLAYER_SCREEN, new Start2Player(battleShip));   ///test
-        updateScreenSize();
-    }
-
-    public void updateScreenSize() {
-        for (JPanel screen : screenMap.values()) {
-            //            //      screen.setPreferredSize(new Dimension(battleShip.getWidth(), battleShip.getHeight()));
-        }
     }
 
     public BattleShip getBattleShip() {

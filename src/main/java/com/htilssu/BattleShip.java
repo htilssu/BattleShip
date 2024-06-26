@@ -79,8 +79,9 @@ public class BattleShip extends JFrame implements Runnable, KeyListener, Compone
         setResizable(false);
         addComponentListener(this);
         setExtendedState(Frame.MAXIMIZED_BOTH);
+        gameManager.createTestGamePlay();
+//        gameManager.getCurrentGamePlay().setGameMode(GamePlay.PLAY_MODE);
 
-        screenManager.updateScreenSize();
     }
 
     /**
@@ -244,7 +245,6 @@ public class BattleShip extends JFrame implements Runnable, KeyListener, Compone
             GameSetting.SCALE = 1;
         }
 
-        screenManager.updateScreenSize();
         setLocationRelativeTo(null);
         pack();
         setVisible(true);

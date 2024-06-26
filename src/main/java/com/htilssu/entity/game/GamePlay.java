@@ -14,11 +14,16 @@ import com.htilssu.multiplayer.Client;
 import com.htilssu.multiplayer.Host;
 import com.htilssu.render.Renderable;
 import com.htilssu.setting.GameSetting;
+import com.htilssu.ui.component.GameButton;
+import com.htilssu.ui.component.GameLabel;
+import com.htilssu.ui.component.GamePanel;
+import com.htilssu.ui.component.GameProgress;
 import com.htilssu.util.AssetUtils;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -37,14 +42,21 @@ public class GamePlay implements Renderable {
     public static final int END_MODE = 2;
     private static final int MARGIN = 30;
     public final Map<Integer, Sprite> sprites = new HashMap<>();
+    private final GameButton previewLabel = new GameButton(AssetUtils.getImage(AssetUtils.ASSET_TEXT_FIELD_2)) {{
+        this.setText("Preview Board");
+        this.setTextSize(24);
+    }};
+    private final Timer timer;
+    private final GameProgress gameProgress = new GameProgress(GameManager.TIME_PER_TURN);
     private final Map<Integer, Integer> shipInBoard = new HashMap<>();
     private final List<Player> playerList;
     private final int size;
     private final Sprite selectSprite;
     private final Sprite readyButton = new Sprite(AssetUtils.getImage(AssetUtils.ASSET_READY_BUTTON));
+    private int timeCountDown;
     private int winner = -1;
     private boolean isReady = false;
-    private int gameMode = SETUP_MODE;
+    private int gameMode = PLAY_MODE;
     private int turn;
     private int direction = VERTICAL;
     private Sprite setUpSprite;
@@ -52,13 +64,14 @@ public class GamePlay implements Renderable {
     private GameManager gameManager;
     private boolean isSelectSpriteInBoard;
     private BattleShip battleShip;
+    private Cursor playerCursor;
+    private GamePanel targetPanel;
 
     {
         sprites.put(Ship.SHIP_2, new Sprite(AssetUtils.getImage(AssetUtils.ASSET_SHIP_2)));
         sprites.put(Ship.SHIP_3, new Sprite(AssetUtils.getImage(AssetUtils.ASSET_SHIP_3)));
         sprites.put(Ship.SHIP_4, new Sprite(AssetUtils.getImage(AssetUtils.ASSET_SHIP_4)));
         sprites.put(Ship.SHIP_5, new Sprite(AssetUtils.getImage(AssetUtils.ASSET_SHIP_5)));
-
     }
 
     {
@@ -78,8 +91,53 @@ public class GamePlay implements Renderable {
         this.turn = turn;
         this.size = size;
         selectSprite = new Sprite(AssetUtils.getImage(AssetUtils.ASSET_SELECT));
+        timer = new Timer(5, e -> {
+            timeCountDown--;
+            gameProgress.setProgress(timeCountDown);
+            if (timeCountDown == 0) {
+                if (battleShip.getHost().isConnected()) {
+                    battleShip.getHost().send(GameAction.END_TURN);
+                    endTurn();
+                }
 
+                resetCountDown();
+                startCount();
+            }
+        });
+
+        initTargetBoard();
+        resetCountDown();
         initBoard();
+    }
+
+    /**
+     * Kết thúc lượt chơi của người chơi hiện tại
+     */
+    public void endTurn() {
+        turn = (turn + 1) % playerList.size();
+
+
+        resetCountDown();
+        startCount();
+    }
+
+    public void resetCountDown() {
+        timeCountDown = GameManager.TIME_PER_TURN * 200;
+    }
+
+    public void startCount() {
+        timer.start();
+    }
+
+    private void initTargetBoard() {
+        targetPanel = new GamePanel(AssetUtils.getImage(AssetUtils.ASSET_HOLDER));
+        //set vertical layout
+        targetPanel.setLayout(new BoxLayout(targetPanel, BoxLayout.Y_AXIS));
+
+        targetPanel.add(new GameLabel("Target") {{
+            this.setFontSize(30);
+        }});
+
     }
 
     private void initBoard() {
@@ -188,6 +246,11 @@ public class GamePlay implements Renderable {
         return playerList.get((turn + 1) % playerList.size());
     }
 
+    /**
+     * Bắn vào vị trí {@code pos}
+     *
+     * @param pos vị trí cần bắn
+     */
     private void shoot(Position pos) {
 
         if (battleShip.getHost().isConnected()) {
@@ -196,6 +259,10 @@ public class GamePlay implements Renderable {
         else {
             battleShip.getClient().sendShoot(pos);
         }
+
+        timer.stop();
+        resetCountDown();
+        SoundManager.playSound(SoundManager.ATTACK_SOUND);
 
         battleShip.getListenerManager()
                 .callEvent(new PlayerShootEvent(getCurrentPlayer(), getOpponent().getBoard(), pos), gameManager);
@@ -333,6 +400,15 @@ public class GamePlay implements Renderable {
             case PLAY_MODE -> {
                 PlayerBoard playerBoard = getCurrentPlayer().getBoard();
                 if (playerBoard.isInside(point)) {
+                    if (playerCursor == null) playerCursor = getScreen().getCursor();
+                    //hide cursor
+                    getScreen().setCursor(getScreen().getToolkit()
+                                                  .createCustomCursor(new BufferedImage(1,
+                                                                                        1,
+                                                                                        BufferedImage.TYPE_INT_ARGB),
+                                                                      new Point(0, 0),
+                                                                      "null"));
+
                     var mouseLocation = playerBoard.getBoardRowCol(point);
                     selectSprite.setSize(playerBoard.getCellSize(), playerBoard.getCellSize());
                     selectSprite.setLocation(playerBoard.getX() + mouseLocation.x * playerBoard.getCellSize(),
@@ -340,7 +416,13 @@ public class GamePlay implements Renderable {
 
                     isSelectSpriteInBoard = true;
                 }
-                else isSelectSpriteInBoard = false;
+                else {
+                    isSelectSpriteInBoard = false;
+                    if (playerCursor != null) {
+                        getScreen().setCursor(playerCursor);
+                        playerCursor = null;
+                    }
+                }
             }
         }
     }
@@ -349,11 +431,8 @@ public class GamePlay implements Renderable {
         readyButton.handleHover(point.x, point.y);
     }
 
-    /**
-     * Kết thúc lượt chơi của người chơi hiện tại
-     */
-    public void endTurn() {
-        turn = (turn + 1) % playerList.size();
+    public JPanel getScreen() {
+        return battleShip.getScreenManager().getCurrentScreen();
     }
 
     /**
@@ -415,6 +494,10 @@ public class GamePlay implements Renderable {
     private void renderPlayMode(Graphics g) {
         renderShootBoard(g);
         renderPreviewBoard(g);
+        renderTargetPanel();
+
+        getScreen().add(gameProgress);
+        getScreen().add(targetPanel);
 
         //render select sprite
         if (isSelectSpriteInBoard && getCurrentPlayer().getId().equals(GameManager.gamePlayer.getId()))
@@ -432,7 +515,32 @@ public class GamePlay implements Renderable {
      * Vẽ bảng của đối thủ của người chơi hiện tại
      */
     private void renderPreviewBoard(Graphics g) {
-        var tempBoard = new PlayerBoard(getCurrentPlayer().getBoard());
+        PlayerBoard playerBoard = getCurrentPlayer().getBoard();
+        int startX = playerBoard.getWidth() + playerBoard.getX();
+        int remainWidth = getScreen().getWidth() - startX;
+
+        var tempBoard = new PlayerBoard(playerBoard);
+        tempBoard.setSize(300, 300);
+
+        int startXWithMargin = startX + (remainWidth - tempBoard.getWidth()) / 2;
+
+
+        tempBoard.setLocation(startXWithMargin, 100);
+        tempBoard.update();
+        tempBoard.render(g);
+
+        //game preview label
+        getScreen().add(previewLabel);
+        previewLabel.setBounds(startXWithMargin, tempBoard.getY() + tempBoard.getHeight() + 20, 300, 70);
+
+    }
+
+    private void renderTargetPanel() {
+        var playerBoard = getCurrentPlayer().getBoard();
+
+        targetPanel.setSize(playerBoard.getX() - 50, playerBoard.getHeight());
+
+        targetPanel.setLocation(25, playerBoard.getY());
     }
 
     public int getGameMode() {
@@ -492,6 +600,9 @@ public class GamePlay implements Renderable {
                     //set center location
                     playerBoard.setLocation(currentScreen.getWidth() / 2 - playerBoard.getWidth() / 2, 100);
                     playerBoard.update();
+                    startCount();
+                    gameProgress.setSize(currentScreen.getWidth() - 100, 30);
+                    gameProgress.setLocation(50, 25);
                 }
             }
         }
@@ -521,7 +632,12 @@ public class GamePlay implements Renderable {
         setDirection((direction + 1) % 2);
     }
 
-    public Component getScreen() {
-        return battleShip.getScreenManager().getCurrentScreen();
+    /**
+     * Hàm xóa các component khỏi playscreen
+     */
+    public void destroy() {
+        getScreen().remove(previewLabel);
+        getScreen().remove(gameProgress);
+        getScreen().remove(targetPanel);
     }
 }

@@ -11,8 +11,6 @@ import java.util.Map;
 public final class SoundManager {
 
     public static final int BOOM_SOUND = 1;
-    private static int currentVolume = 100; // Giá trị âm lượng mặc định (0-100)
-
     public static final int DUCK_SOUND = 2;
     public static final int PUT_SHIP_SOUND = 3;
     public static final int ATTACK_SOUND = 4;
@@ -22,8 +20,13 @@ public final class SoundManager {
     public static final int ERROR_SOUND = 8;
     public static final int NOTIFY_SOUND = 9;
     private static final Map<Integer, String> soundMap = new HashMap<>();
+    public static boolean flagVolumeplaySound = true;
+    public static boolean flagVolumePlaySound = true;
+
     static boolean isBackgroundPlaying = false;
+    private static int currentVolume = 100; // Giá trị âm lượng mặc định (0-100)
     private static Clip backgroundClip;
+    private static FloatControl backgroundVolumeControl; //dieu chinh am luong
 
     static {
         soundMap.put(BOOM_SOUND, "/sounds/A_BoomSound.wav");
@@ -38,6 +41,8 @@ public final class SoundManager {
     }
 
     public static synchronized void playSound(int soundName) {
+        if (!flagVolumePlaySound) return;
+
         String filePath = soundMap.get(soundName);
         if (filePath == null) {
             System.err.println("Sound not found: " + soundName);
@@ -65,8 +70,21 @@ một AudioInputStream mới sẽ được tạo và sử dụng, am thanh co th
             GameLogger.log(e.getMessage());
         }
     }
-///ham nay dung de lap lai am thanh
+
+    public static void setVolume(Clip clip, int volume) {
+        if (clip != null) {
+            FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+            float minVol = -30;
+            float maxVolume = gainControl.getMaximum();
+            float newVolume = minVol + Math.abs(minVol - maxVolume) * volume / 100;
+            gainControl.setValue(newVolume);
+        }
+    }
+
+    ///ham nay dung de lap lai am thanh
     public static synchronized void playBackGround(int backgroundSound) {
+
+
         String filePath = soundMap.get(backgroundSound);
         if (filePath == null) {
             System.err.println("Background sound not found: " + backgroundSound);
@@ -88,23 +106,25 @@ một AudioInputStream mới sẽ được tạo và sử dụng, am thanh co th
             backgroundClip = AudioSystem.getClip();
             backgroundClip.open(audioInputStream);
             setVolume(backgroundClip, currentVolume); //  Đặt âm lượng cho nhạc nền
-            backgroundClip.start();
-            backgroundClip.loop(Clip.LOOP_CONTINUOUSLY);
+//            backgroundClip.loop(Clip.LOOP_CONTINUOUSLY);
             isBackgroundPlaying = true;
-
         } catch (LineUnavailableException | IOException e) {
             GameLogger.log(e.getMessage());
 
         }
     }
 
-    public static void setVolume(Clip clip, int volume) {
-        if (clip != null) {
-            FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
-            float minVol = gainControl.getMinimum();
-            float maxVolume = gainControl.getMaximum();
-            float newVolume = -30 + Math.abs(-30 - maxVolume) * volume / 100;
-            gainControl.setValue(newVolume);
+    //Tắt âm thanh nền
+    public static void muteBackGround() {
+        if (backgroundVolumeControl != null) {
+            backgroundVolumeControl.setValue(backgroundVolumeControl.getMinimum());
+        }
+    }
+
+    //Bật âm thanh nền:
+    public static void unmuteBackGround() {
+        if (backgroundVolumeControl != null) {
+            backgroundVolumeControl.setValue(0);  // Đặt âm lượng về mức bình thường
         }
     }
 
@@ -126,6 +146,7 @@ một AudioInputStream mới sẽ được tạo và sử dụng, am thanh co th
     public static Clip getBackgroundClip() {
         return backgroundClip;
     }
+
     ///ham delay
     public static void wait_Giay(int milliseconds) {
         try {

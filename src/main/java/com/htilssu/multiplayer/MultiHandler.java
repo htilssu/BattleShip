@@ -26,8 +26,7 @@ import java.util.Random;
 
 import static com.htilssu.entity.player.PlayerBoard.SHOOT_HIT;
 import static com.htilssu.entity.player.PlayerBoard.SHOOT_MISS;
-import static com.htilssu.event.game.GameAction.END_GAME;
-import static com.htilssu.event.game.GameAction.RESPONSE_SHOOT;
+import static com.htilssu.event.game.GameAction.*;
 import static com.htilssu.manager.GameManager.gamePlayer;
 import static com.htilssu.manager.ScreenManager.NETWORK_SCREEN;
 
@@ -69,6 +68,7 @@ public abstract class MultiHandler {
     private void handle(String message) {
         List<String> messageParts = Arrays.asList(message.split("\\|"));
         GameManager gameManager = battleShip.getGameManager();
+        GamePlay currentGamePlay = gameManager.getCurrentGamePlay();
         Integer action = null;
         try {
             action = Integer.parseInt(messageParts.getFirst());
@@ -174,9 +174,12 @@ public abstract class MultiHandler {
                     break;
 
                 case END_GAME:
-                    var currentGamePlay = gameManager.getCurrentGamePlay();
                     currentGamePlay.setGameMode(GamePlay.END_MODE);
                     currentGamePlay.setWinner(0);
+                    break;
+
+                case END_TURN:
+                    currentGamePlay.endTurn();
                     break;
 
                 default:
@@ -218,6 +221,11 @@ public abstract class MultiHandler {
                 gamePlay.setWinner(1);
             }
             if (responseStatus == SHOOT_MISS) gamePlay.endTurn();
+            else {
+                gamePlay.resetCountDown();
+                gamePlay.startCount();
+            }
+
 
             battleShip.getListenerManager()
                     .callEvent(new PlayerShootEvent(currentPlayer, gamePlay.getOpponent().getBoard(), pos),
@@ -256,6 +264,11 @@ public abstract class MultiHandler {
         playerBoard.shoot(pos, shootStatus);
 
         if (shootStatus == SHOOT_MISS) gamePlay.endTurn();
+
+        else {
+            gamePlay.resetCountDown();
+            gamePlay.startCount();
+        }
 
 
         battleShip.getListenerManager()
