@@ -7,7 +7,6 @@ import com.htilssu.setting.GameSetting;
 import com.htilssu.ui.component.CustomButton;
 import com.htilssu.util.AssetUtils;
 
-import javax.sound.sampled.Clip;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
@@ -28,7 +27,7 @@ public class MenuScreen extends JPanel {
     setPreferredSize(new Dimension(GameSetting.WIDTH, GameSetting.HEIGHT));
     buttons = new ArrayList<>();
     createButtons();
-    playBackgroundMusic();
+
 
     addComponentListener(
             new ComponentAdapter() {
@@ -36,6 +35,7 @@ public class MenuScreen extends JPanel {
                 public void componentResized(ComponentEvent e) {
                     super.componentResized(e);
                     repositionButtons();
+                    playBackgroundMusic();
                 }
             }
     );
@@ -44,6 +44,21 @@ public class MenuScreen extends JPanel {
   private void loadBackgroundImage() {
     backgroundImage = AssetUtils.loadImage("/images/sea1.png");
   }
+
+    private void loadMenu() {
+        menuImage = AssetUtils.loadImage("/images/MENU2.png"); // Tải hình ảnh biểu tượng menu
+    }
+
+    private void createButtons() {
+
+        addButton("/images/play2.png", "PLAY");
+        addButton("/images/MultiPlayer.png", "Multiplayer");
+        addButton("/images/continue.png", "Continue");
+        addButton("/images/setting2.png", "SETTING");
+        addButton("/images/exit.png", "QUIT");
+        repositionButtons();
+    }
+
     private void repositionButtons() { // định hinh cac nut khi thay doi kich thuoc man hinh
         int buttonWidth = 200;
         int buttonHeight = 60;
@@ -60,19 +75,12 @@ public class MenuScreen extends JPanel {
         }
   }
 
-    private void loadMenu() {
-        menuImage = AssetUtils.loadImage("/images/MENU2.png"); // Tải hình ảnh biểu tượng menu
+    private void playBackgroundMusic() {
+        if (!SoundManager.isBackgroundPlaying()) {
+            SoundManager.playBackGround(SoundManager.BACKGROUND_MENU);
+    }
     }
 
-    private void createButtons() {
-
-        addButton("/images/play2.png", "PLAY");
-        addButton("/images/MultiPlayer.png", "Multiplayer");
-        addButton("/images/continue.png", "Continue");
-        addButton("/images/setting2.png", "SETTING");
-        addButton("/images/exit.png", "QUIT");
-        repositionButtons();
-    }
     private void addButton(String imagePath, String actionCommand) {
         CustomButton button = new CustomButton(imagePath);
         button.setActionCommand(actionCommand);
@@ -80,6 +88,7 @@ public class MenuScreen extends JPanel {
         buttons.add(button);
         add(button);
     }
+
     private void handleButtonClick(String actionCommand) {
     switch (actionCommand) {
       case "PLAY":
@@ -94,11 +103,6 @@ public class MenuScreen extends JPanel {
       case "QUIT":
         System.exit(0);
         break;
-    }
-  }
-  private void playBackgroundMusic() {
-    if (!SoundManager.isBackgroundPlaying()) {
-      SoundManager.playBackGround(SoundManager.BACKGROUND_MENU);
     }
   }
 

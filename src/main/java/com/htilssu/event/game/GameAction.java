@@ -4,6 +4,7 @@ package com.htilssu.event.game;
  * Lớp chứa các hành động mà người chơi có thể thực hiện
  */
 public final class GameAction {
+
     /**
      * Người chơi thực hiện hành động bắn đạn
      */
@@ -35,4 +36,5 @@ public final class GameAction {
      * Kết thúc trò chơi, người nhận được sự kiện {@link #END_GAME} từ {@link #RESPONSE_SHOOT} sẽ là người chiến thắng
      */
     public static final int END_GAME = 7;
+    public static final int END_TURN = 8;
 }
