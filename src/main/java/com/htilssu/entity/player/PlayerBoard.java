@@ -88,26 +88,47 @@ public class PlayerBoard extends Collision implements Renderable {
     }
 
     public boolean canAddShip(int row, int col, int direction, int shipType) {
-        int xMax = cellSize;
-        int yMax = cellSize;
+        //max x cua ship duoc them
+        int xMax;
+        //max y cua ship duoc them
+        int yMax;
+        //vi tri x bat dau ship duoc them
         int x = getX() + col * cellSize;
+        //vi tri y bat adu ship duoc them
         int y = getY() + row * cellSize;
 
         if (direction == Ship.HORIZONTAL) {
             xMax = x + shipType * cellSize;
+            yMax = y + cellSize;
         }
         else {
             yMax = y + shipType * cellSize;
+            xMax = x + cellSize;
         }
 
 
         for (Ship s : ships) {
             Sprite sp = s.getSprite();
-            if (xMax > sp.getX() && sp.getX() + sp.getWidth() > x && yMax > sp.getY() && y < sp.getY() + sp.getHeight()) {
+            int spX = sp.getX();
+            int spY = sp.getY();
+            int maxSpWidth = sp.getX() + sp.getWidth();
+            int maxSpHeight = sp.getY() + sp.getHeight();
+
+            if (spX >= xMax
+                    || x >= maxSpWidth
+                    || y >= maxSpHeight
+                    || sp.getY() >= yMax) {
+            }
+            else {
                 return false;
             }
+
         }
         return true;
+    }
+
+    public boolean canAddShip(Ship ship) {
+        return canAddShip(ship.getPosition().y, ship.getPosition().x, ship.getDirection(), ship.getShipType());
     }
 
     public int getCellSize() {
@@ -237,10 +258,6 @@ public class PlayerBoard extends Collision implements Renderable {
 
     public void setGamePlay(GamePlay gamePlay) {
         this.gamePlay = gamePlay;
-    }
-
-    public boolean canAddShip(Ship ship) {
-        return canAddShip(ship.getPosition().x, ship.getPosition().getY(), ship.getDirection(), ship.getShipType());
     }
 
     public Ship getShipAtPosition(Position position) {
