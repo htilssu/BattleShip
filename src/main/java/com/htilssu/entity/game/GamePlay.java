@@ -119,6 +119,8 @@ public class GamePlay implements Renderable {
 
         resetCountDown();
         startCount();
+
+        getScreen().repaint();
     }
 
     public void resetCountDown() {
@@ -148,6 +150,10 @@ public class GamePlay implements Renderable {
             player.setShot(new byte[boardSize][boardSize]);
             player.setGamePlay(this);
         }
+    }
+
+    public JPanel getScreen() {
+        return battleShip.getScreenManager().getCurrentScreen();
     }
 
     private int getBoardSize() {
@@ -429,10 +435,6 @@ public class GamePlay implements Renderable {
 
     private void handleReadyButtonOnHover(Point point) {
         readyButton.handleHover(point.x, point.y);
-    }
-
-    public JPanel getScreen() {
-        return battleShip.getScreenManager().getCurrentScreen();
     }
 
     /**
