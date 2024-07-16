@@ -48,6 +48,9 @@ public class Client extends MultiHandler implements Runnable {
         this.status = status;
     }
 
+    /**
+     * Gửi yêu cầu tham gia vào game
+     */
     public void join() {
         send(GameAction.JOIN, GameManager.gamePlayer.getId(), GameManager.gamePlayer.getName());
     }

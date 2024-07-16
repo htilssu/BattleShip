@@ -14,6 +14,7 @@ import com.htilssu.manager.GameManager;
 import com.htilssu.manager.ScreenManager;
 import com.htilssu.manager.ShipManager;
 import com.htilssu.ui.screen.NetworkScreen;
+import com.htilssu.ui.screen.PickScreen;
 import com.htilssu.util.GameLogger;
 import com.htilssu.util.ScoreUtil;
 
@@ -110,7 +111,10 @@ public abstract class MultiHandler {
                     else gameManager.setTurn(new Random().nextInt(1));
 
 
-                    gameManager.createNewGamePlay();
+                    if (this instanceof Client) {
+                        gameManager.createNewGamePlay();
+                        battleShip.changeScreen(ScreenManager.PLAY_SCREEN);
+                    }
                     battleShip.getListenerManager()
                             .callEvent(new PlayerJoinEvent(player,
                                                            battleShip.getGameManager()
@@ -118,13 +122,14 @@ public abstract class MultiHandler {
                                        ),
                                        battleShip.getGameManager()
                             );
-                    battleShip.changeScreen(ScreenManager.PLAY_SCREEN);
+
                     if (this instanceof Host) {
-                        int opponentTurn = gameManager.turn == 0 ? 1 : 0;
-                        this.send(GameAction.JOIN, gamePlayer.getId(), gamePlayer.getName(),
-                                  DifficultyManager.difficulty, opponentTurn
-                        );
+                        PickScreen screen = (PickScreen) battleShip.getScreenManager()
+                                .getScreen(ScreenManager.PICK_SCREEN);
+                        screen.setGameMode(GameManager.MULTI_PLAYER);
+                        battleShip.changeScreen(ScreenManager.PICK_SCREEN);
                     }
+
                     break;
 
                 case GameAction.SHOOT:
@@ -184,6 +189,7 @@ public abstract class MultiHandler {
 
                 case END_GAME:
                     currentGamePlay.setGameMode(GamePlay.END_MODE);
+                    currentGamePlay.endGame();
                     currentGamePlay.setWinner(0);
                     break;
 
@@ -197,8 +203,6 @@ public abstract class MultiHandler {
             }
         }
     }
-
-    public abstract void send(Object... message);
 
     private void handleShootRequest(List<String> messageParts) {
         var playerId = messageParts.get(1);
@@ -232,6 +236,7 @@ public abstract class MultiHandler {
             if (playerBoard.isAllShipsDestroyed()) {
                 this.send(GameAction.END_GAME);
                 gamePlay.setWinner(1);
+                gamePlay.endGame();
             }
             if (responseStatus == SHOOT_MISS) gamePlay.endTurn();
             else {
@@ -299,6 +304,8 @@ public abstract class MultiHandler {
                 );
 
     }
+
+    public abstract void send(Object... message);
 
     private void sendResponseShoot(int shootStatus, int x, int y, Ship ship) {
 

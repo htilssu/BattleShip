@@ -1,6 +1,7 @@
 package com.htilssu.ui.screen;
 
 import com.htilssu.BattleShip;
+import com.htilssu.manager.GameManager;
 import com.htilssu.manager.ScreenManager;
 import com.htilssu.manager.SoundManager;
 import com.htilssu.setting.GameSetting;
@@ -92,6 +93,8 @@ public class MenuScreen extends JPanel {
     private void handleButtonClick(String actionCommand) {
     switch (actionCommand) {
       case "PLAY":
+          ((PickScreen) window.getScreenManager().getScreen(ScreenManager.PICK_SCREEN)).setGameMode(
+                  GameManager.SINGLE_PLAYER);
         window.changeScreen(ScreenManager.PICK_SCREEN);
         break;
       case "SETTING":

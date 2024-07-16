@@ -8,6 +8,7 @@ public class Player {
 
     String id = UUID.randomUUID().toString();
     String name = "DepTrai";
+    int totalShoot = 0;
     PlayerBoard playerBoard;
     int score = 0;
     /**
@@ -18,7 +19,6 @@ public class Player {
      */
     byte[][] shot;
     private GamePlay gamePlay;
-
     public Player(String id, String name) {
         this.id = id;
         this.name = name;
@@ -29,6 +29,10 @@ public class Player {
     }
 
     public Player() {
+    }
+
+    public void resetData() {
+        totalShoot = 0;
     }
 
     public int getScore() {
