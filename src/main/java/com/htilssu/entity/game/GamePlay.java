@@ -408,6 +408,7 @@ public class GamePlay implements Renderable {
         Collection<Sprite> spriteValues = sprites.values();
         for (Sprite sprite : spriteValues) {
             if (sprite.isInside(position.x, position.y)) {
+                if (setUpSprite == null) return;
                 setUpSprite = sprite;
                 int ratio = setUpSprite.getHeight() / setUpSprite.getWidth();
                 setUpSprite.setSize(playerBoard.getCellSize(), playerBoard.getCellSize() * ratio);
