@@ -19,7 +19,6 @@ public class Player {
      */
     byte[][] shot;
     private GamePlay gamePlay;
-
     public Player(String id, String name) {
         this.id = id;
         this.name = name;
@@ -30,6 +29,10 @@ public class Player {
     }
 
     public Player() {
+    }
+
+    public void resetData() {
+        totalShoot = 0;
     }
 
     public int getScore() {

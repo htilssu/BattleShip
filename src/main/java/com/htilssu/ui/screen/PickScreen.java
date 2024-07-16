@@ -1,7 +1,11 @@
 package com.htilssu.ui.screen;
 
 import com.htilssu.BattleShip;
+import com.htilssu.event.game.GameAction;
+import com.htilssu.manager.DifficultyManager;
+import com.htilssu.manager.GameManager;
 import com.htilssu.manager.ScreenManager;
+import com.htilssu.multiplayer.Host;
 import com.htilssu.util.AssetUtils;
 
 import javax.swing.*;
@@ -10,13 +14,18 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 
+import static com.htilssu.manager.GameManager.gamePlayer;
+
 public class PickScreen extends JPanel {
+
+    private static final int IMAGE_GAP = 30; // Khoảng cách cố định giữa các hình ảnh
     private BattleShip window;
     private BufferedImage normalImage, hardImage, backgroundImage;
-    private static final int IMAGE_GAP = 30; // Khoảng cách cố định giữa các hình ảnh
-
     private boolean isNormalImageHovered = false;
     private boolean isHardImageHovered = false;
+    private int normalImageX, normalImageY, newNormalImageWidth, newImageHeight;
+    private int hardImageX, hardImageY, newHardImageWidth;
+    private int pickMode = GameManager.SINGLE_PLAYER;
 
     public PickScreen(BattleShip battleShip) {
         window = battleShip;
@@ -27,8 +36,8 @@ public class PickScreen extends JPanel {
         loadBackgroundImage();
         addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseMoved(MouseEvent e) {
-                handleMouseMove(e.getX(), e.getY());
+            public void mouseClicked(MouseEvent e) {
+                handleMouseClick(e.getX(), e.getY());
             }
 
             @Override
@@ -44,8 +53,8 @@ public class PickScreen extends JPanel {
             }
 
             @Override
-            public void mouseClicked(MouseEvent e) {
-                handleMouseClick(e.getX(), e.getY());
+            public void mouseMoved(MouseEvent e) {
+                handleMouseMove(e.getX(), e.getY());
             }
         });
 
@@ -57,29 +66,90 @@ public class PickScreen extends JPanel {
         });
     }
 
+    private void loadBackgroundImage() {
+        backgroundImage = AssetUtils.loadImage("/images/ground.png"); // Tải hình nền
+    }
+
     private void handleMouseClick(int mouseX, int mouseY) {
-        if (isInsideImage(mouseX, mouseY, normalImageX, normalImageY, newNormalImageWidth, newImageHeight)) {//kiểm tra nếu chuột nằm trong phạm vi ảnh bấm vào se chuyển màn hình bằng transition screen
-            transitionToGameScreen();
+        int difficulty = getImage(mouseX, mouseY);
+        if (difficulty != -1) {
+            DifficultyManager.difficulty = difficulty;
+            if (pickMode == GameManager.SINGLE_PLAYER) {
+                transitionToGameScreen();
+            }
+            else {
+                Host host = window.getHost();
+                if (host.isConnected()) {
+                    int opponentTurn = window.getGameManager().turn == 0 ? 1 : 0;
+                    host.send(GameAction.JOIN, gamePlayer.getId(), gamePlayer.getName(),
+                              DifficultyManager.difficulty, opponentTurn
+                    );
+
+                    window.getGameManager().createNewGamePlay();
+
+
+                    window.changeScreen(ScreenManager.PLAY_SCREEN);
+                }
+            }
         }
     }
 
     private void handleMouseMove(int mouseX, int mouseY) {
         boolean previouslyHovered = isNormalImageHovered || isHardImageHovered;
 
-        isNormalImageHovered = isInsideImage(mouseX, mouseY, normalImageX, normalImageY, newNormalImageWidth, newImageHeight);
-        isHardImageHovered = isInsideImage(mouseX, mouseY, hardImageX, hardImageY, newHardImageWidth, newImageHeight);
+        isNormalImageHovered = isInsideImage(mouseX,
+                                             mouseY,
+                                             normalImageX,
+                                             normalImageY,
+                                             newNormalImageWidth,
+                                             newImageHeight
+        );
+        isHardImageHovered = isInsideImage(mouseX,
+                                           mouseY,
+                                           hardImageX,
+                                           hardImageY,
+                                           newHardImageWidth,
+                                           newImageHeight
+        );
 
         if (previouslyHovered != (isNormalImageHovered || isHardImageHovered)) {
             repaint();
         }
     }
 
-    private boolean isInsideImage(int mouseX, int mouseY, int imageX, int imageY, int imageWidth, int imageHeight) {// Kiểm tra xem chuột có nằm trong phạm vi ảnh kooong
-        return mouseX >= imageX && mouseX <= imageX + imageWidth && mouseY >= imageY && mouseY <= imageY + imageHeight;
+    private int getImage(int mouseX, int mouseY) {
+        isNormalImageHovered = isInsideImage(mouseX,
+                                             mouseY,
+                                             normalImageX,
+                                             normalImageY,
+                                             newNormalImageWidth,
+                                             newImageHeight
+        );
+        isHardImageHovered = isInsideImage(mouseX,
+                                           mouseY,
+                                           hardImageX,
+                                           hardImageY,
+                                           newHardImageWidth,
+                                           newImageHeight
+        );
+
+        if (isNormalImageHovered) return DifficultyManager.NORMAL;
+        if (isHardImageHovered) return DifficultyManager.HARD;
+        return -1;
     }
 
-    private int normalImageX, normalImageY, newNormalImageWidth, newImageHeight;
-    private int hardImageX, hardImageY, newHardImageWidth;
+    private void transitionToGameScreen() {
+        window.changeScreen(ScreenManager.START2_PLAYER_SCREEN);
+    }
+
+    private boolean isInsideImage(int mouseX,
+                                  int mouseY,
+                                  int imageX,
+                                  int imageY,
+                                  int imageWidth,
+                                  int imageHeight) {// Kiểm tra xem chuột có nằm trong phạm vi ảnh kooong
+        return mouseX >= imageX && mouseX <= imageX + imageWidth && mouseY >= imageY && mouseY <= imageY + imageHeight;
+    }
 
     @Override
     protected void paintComponent(Graphics g) {
@@ -110,9 +180,9 @@ public class PickScreen extends JPanel {
             // Đảm bảo hình ảnh vừa với chiều rộng của panel
             if (totalWidth > panelWidth) {
                 float scaleFactor = (float) (panelWidth - IMAGE_GAP) / (newNormalImageWidth + newHardImageWidth);
-                newNormalImageWidth *= scaleFactor;
-                newHardImageWidth *= scaleFactor;
-                newImageHeight *= scaleFactor;
+                newNormalImageWidth *= (int) scaleFactor;
+                newHardImageWidth *= (int) scaleFactor;
+                newImageHeight *= (int) scaleFactor;
             }
 
             // Tính toán vị trí để căn giữa hình ảnh với khoảng cách
@@ -123,20 +193,51 @@ public class PickScreen extends JPanel {
 
             // Vẽ hình ảnh với kích thước và khoảng cách mới
             if (isNormalImageHovered) {
-                drawResizedImage(g, normalImage, normalImageX, normalImageY, newNormalImageWidth, newImageHeight);
-            } else {
-                g.drawImage(normalImage, normalImageX, normalImageY, newNormalImageWidth, newImageHeight, this);
+                drawResizedImage(g,
+                                 normalImage,
+                                 normalImageX,
+                                 normalImageY,
+                                 newNormalImageWidth,
+                                 newImageHeight
+                );
+            }
+            else {
+                g.drawImage(normalImage,
+                            normalImageX,
+                            normalImageY,
+                            newNormalImageWidth,
+                            newImageHeight,
+                            this
+                );
             }
 
             if (isHardImageHovered) {
-                drawResizedImage(g, hardImage, hardImageX, hardImageY, newHardImageWidth, newImageHeight);
-            } else {
-                g.drawImage(hardImage, hardImageX, hardImageY, newHardImageWidth, newImageHeight, this);
+                drawResizedImage(g,
+                                 hardImage,
+                                 hardImageX,
+                                 hardImageY,
+                                 newHardImageWidth,
+                                 newImageHeight
+                );
+            }
+            else {
+                g.drawImage(hardImage,
+                            hardImageX,
+                            hardImageY,
+                            newHardImageWidth,
+                            newImageHeight,
+                            this
+                );
             }
         }
     }
 
-    private void drawResizedImage(Graphics g, BufferedImage image, int x, int y, int width, int height) {
+    private void drawResizedImage(Graphics g,
+                                  BufferedImage image,
+                                  int x,
+                                  int y,
+                                  int width,
+                                  int height) {
         int shrinkAmount = 10; // Kích thước thu nhỏ
         int newWidth = width - shrinkAmount; // Chiều rộng mới khi hover
         int newHeight = height - shrinkAmount; // Chiều cao mới khi hover
@@ -145,11 +246,7 @@ public class PickScreen extends JPanel {
         g.drawImage(image, x + xOffset, y + yOffset, newWidth, newHeight, this);
     }
 
-    private void transitionToGameScreen() {
-        window.changeScreen(ScreenManager.START2_PLAYER_SCREEN);
-    }
-
-    private void loadBackgroundImage() {
-        backgroundImage = AssetUtils.loadImage("/images/ground.png"); // Tải hình nền
+    public void setGameMode(int pickMode) {
+        this.pickMode = pickMode;
     }
 }

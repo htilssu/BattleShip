@@ -3,7 +3,6 @@ package com.htilssu.manager;
 import com.htilssu.BattleShip;
 import com.htilssu.entity.game.GamePlay;
 import com.htilssu.entity.player.Player;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +12,8 @@ public final class GameManager {
     public static final int MAX_PLAYER = 2;
     public static final Player gamePlayer = new Player();
     public static final int TIME_PER_TURN = 35;
+    public static final int SINGLE_PLAYER = 1;
+    public static final int MULTI_PLAYER = 2;
     public int turn = 0;
     BattleShip battleShip;
     List<Player> players;
@@ -48,14 +49,17 @@ public final class GameManager {
             return;
         }
 
-        GamePlay newGamePlay = new GamePlay(players, turn, DifficultyManager.getGameBoardSize(DifficultyManager.difficulty), multiPlayer);
+        GamePlay newGamePlay = new GamePlay(players,
+                                            turn,
+                                            DifficultyManager.getGameBoardSize(DifficultyManager.difficulty),
+                                            multiPlayer
+        );
         newGamePlay.setGameManager(this);
 
         initPlayerList();
         setCurrentGamePlay(newGamePlay);
     }
 
-    @NotNull
     public GamePlay getCurrentGamePlay() {
         return currentGamePlay;
     }
@@ -72,7 +76,10 @@ public final class GameManager {
 
         setCurrentGamePlay(
                 new GamePlay(
-                        testPlayers, 0, DifficultyManager.getGameBoardSize(DifficultyManager.difficulty)));
+                        testPlayers,
+                        0,
+                        DifficultyManager.getGameBoardSize(DifficultyManager.difficulty)
+                ));
     }
 
     public void setMultiPlayer(boolean multiPlayer) {

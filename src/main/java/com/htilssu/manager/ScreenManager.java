@@ -44,7 +44,7 @@ public final class ScreenManager {
     /***
      * Màn hình hiện tại
      */
-    int currentScreen = END_GAME_SCREEN;
+    int currentScreen = MENU_SCREEN;
 
     public ScreenManager(BattleShip battleShip) {
         this.battleShip = battleShip;
