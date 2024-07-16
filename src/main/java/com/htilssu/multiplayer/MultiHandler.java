@@ -184,6 +184,7 @@ public abstract class MultiHandler {
 
                 case END_GAME:
                     currentGamePlay.setGameMode(GamePlay.END_MODE);
+                    currentGamePlay.endGame();
                     currentGamePlay.setWinner(0);
                     break;
 
@@ -232,6 +233,7 @@ public abstract class MultiHandler {
             if (playerBoard.isAllShipsDestroyed()) {
                 this.send(GameAction.END_GAME);
                 gamePlay.setWinner(1);
+                gamePlay.endGame();
             }
             if (responseStatus == SHOOT_MISS) gamePlay.endTurn();
             else {

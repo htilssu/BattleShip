@@ -20,5 +20,4 @@ public class GameLabel extends JLabel {
     public void setFontSize(int size) {
         setFont(AssetUtils.gameFont.deriveFont((float) size));
     }
-
 }

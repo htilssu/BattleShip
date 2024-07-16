@@ -9,6 +9,7 @@ import com.htilssu.entity.player.PlayerBoard;
 import com.htilssu.event.game.GameAction;
 import com.htilssu.event.player.PlayerShootEvent;
 import com.htilssu.manager.GameManager;
+import com.htilssu.manager.ScreenManager;
 import com.htilssu.manager.SoundManager;
 import com.htilssu.multiplayer.Client;
 import com.htilssu.multiplayer.Host;
@@ -18,6 +19,7 @@ import com.htilssu.ui.component.GameButton;
 import com.htilssu.ui.component.GameLabel;
 import com.htilssu.ui.component.GamePanel;
 import com.htilssu.ui.component.GameProgress;
+import com.htilssu.ui.screen.EndGameScreen;
 import com.htilssu.util.AssetUtils;
 
 import javax.swing.*;
@@ -54,6 +56,7 @@ public class GamePlay implements Renderable {
     }};
     private final GamePanel targetPanel = new GamePanel(AssetUtils.getImage(AssetUtils.ASSET_HOLDER));
     private final GameButton scorePanel = new GameButton(AssetUtils.getImage(AssetUtils.ASSET_TEXT_FIELD_2));
+    private int totalShot = 0;
     private int timeCountDown;
     private int winner = -1;
     private boolean isReady = false;
@@ -158,8 +161,123 @@ public class GamePlay implements Renderable {
         return size;
     }
 
-    public int getTimeCountDown() {
-        return timeCountDown;
+    /**
+     * Kết thúc game
+     */
+    public void endGame() {
+        setGameMode(END_MODE);
+        final JPanel endScreen = battleShip.getScreenManager()
+                .getScreen(ScreenManager.END_GAME_SCREEN);
+        Player opponent = getOpponent();
+
+        if (opponent != null) {
+            if (endScreen instanceof EndGameScreen endGameScreen) {
+                endGameScreen.setOpponentBoard(opponent.getBoard());
+                var loser = getLoser();
+                endGameScreen.setWin(loser != GameManager.gamePlayer);
+            }
+        }
+
+        battleShip.changeScreen(ScreenManager.END_GAME_SCREEN);
+    }
+
+    /**
+     * Lấy đối thủ của người chơi hiện tại
+     * phương thức sẽ trả về 1 đối tượng {@link Player} là đối thủ của người chơi hiện tại
+     * trong turn bắn hiện tại
+     *
+     * @return {@link Player} là đối thủ của người chơi hiện tại
+     */
+    public Player getOpponent() {
+        return playerList.get((turn + 1) % playerList.size());
+    }
+
+    private Player getLoser() {
+        for (Player player : playerList) {
+            if (player.getBoard().isAllShipsDestroyed()) {
+                return player;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Cập nhật lại kích thước của game
+     */
+    public void update() {
+
+        JPanel currentScreen = gameManager.getBattleShip().getScreenManager().getCurrentScreen();
+        switch (gameMode) {
+            case SETUP_MODE -> {
+                PlayerBoard playerBoard = GameManager.gamePlayer.getBoard();
+
+                int shipSpriteMargin = MARGIN * Math.round(GameSetting.SCALE);
+                int yMidPosition = currentScreen.getHeight() / 2;
+                int xMidPosition = currentScreen.getWidth() / 2;
+
+                // set ready button size
+                readyButton.setSize((int) (readyButton.getAsset()
+                                            .getWidth() / 2f * GameSetting.SCALE * 0.8f),
+                                    (int) (readyButton.getAsset()
+                                            .getHeight() / 2f * GameSetting.SCALE * 0.8f)
+                );
+                readyButton.setLocation(xMidPosition - readyButton.getWidth() / 2,
+                                        currentScreen.getHeight() - readyButton.getHeight() - shipSpriteMargin / 2
+                );
+                playerBoard.setSize(currentScreen.getWidth() / 2,
+                                    currentScreen.getHeight() - (currentScreen.getHeight() - readyButton.getY()) - shipSpriteMargin
+                );
+                playerBoard.update();
+                playerBoard.setLocation(xMidPosition - 100, shipSpriteMargin / 2);
+                if (setUpSprite != null) {
+                    float ratio = (float) setUpSprite.getHeight() / setUpSprite.getWidth();
+                    updateSpriteByRatio(ratio);
+                }
+
+                for (int i = 0; i < sprites.size(); i++) {
+                    Sprite sprite = sprites.get(i + 2);
+
+                    sprite.setLocation((int) (i * (sprite.getWidth() + shipSpriteMargin) + 32 * GameSetting.SCALE),
+                                       yMidPosition - sprite.getHeight() / 2
+                    );
+                }
+            }
+            case PLAY_MODE -> {
+                for (Player player : playerList) {
+                    var playerBoard = player.getBoard();
+                    playerBoard.setSize(currentScreen.getWidth() / 2,
+                                        currentScreen.getHeight() - 2 * 100
+                    );
+                    //set center location
+                    playerBoard.setLocation(currentScreen.getWidth() / 2 - playerBoard.getWidth() / 2,
+                                            100
+                    );
+                    playerBoard.update();
+                    startCount();
+                    gameProgress.setSize(currentScreen.getWidth() - 100, 30);
+                    gameProgress.setLocation(50, 25);
+
+                }
+            }
+        }
+
+    }
+
+    private void updateSpriteByRatio(float ratio) {
+        PlayerBoard playerBoard = GameManager.gamePlayer.getBoard();
+        if (ratio < 1 && ratio > 0) {
+            ratio = 1 / ratio;
+            setUpSprite.setSize((int) (playerBoard.getCellSize() * ratio),
+                                playerBoard.getCellSize()
+            );
+
+        }
+        else {
+            setUpSprite.setSize(playerBoard.getCellSize(),
+                                (int) (playerBoard.getCellSize() * ratio)
+            );
+        }
     }
 
     public int getWinner() {
@@ -168,6 +286,10 @@ public class GamePlay implements Renderable {
 
     public void setWinner(int winner) {
         this.winner = winner;
+    }
+
+    public int getTimeCountDown() {
+        return timeCountDown;
     }
 
     public int getDirection() {
@@ -248,23 +370,12 @@ public class GamePlay implements Renderable {
     }
 
     /**
-     * Lấy đối thủ của người chơi hiện tại
-     * phương thức sẽ trả về 1 đối tượng {@link Player} là đối thủ của người chơi hiện tại
-     * trong turn bắn hiện tại
-     *
-     * @return {@link Player} là đối thủ của người chơi hiện tại
-     */
-    public Player getOpponent() {
-        return playerList.get((turn + 1) % playerList.size());
-    }
-
-    /**
      * Bắn vào vị trí {@code pos}
      *
      * @param pos vị trí cần bắn
      */
     private void shoot(Position pos) {
-
+        totalShot++;
         if (battleShip.getHost().isConnected()) {
             battleShip.getHost().sendShoot(pos);
         }
@@ -590,84 +701,6 @@ public class GamePlay implements Renderable {
     }
 
     /**
-     * Cập nhật lại kích thước của game
-     */
-    public void update() {
-
-        JPanel currentScreen = gameManager.getBattleShip().getScreenManager().getCurrentScreen();
-        switch (gameMode) {
-            case SETUP_MODE -> {
-                PlayerBoard playerBoard = GameManager.gamePlayer.getBoard();
-
-                int shipSpriteMargin = MARGIN * Math.round(GameSetting.SCALE);
-                int yMidPosition = currentScreen.getHeight() / 2;
-                int xMidPosition = currentScreen.getWidth() / 2;
-
-                // set ready button size
-                readyButton.setSize((int) (readyButton.getAsset()
-                                            .getWidth() / 2f * GameSetting.SCALE * 0.8f),
-                                    (int) (readyButton.getAsset()
-                                            .getHeight() / 2f * GameSetting.SCALE * 0.8f)
-                );
-                readyButton.setLocation(xMidPosition - readyButton.getWidth() / 2,
-                                        currentScreen.getHeight() - readyButton.getHeight() - shipSpriteMargin / 2
-                );
-                playerBoard.setSize(currentScreen.getWidth() / 2,
-                                    currentScreen.getHeight() - (currentScreen.getHeight() - readyButton.getY()) - shipSpriteMargin
-                );
-                playerBoard.update();
-                playerBoard.setLocation(xMidPosition - 100, shipSpriteMargin / 2);
-                if (setUpSprite != null) {
-                    float ratio = (float) setUpSprite.getHeight() / setUpSprite.getWidth();
-                    updateSpriteByRatio(ratio);
-                }
-
-                for (int i = 0; i < sprites.size(); i++) {
-                    Sprite sprite = sprites.get(i + 2);
-
-                    sprite.setLocation((int) (i * (sprite.getWidth() + shipSpriteMargin) + 32 * GameSetting.SCALE),
-                                       yMidPosition - sprite.getHeight() / 2
-                    );
-                }
-            }
-            case PLAY_MODE -> {
-                for (Player player : playerList) {
-                    var playerBoard = player.getBoard();
-                    playerBoard.setSize(currentScreen.getWidth() / 2,
-                                        currentScreen.getHeight() - 2 * 100
-                    );
-                    //set center location
-                    playerBoard.setLocation(currentScreen.getWidth() / 2 - playerBoard.getWidth() / 2,
-                                            100
-                    );
-                    playerBoard.update();
-                    startCount();
-                    gameProgress.setSize(currentScreen.getWidth() - 100, 30);
-                    gameProgress.setLocation(50, 25);
-
-                }
-            }
-        }
-
-    }
-
-    private void updateSpriteByRatio(float ratio) {
-        PlayerBoard playerBoard = GameManager.gamePlayer.getBoard();
-        if (ratio < 1 && ratio > 0) {
-            ratio = 1 / ratio;
-            setUpSprite.setSize((int) (playerBoard.getCellSize() * ratio),
-                                playerBoard.getCellSize()
-            );
-
-        }
-        else {
-            setUpSprite.setSize(playerBoard.getCellSize(),
-                                (int) (playerBoard.getCellSize() * ratio)
-            );
-        }
-    }
-
-    /**
      * Thay đổi hướng của tàu
      * nếu đang ở chế độ {@link #PLAY_MODE} thì không thay đổi
      * nếu đang ở chế độ đặt tàu thì thay đổi hướng của tàu
@@ -686,4 +719,9 @@ public class GamePlay implements Renderable {
         getScreen().remove(gameProgress);
         getScreen().remove(targetPanel);
     }
+
+    public int getTotalShot() {
+        return totalShot;
+    }
+
 }

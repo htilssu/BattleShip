@@ -8,6 +8,7 @@ public class Player {
 
     String id = UUID.randomUUID().toString();
     String name = "DepTrai";
+    int totalShoot = 0;
     PlayerBoard playerBoard;
     int score = 0;
     /**

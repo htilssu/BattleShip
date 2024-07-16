@@ -122,6 +122,9 @@ public class Ship extends Collision implements Renderable {
         update();
     }
 
+    /**
+     * Cập nhật lại kích thước, vị trí của tàu dựa theo {@link Ship#playerBoard}
+     */
     public void update() {
         float ratio = (float) sprite.getHeight() / sprite.getWidth();
         sprite.setLocation(
