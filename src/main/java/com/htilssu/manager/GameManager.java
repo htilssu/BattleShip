@@ -11,7 +11,7 @@ public final class GameManager {
 
     public static final int MAX_PLAYER = 2;
     public static final Player gamePlayer = new Player();
-    public static final int TIME_PER_TURN = 35;
+    public static final int TIME_PER_TURN = 40;
     public static final int SINGLE_PLAYER = 1;
     public static final int MULTI_PLAYER = 2;
     public int turn = 0;

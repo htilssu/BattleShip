@@ -189,6 +189,7 @@ public abstract class MultiHandler {
 
                 case END_GAME:
                     currentGamePlay.setGameMode(GamePlay.END_MODE);
+                    sendRemainingShips();
                     currentGamePlay.endGame();
                     currentGamePlay.setWinner(0);
                     break;
@@ -197,6 +198,9 @@ public abstract class MultiHandler {
                     currentGamePlay.endTurn();
                     break;
 
+                case SHIP_LEAK:
+                    handleShipLeak(messageParts);
+                    break;
                 default:
                     GameLogger.log("Unknown message: " + message);
                     break;
@@ -235,6 +239,7 @@ public abstract class MultiHandler {
             //check player lose
             if (playerBoard.isAllShipsDestroyed()) {
                 this.send(GameAction.END_GAME);
+                gamePlay.setGameMode(GamePlay.END_MODE);
                 gamePlay.setWinner(1);
                 gamePlay.endGame();
             }
@@ -289,10 +294,8 @@ public abstract class MultiHandler {
         if (shootStatus == SHOOT_HIT) gamePlay.getCurrentPlayer()
                 .plusScore(ScoreUtil.calculateScore(gamePlay.getTimeCountDown()));
 
-        else {
-            gamePlay.resetCountDown();
-            gamePlay.startCount();
-        }
+        gamePlay.resetCountDown();
+        gamePlay.startCount();
 
 
         battleShip.getListenerManager()
@@ -306,6 +309,38 @@ public abstract class MultiHandler {
     }
 
     public abstract void send(Object... message);
+
+    private void sendRemainingShips() {
+        for (Ship remainingShip : gamePlayer.getBoard().getRemainingShips()) {
+            this.send(GameAction.SHIP_LEAK,
+                      remainingShip.getPosition().x,
+                      remainingShip.getPosition().y,
+                      remainingShip.getShipType(), remainingShip.getDirection()
+            );
+        }
+    }
+
+    /**
+     * Xử lý ship leak khi kết thúc game hiển thị tất cả thuyền chưa chìm của đối thủ
+     *
+     * @param messageParts danh sách tham số nhận được
+     */
+    private void handleShipLeak(List<String> messageParts) {
+        if (messageParts.size() >= 5) {
+            int x = Integer.parseInt(messageParts.get(1));
+            int y = Integer.parseInt(messageParts.get(2));
+
+            int shipType = Integer.parseInt(messageParts.get(3));
+            int direction = Integer.parseInt(messageParts.get(4));
+
+            var opponent = battleShip.getGameManager().getCurrentGamePlay().getOpponent();
+            Ship ship = ShipManager.createShip(shipType, direction);
+            ship.setPosition(new Position(x, y));
+            opponent.getBoard().addShip(ship);
+            battleShip.getGameManager().getCurrentGamePlay().update();
+            battleShip.getScreenManager().getCurrentScreen().repaint();
+        }
+    }
 
     private void sendResponseShoot(int shootStatus, int x, int y, Ship ship) {
 
