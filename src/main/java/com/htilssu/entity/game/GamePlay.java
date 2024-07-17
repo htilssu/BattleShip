@@ -108,7 +108,7 @@ public class GamePlay implements Renderable {
             }
         });
 
-        initTargetBoard();
+//        initTargetBoard();
         resetCountDown();
         initBoard();
     }
@@ -123,6 +123,7 @@ public class GamePlay implements Renderable {
         resetCountDown();
         startCount();
 
+        getCurrentPlayer().getGamePlay().update();
         getScreen().repaint();
     }
 
@@ -134,15 +135,6 @@ public class GamePlay implements Renderable {
         timer.start();
     }
 
-    private void initTargetBoard() {
-        //set vertical layout
-        targetPanel.setLayout(new BoxLayout(targetPanel, BoxLayout.Y_AXIS));
-
-        targetPanel.add(new GameLabel("Target") {{
-            this.setFontSize(30);
-        }});
-    }
-
     private void initBoard() {
         int boardSize = getBoardSize();
 
@@ -151,55 +143,6 @@ public class GamePlay implements Renderable {
             player.setShot(new byte[boardSize][boardSize]);
             player.setGamePlay(this);
         }
-    }
-
-    public JPanel getScreen() {
-        return battleShip.getScreenManager().getCurrentScreen();
-    }
-
-    private int getBoardSize() {
-        return size;
-    }
-
-    /**
-     * Kết thúc game
-     */
-    public void endGame() {
-        setGameMode(END_MODE);
-        final JPanel endScreen = battleShip.getScreenManager()
-                .getScreen(ScreenManager.END_GAME_SCREEN);
-        Player opponent = getOpponent();
-
-        if (opponent != null) {
-            if (endScreen instanceof EndGameScreen endGameScreen) {
-                endGameScreen.setOpponentBoard(opponent.getBoard());
-                var loser = getLoser();
-                endGameScreen.setWin(loser != GameManager.gamePlayer);
-            }
-        }
-
-        battleShip.changeScreen(ScreenManager.END_GAME_SCREEN);
-    }
-
-    /**
-     * Lấy đối thủ của người chơi hiện tại
-     * phương thức sẽ trả về 1 đối tượng {@link Player} là đối thủ của người chơi hiện tại
-     * trong turn bắn hiện tại
-     *
-     * @return {@link Player} là đối thủ của người chơi hiện tại
-     */
-    public Player getOpponent() {
-        return playerList.get((turn + 1) % playerList.size());
-    }
-
-    private Player getLoser() {
-        for (Player player : playerList) {
-            if (player.getBoard().isAllShipsDestroyed()) {
-                return player;
-            }
-        }
-
-        return null;
     }
 
     /**
@@ -254,14 +197,29 @@ public class GamePlay implements Renderable {
                                             100
                     );
                     playerBoard.update();
-                    startCount();
                     gameProgress.setSize(currentScreen.getWidth() - 100, 30);
                     gameProgress.setLocation(50, 25);
-
                 }
             }
         }
 
+    }
+
+    /**
+     * Lấy người chơi hiện tại đang tới lượt chơi
+     *
+     * @return người chơi hiện tại
+     */
+    public Player getCurrentPlayer() {
+        return playerList.get(turn);
+    }
+
+    public JPanel getScreen() {
+        return battleShip.getScreenManager().getCurrentScreen();
+    }
+
+    private int getBoardSize() {
+        return size;
     }
 
     private void updateSpriteByRatio(float ratio) {
@@ -278,6 +236,56 @@ public class GamePlay implements Renderable {
                                 (int) (playerBoard.getCellSize() * ratio)
             );
         }
+    }
+
+    private void initTargetBoard() {
+        //set vertical layout
+        targetPanel.setLayout(new BoxLayout(targetPanel, BoxLayout.Y_AXIS));
+
+        targetPanel.add(new GameLabel("Target") {{
+            this.setFontSize(30);
+        }});
+    }
+
+    /**
+     * Kết thúc game
+     */
+    public void endGame() {
+        setGameMode(END_MODE);
+        final JPanel endScreen = battleShip.getScreenManager()
+                .getScreen(ScreenManager.END_GAME_SCREEN);
+        Player opponent = getOpponent();
+
+        if (opponent != null) {
+            if (endScreen instanceof EndGameScreen endGameScreen) {
+                endGameScreen.setOpponentBoard(opponent.getBoard());
+                var loser = getLoser();
+                endGameScreen.setWin(loser != GameManager.gamePlayer);
+            }
+        }
+
+        battleShip.changeScreen(ScreenManager.END_GAME_SCREEN);
+    }
+
+    /**
+     * Lấy đối thủ của người chơi hiện tại
+     * phương thức sẽ trả về 1 đối tượng {@link Player} là đối thủ của người chơi hiện tại
+     * trong turn bắn hiện tại
+     *
+     * @return {@link Player} là đối thủ của người chơi hiện tại
+     */
+    public Player getOpponent() {
+        return playerList.get((turn + 1) % playerList.size());
+    }
+
+    private Player getLoser() {
+        for (Player player : playerList) {
+            if (player.getBoard().isAllShipsDestroyed()) {
+                return player;
+            }
+        }
+
+        return null;
     }
 
     public int getWinner() {
@@ -361,15 +369,6 @@ public class GamePlay implements Renderable {
     }
 
     /**
-     * Lấy người chơi hiện tại đang tới lượt chơi
-     *
-     * @return người chơi hiện tại
-     */
-    public Player getCurrentPlayer() {
-        return playerList.get(turn);
-    }
-
-    /**
      * Bắn vào vị trí {@code pos}
      *
      * @param pos vị trí cần bắn
@@ -408,7 +407,7 @@ public class GamePlay implements Renderable {
         Collection<Sprite> spriteValues = sprites.values();
         for (Sprite sprite : spriteValues) {
             if (sprite.isInside(position.x, position.y)) {
-                if (setUpSprite == null) return;
+                if (setUpSprite != null) return;
                 setUpSprite = sprite;
                 int ratio = setUpSprite.getHeight() / setUpSprite.getWidth();
                 setUpSprite.setSize(playerBoard.getCellSize(), playerBoard.getCellSize() * ratio);
@@ -631,6 +630,8 @@ public class GamePlay implements Renderable {
         if (isSelectSpriteInBoard && getCurrentPlayer().getId()
                 .equals(GameManager.gamePlayer.getId()))
             selectSprite.render(g);
+
+        getScreen().updateUI();
     }
 
     /**
@@ -693,11 +694,14 @@ public class GamePlay implements Renderable {
     /**
      * Set trạng thái của {@link GamePlay}
      * trạng thái có thể là {@link #SETUP_MODE} hoặc {@link #PLAY_MODE}
+     * khi trạng thái là {@link GamePlay#END_MODE} thì không thể set lại trạng thái
      *
      * @param gameMode trạng thái của {@link GamePlay}
      */
     public void setGameMode(int gameMode) {
-        this.gameMode = gameMode;
+
+        if (gameMode != END_MODE) this.gameMode = gameMode;
+        if (gameMode == PLAY_MODE) startCount();
         update();
     }
 

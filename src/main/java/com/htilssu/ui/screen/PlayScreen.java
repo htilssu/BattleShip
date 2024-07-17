@@ -21,6 +21,7 @@ public class PlayScreen extends JPanel
         setPreferredSize(new Dimension(GameSetting.WIDTH, GameSetting.HEIGHT));
         setFocusable(true);
         setBackground(Color.GRAY);
+        setLayout(null);
         addMouseListener(this);
         addMouseMotionListener(this);
         addComponentListener(this);

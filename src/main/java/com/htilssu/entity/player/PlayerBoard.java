@@ -353,6 +353,7 @@ public class PlayerBoard extends Collision implements Renderable {
     public void markShipDestroyed(Ship ship) {
         Position pos = ship.getPosition();
         remainingShips--;
+        ship.setIsSunk(true);
 
         for (int i = 0; i < ship.getShipType(); i++) {
             switch (ship.getDirection()) {
@@ -368,6 +369,29 @@ public class PlayerBoard extends Collision implements Renderable {
 
     public boolean isAllShipsDestroyed() {
         return remainingShips == 0;
+    }
+
+    /**
+     * Lấy những thuyền chưa chìm
+     * chỉ trả về khi {@link GamePlay#getGameMode()}  == {@link GamePlay#END_MODE} nếu không phải
+     * thì luôn trả về {@code null}
+     *
+     * @return danh sách thuyền
+     */
+    public List<Ship> getRemainingShips() {
+        List<Ship> remainingShips = new ArrayList<>();
+        if (gamePlay.getGameMode() == GamePlay.END_MODE) {
+            for (Ship ship : ships) {
+                if (ship.isSunk()) {
+                    remainingShips.add(ship);
+                }
+            }
+        }
+        else {
+            return null;
+        }
+
+        return remainingShips;
     }
 }
 
