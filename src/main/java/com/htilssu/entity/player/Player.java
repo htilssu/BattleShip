@@ -5,68 +5,81 @@ import com.htilssu.entity.game.GamePlay;
 import java.util.UUID;
 
 public class Player {
-  String id = UUID.randomUUID().toString();
-  String name = "DepTrai";
-  PlayerBoard playerBoard;
 
-  /**
-   * Mảng lưu lịch sử bắn của người chơi
-   *
-   * <p>đánh dấu là {@code 0} nếu vị trí đó chưa được bắn, đánh dấu là {@code 2} nếu bắn trúng tàu,
-   * đánh dấu là {@code 1} nếu bắn trượt, đánh dấu là {@code 3} nếu tàu đó đã bị chìm
-   */
-  byte[][] shot;
+    String id = UUID.randomUUID().toString();
+    String name = "DepTrai";
+    int totalShoot = 0;
+    PlayerBoard playerBoard;
+    int score = 0;
+    /**
+     * Mảng lưu lịch sử bắn của người chơi
+     *
+     * <p>đánh dấu là {@code 0} nếu vị trí đó chưa được bắn, đánh dấu là {@code 2} nếu bắn trúng tàu,
+     * đánh dấu là {@code 1} nếu bắn trượt, đánh dấu là {@code 3} nếu tàu đó đã bị chìm
+     */
+    byte[][] shot;
+    private GamePlay gamePlay;
+    public Player(String id, String name) {
+        this.id = id;
+        this.name = name;
+    }
 
-  private GamePlay gamePlay;
+    public Player(String name) {
+        this.name = name;
+    }
 
-  public Player(String id, String name) {
-    this.id = id;
-    this.name = name;
-  }
+    public Player() {
+    }
 
-  public Player(String name) {
-    this.name = name;
-  }
+    public void resetData() {
+        totalShoot = 0;
+    }
 
-  public Player() {}
+    public int getScore() {
+        return score;
+    }
 
-  public byte[][] getShot() {
-    return shot;
-  }
+    public void plusScore(int score) {
+        this.score += score;
+    }
 
-  public void setShot(byte[][] shot) {
-    this.shot = shot;
-  }
+    public byte[][] getShot() {
+        return shot;
+    }
 
-  public void setPlayerBoard(PlayerBoard playerBoard) {
-    this.playerBoard = playerBoard;
-    this.playerBoard.player = this;
-  }
+    public void setShot(byte[][] shot) {
+        this.shot = shot;
+    }
 
-  public String getName() {
-    return name;
-  }
+    public void setPlayerBoard(PlayerBoard playerBoard) {
+        this.playerBoard = playerBoard;
+        this.playerBoard.player = this;
+    }
 
-  public void setName(String name) {
-    this.name = name;
-  }
+    public String getName() {
+        return name;
+    }
 
-  public String getId() {
-    return id;
-  }
+    public void setName(String name) {
+        this.name = name;
+    }
 
-  public PlayerBoard getBoard() {
-    return playerBoard;
-  }
+    public String getId() {
+        return id;
+    }
 
-  public GamePlay getGamePlay() {
-    return gamePlay;
-  }
+    public PlayerBoard getBoard() {
+        return playerBoard;
+    }
 
-  public void setGamePlay(GamePlay gamePlay) {
-    this.gamePlay = gamePlay;
-    if (playerBoard != null) playerBoard.setGamePlay(gamePlay);
-  }
+    public GamePlay getGamePlay() {
+        return gamePlay;
+    }
+
+    public void setGamePlay(GamePlay gamePlay) {
+        this.gamePlay = gamePlay;
+        if (playerBoard != null) playerBoard.setGamePlay(gamePlay);
+    }
 
   /*  public boolean canShoot(Position position) {
     return shot[position.x][position.y] != GameManager.UNKNOWN;

@@ -66,7 +66,8 @@ public class GameButton extends JButton {
         }
     }
 
-    protected void setTextSize(int size) {
+    public void setTextSize(int size) {
         this.setFont(getFont().deriveFont((float) size));
     }
+
 }

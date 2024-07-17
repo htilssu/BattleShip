@@ -1,6 +1,7 @@
 package com.htilssu.ui.screen;
 
 import com.htilssu.BattleShip;
+import com.htilssu.manager.GameManager;
 import com.htilssu.manager.ScreenManager;
 import com.htilssu.manager.SoundManager;
 import com.htilssu.setting.GameSetting;
@@ -110,6 +111,7 @@ public class MenuScreen extends JPanel {
                 break;
         }
     }
+
 
     @Override
     protected void paintComponent(Graphics g) {

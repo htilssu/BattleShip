@@ -10,7 +10,6 @@ import com.htilssu.ui.component.GameLabel;
 import com.htilssu.ui.component.GamePanel;
 import com.htilssu.ui.component.GameTextField;
 import com.htilssu.util.AssetUtils;
-import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
@@ -265,7 +264,7 @@ public class NetworkScreen extends GamePanel implements ComponentListener {
         timer.start();
     }
 
-    private @NotNull Timer getTimer(int speed, int targetWidth, int targetHeight) {
+    private Timer getTimer(int speed, int targetWidth, int targetHeight) {
         Timer timer = new Timer(10, null);
         timer.addActionListener(e -> {
             int newWidth = Math.min(hostSettingPanel.getWidth() + speed, targetWidth);

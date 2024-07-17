@@ -38,6 +38,7 @@ public final class ScreenManager {
     public static final int INTRODUCTION_SCREEN = 7;
 
     public static final int START2_PLAYER_SCREEN = 6;   ///Game Tuan
+    public static final int END_GAME_SCREEN = 7;
 
     private final Map<Integer, JPanel> screenMap = new HashMap<>();
     private final BattleShip battleShip;
@@ -56,6 +57,7 @@ public final class ScreenManager {
         screenMap.put(INTRODUCTION_SCREEN, new IntroductionScreen(battleShip));  //gioi thieu game
         screenMap.put(PICK_SCREEN, new PickScreen(battleShip));
         screenMap.put(START2_PLAYER_SCREEN, new Start2Player(battleShip));   ///test
+        screenMap.put(END_GAME_SCREEN, new EndGameScreen(battleShip));
     }
 
     public BattleShip getBattleShip() {

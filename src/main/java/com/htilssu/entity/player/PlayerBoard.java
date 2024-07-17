@@ -7,7 +7,6 @@ import com.htilssu.entity.game.GamePlay;
 import com.htilssu.render.Collision;
 import com.htilssu.render.Renderable;
 import com.htilssu.util.AssetUtils;
-import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -46,7 +45,7 @@ public class PlayerBoard extends Collision implements Renderable {
     }
 
     /**
-     * Cập nhật kích thước của bảng người chơi
+     * Cập nhật kích thước của bảng người chơi bao gồm {@link PlayerBoard#cellSize} và kích thước của các tàu
      */
     public void update() {
         cellSize = getHeight() / size;
@@ -56,6 +55,14 @@ public class PlayerBoard extends Collision implements Renderable {
         }
     }
 
+    /**
+     * Đặt kích thước của bảng người chơi
+     * mỗi khi set lại kích thước, gọi hàm {@link PlayerBoard#update()} để cập nhật lại kích
+     * thước của thuyền và {@link PlayerBoard#cellSize}
+     *
+     * @param width  Kích thước chiều rộng
+     * @param height Kích thước chiều cao
+     */
     @Override
     public void setSize(int width, int height) {
         //noinspection SuspiciousNameCombination
@@ -88,7 +95,11 @@ public class PlayerBoard extends Collision implements Renderable {
     }
 
     public boolean canAddShip(Ship ship) {
-        return canAddShip(ship.getPosition().y, ship.getPosition().x, ship.getDirection(), ship.getShipType());
+        return canAddShip(ship.getPosition().y,
+                          ship.getPosition().x,
+                          ship.getDirection(),
+                          ship.getShipType()
+        );
     }
 
     public boolean canAddShip(int row, int col, int direction, int shipType) {
@@ -140,7 +151,7 @@ public class PlayerBoard extends Collision implements Renderable {
     }
 
     @Override
-    public void render(@NotNull Graphics g) {
+    public void render(Graphics g) {
 
         // Vẽ bảng người chơi
         Graphics2D g2d = (Graphics2D) g.create();
@@ -181,7 +192,11 @@ public class PlayerBoard extends Collision implements Renderable {
         for (int i = 0; i < size; i++) {
 
             g2d.drawLine(getX(), getY() + i * cellSize, getX() + getWidth(), getY() + i * cellSize);
-            g2d.drawLine(getX() + i * cellSize, getY(), getX() + i * cellSize, getY() + getHeight());
+            g2d.drawLine(getX() + i * cellSize,
+                         getY(),
+                         getX() + i * cellSize,
+                         getY() + getHeight()
+            );
         }
 
 
@@ -204,10 +219,22 @@ public class PlayerBoard extends Collision implements Renderable {
 
         switch (shotBoard[row][col]) {
             case (byte) SHOOT_MISS:
-                g.drawImage(AssetUtils.getImage(AssetUtils.ASSET_SHOOT_MISS), x, y, cellSize, cellSize, null);
+                g.drawImage(AssetUtils.getImage(AssetUtils.ASSET_SHOOT_MISS),
+                            x,
+                            y,
+                            cellSize,
+                            cellSize,
+                            null
+                );
                 break;
             case (byte) SHOOT_HIT:
-                g.drawImage(AssetUtils.getImage(AssetUtils.ASSET_SHOOT_HIT), x, y, cellSize, cellSize, null);
+                g.drawImage(AssetUtils.getImage(AssetUtils.ASSET_SHOOT_HIT),
+                            x,
+                            y,
+                            cellSize,
+                            cellSize,
+                            null
+                );
                 break;
         }
 

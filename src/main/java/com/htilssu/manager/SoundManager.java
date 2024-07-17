@@ -105,7 +105,8 @@ một AudioInputStream mới sẽ được tạo và sử dụng, am thanh co th
             backgroundClip = AudioSystem.getClip();
             backgroundClip.open(audioInputStream);
             setVolume(backgroundClip, currentVolume); //  Đặt âm lượng cho nhạc nền
-            backgroundClip.loop(Clip.LOOP_CONTINUOUSLY);
+            //TODO:Delete comment to loop background sound
+//            backgroundClip.loop(Clip.LOOP_CONTINUOUSLY);
             isBackgroundPlaying = true;
         } catch (LineUnavailableException | IOException e) {
             GameLogger.log(e.getMessage());
