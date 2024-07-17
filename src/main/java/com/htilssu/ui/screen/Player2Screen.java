@@ -73,6 +73,12 @@ public class Player2Screen extends JFrame implements ComponentListener {
         btnHideSelfGrid.setBounds(1190, 470, 210, 50);
         btnHideSelfGrid.setText("Hide SelfGrid");
 
+        //Ten nguoi choi
+        GameButton NamePlayer = new GameButton(AssetUtils.getImage(AssetUtils.ASSET_BG_NEXT)); //truyen hinh nen duoc
+        NamePlayer.setBounds(650, 460, 250, 50); //xet vi tri
+        NamePlayer.setText("Status "+ name);
+        contentPane.add(NamePlayer);
+
         //Add cac phan tu vao GamePanel
         contentPane.add(selfGrid);
         contentPane.add(attackGrid);
@@ -83,7 +89,7 @@ public class Player2Screen extends JFrame implements ComponentListener {
         contentPane.add(btnHideSelfGrid);
 
         //cac du lieu dang choi game
-        setInforBox(contentPane, name);
+        setInforBox(contentPane);
         setButtonGame(contentPane);
 
         btnRotate.addActionListener(e -> {
@@ -159,12 +165,9 @@ public class Player2Screen extends JFrame implements ComponentListener {
         gamePanel.add(comboBox);
     }
 
-    private void setInforBox(GamePanel gamePanel, String name) {
+    private void setInforBox(GamePanel gamePanel) {
         GamePanel gamePanelBox = new GamePanel();
         // Tạo các hộp chứa thông tin
-        JLabel statusLabel = new JLabel("Status for " + name);
-        statusLabel.setFont(new Font("Roboto", Font.BOLD, 20));
-        statusLabel.setForeground(Color.RED);
 
         JLabel ownShipsLabel = new JLabel("So tau cua minh : ");
         shipBeginning = new JLabel("" + Integer.toString(size));
@@ -185,8 +188,6 @@ public class Player2Screen extends JFrame implements ComponentListener {
         gamePanelBox.setRadius(50);
 
         // Thêm các thông tin vào contentPane
-        gamePanelBox.add(createCenteredPanel(statusLabel));
-        gamePanelBox.add(Box.createVerticalStrut(10));
 
         gamePanelBox.add(createCenteredPanel(ownShipsLabel, shipBeginning));
         gamePanelBox.add(Box.createVerticalStrut(2));
@@ -197,7 +198,7 @@ public class Player2Screen extends JFrame implements ComponentListener {
         gamePanelBox.add(createCenteredPanel(enemyShipsSunkLabel, enemyShipSunk));
 
         gamePanelBox.setBackground(new Color(0, 0, 0, 0.5f));
-        gamePanelBox.setBounds(600, 460, 300, 300);
+        gamePanelBox.setBounds(625, 510, 300, 200);
         gamePanelBox.setLayout(new BoxLayout(gamePanelBox, BoxLayout.Y_AXIS));
 
         gamePanel.add(gamePanelBox);

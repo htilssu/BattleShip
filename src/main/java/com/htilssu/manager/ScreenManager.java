@@ -35,6 +35,8 @@ public final class ScreenManager {
      */
     public static final int NETWORK_SCREEN = 5;
 
+    public static final int INTRODUCTION_SCREEN = 7;
+
     public static final int START2_PLAYER_SCREEN = 6;   ///Game Tuan
 
     private final Map<Integer, JPanel> screenMap = new HashMap<>();
@@ -43,7 +45,7 @@ public final class ScreenManager {
     /***
      * Màn hình hiện tại
      */
-    int currentScreen = PLAY_SCREEN;
+    int currentScreen = MENU_SCREEN;
 
     public ScreenManager(BattleShip battleShip) {
         this.battleShip = battleShip;
@@ -51,6 +53,7 @@ public final class ScreenManager {
         screenMap.put(PLAY_SCREEN, new PlayScreen(battleShip));
         screenMap.put(SETTING_SCREEN, new SettingScreen(battleShip));
         screenMap.put(NETWORK_SCREEN, new NetworkScreen(battleShip));
+        screenMap.put(INTRODUCTION_SCREEN, new IntroductionScreen(battleShip));  //gioi thieu game
         screenMap.put(PICK_SCREEN, new PickScreen(battleShip));
         screenMap.put(START2_PLAYER_SCREEN, new Start2Player(battleShip));   ///test
     }
