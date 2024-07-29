@@ -35,7 +35,7 @@ public final class ScreenManager {
      */
     public static final int NETWORK_SCREEN = 5;
 
-    public static final int INTRODUCTION_SCREEN = 7;
+    public static final int INTRODUCTION_SCREEN = 8;
 
     public static final int START2_PLAYER_SCREEN = 6;   ///Game Tuan
     public static final int END_GAME_SCREEN = 7;
