@@ -388,9 +388,6 @@ public class PlayerBoard extends Collision implements Renderable {
                 }
             }
         }
-        else {
-            return null;
-        }
 
         return remainingShips;
     }

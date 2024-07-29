@@ -188,9 +188,9 @@ public abstract class MultiHandler {
                     break;
 
                 case END_GAME:
-                    sendRemainingShips();
                     currentGamePlay.setWinner(0);
                     currentGamePlay.endGame();
+                    sendRemainingShips();
                     battleShip.getScreenManager().getCurrentScreen().repaint();
                     battleShip.getScreenManager().getCurrentScreen().updateUI();
                     break;

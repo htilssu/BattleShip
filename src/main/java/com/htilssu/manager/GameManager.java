@@ -19,6 +19,7 @@ public final class GameManager {
     BattleShip battleShip;
     List<Player> players;
     GamePlay currentGamePlay;
+
     private boolean multiPlayer;
 
     public GameManager(BattleShip battleShip) {
