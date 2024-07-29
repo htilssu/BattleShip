@@ -53,9 +53,9 @@ public class Host extends MultiHandler implements Runnable {
 
     @Override
     public void run() {
-        while (isRunning) {
+        while (isRunning && serverSocket != null) {
             try {
-                socket = serverSocket != null ? serverSocket.accept() : null;
+                socket = serverSocket.accept();
             } catch (IOException e) {
                 GameLogger.error(e.getMessage());
             }

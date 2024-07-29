@@ -76,6 +76,7 @@ public class EndGameScreen extends GamePanel implements ComponentListener {
         backToMainMenuButton.setSize(new Dimension(200, 70));
         backToMainMenuButton.addActionListener(e -> {
             battleShip.changeScreen(ScreenManager.MENU_SCREEN);
+            battleShip.getClient().disconnect();
         });
 
         add(backToMainMenuButton, 0);
@@ -138,6 +139,7 @@ public class EndGameScreen extends GamePanel implements ComponentListener {
 
     public void setOpponentBoard(PlayerBoard opponentBoard) {
         this.opponentBoard = opponentBoard;
+        playerBoardPanel.setPlayerBoard(opponentBoard);
         updateComponents();
     }
 
