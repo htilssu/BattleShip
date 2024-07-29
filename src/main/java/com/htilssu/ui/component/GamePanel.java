@@ -9,6 +9,7 @@ import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 
 public class GamePanel extends JPanel {
+
     private BufferedImage backgroundImage;
     private BufferedImage roundBackgroundImage;
     private int radius = 0;
@@ -24,9 +25,9 @@ public class GamePanel extends JPanel {
         setBackground(Color.TRANSPARENT);
     }
 
-    public static GamePanel createVerticalBox(){
-        var gamePanel = new  GamePanel();
-        gamePanel.setLayout(new BoxLayout(gamePanel,BoxLayout.Y_AXIS));
+    public static GamePanel createVerticalBox() {
+        var gamePanel = new GamePanel();
+        gamePanel.setLayout(new BoxLayout(gamePanel, BoxLayout.Y_AXIS));
         return gamePanel;
     }
 
@@ -66,7 +67,8 @@ public class GamePanel extends JPanel {
     protected void paintComponent(Graphics g) {
         Graphics2D g2d = (Graphics2D) g.create();
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g2d.setClip(new Area(new RoundRectangle2D.Double(0, 0, getWidth(), getHeight(), radius, radius)));
+        g2d.setClip(new Area(
+                new RoundRectangle2D.Double(0, 0, getWidth(), getHeight(), radius, radius)));
         g2d.setColor(getBackground());
         g2d.fill(new RoundRectangle2D.Double(0, 0, getWidth(), getHeight(), radius, radius));
 

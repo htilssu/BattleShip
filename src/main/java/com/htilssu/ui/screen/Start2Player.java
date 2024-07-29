@@ -9,6 +9,7 @@ import com.htilssu.state.GameState;
 import com.htilssu.state.MidGame2;
 import com.htilssu.ui.component.GameButton;
 import com.htilssu.util.AssetUtils;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -17,6 +18,7 @@ import java.awt.image.BufferedImage;
 import java.util.concurrent.ExecutionException;
 
 public class Start2Player extends JPanel implements GameState {
+
     GameState beginningOfTheGame;
     GameState middleOfTheGame;
     GameState endOfTheGame;
@@ -34,7 +36,7 @@ public class Start2Player extends JPanel implements GameState {
     private JLabel loadingImageLabel;
     private ImageIcon[] images;
 
-    public Start2Player(){}
+    public Start2Player() {}
 
     public Start2Player(BattleShip battleShip) {
         this.battleShip = battleShip;
@@ -70,6 +72,17 @@ public class Start2Player extends JPanel implements GameState {
                 startLoading();
             }
         });
+    }
+
+    private void loadImageScreenStart() {
+        backgroundImage = AssetUtils.loadImage("/images/sea_of_thief.png");
+        // Tải hình ảnh
+        images = new ImageIcon[]{
+                resizeImageIcon(new ImageIcon("src/main/resources/images/Loading1.png"), 210, 35),
+                resizeImageIcon(new ImageIcon("src/main/resources/images/Loading2.png"), 210, 35),
+                resizeImageIcon(new ImageIcon("src/main/resources/images/Loading3.png"), 210, 35),
+                resizeImageIcon(new ImageIcon("src/main/resources/images/Loading4.png"), 210, 35)
+        };
     }
 
     private void startLoading() {
@@ -118,27 +131,15 @@ public class Start2Player extends JPanel implements GameState {
         return new ImageIcon(resizedImage);
     }
 
-    private void loadImageScreenStart() {
-        backgroundImage = AssetUtils.loadImage("/images/sea_of_thief.png");
-        // Tải hình ảnh
-        images = new ImageIcon[] {
-                resizeImageIcon(new ImageIcon("src/main/resources/images/Loading1.png"), 210, 35),
-                resizeImageIcon(new ImageIcon("src/main/resources/images/Loading2.png"), 210, 35),
-                resizeImageIcon(new ImageIcon("src/main/resources/images/Loading3.png"), 210, 35),
-                resizeImageIcon(new ImageIcon("src/main/resources/images/Loading4.png"), 210, 35)
-        };
-    }
-
-    public void SetNew()
-    {
+    public void SetNew() {
         //SoundManager.playBackGround(SoundManager.BACKGROUND_TEST);
-        player1 = new Player2Screen("Player1", true,this);
-        player2 = new Player2Screen("Player2", false,this);
+        player1 = new Player2Screen("Player1", true, this);
+        player2 = new Player2Screen("Player2", false, this);
         player1Data = new PlayerData(player1);
         player2Data = new PlayerData(player2);
-        beginningOfTheGame = new BeginGame2(this, player1,player2);
-        middleOfTheGame = new MidGame2(this, player1,player2);
-        endOfTheGame = new EndGame2(this, player1,player2);
+        beginningOfTheGame = new BeginGame2(this, player1, player2);
+        middleOfTheGame = new MidGame2(this, player1, player2);
+        endOfTheGame = new EndGame2(this, player1, player2);
         state = beginningOfTheGame; //set the state of the game to be the beginning of the game
     }
 

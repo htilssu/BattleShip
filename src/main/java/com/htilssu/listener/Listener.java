@@ -3,7 +3,8 @@ package com.htilssu.listener;
 import com.htilssu.annotation.EventHandler;
 
 /**
- * Interface đánh dấu một class là một listener, khi 1 listener implement interface này thì khi định nghĩa các hàm xử
+ * Interface đánh dấu một class là một listener, khi 1 listener implement interface này thì khi
+ * định nghĩa các hàm xử
  * lý bắt buộc phải có annotation {@link EventHandler}
  * <p>
  * Ví dụ:
@@ -24,4 +25,5 @@ import com.htilssu.annotation.EventHandler;
  * @see EventHandler
  */
 public interface Listener {
+
 }

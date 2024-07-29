@@ -110,13 +110,15 @@ public class Client extends MultiHandler implements Runnable {
      * @param port Cổng kết nối
      */
     public void connect(InetAddress ip, short port) {
-        try {
-            socket = new Socket(ip, port);
-            new Thread(this).start();
-            status = "Đã kết nối đến máy chủ";
-        } catch (IOException e) {
-            disconnect();
-            status = "Không thể kết nối đến máy chủ";
+        if (!isConnected()) {
+            try {
+                socket = new Socket(ip, port);
+                new Thread(this).start();
+                status = "Đã kết nối đến máy chủ";
+            } catch (IOException e) {
+                disconnect();
+                status = "Không thể kết nối đến máy chủ";
+            }
         }
     }
 

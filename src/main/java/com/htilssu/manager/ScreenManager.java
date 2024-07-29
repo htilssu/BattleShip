@@ -12,6 +12,7 @@ import java.util.Map;
  * Lớp quản lý các màn hình trong game
  */
 public final class ScreenManager {
+
     /**
      * Màn hình bắt đầu - màn hình chọn thể loại, setting
      */
@@ -65,6 +66,7 @@ public final class ScreenManager {
      * Lấy màn hình theo loại screen
      *
      * @param screen số nguyên biểu diễn loại màn hình
+     *
      * @return Màn hình được kế thừa từ {@link JPanel} hoặc {@code null} nếu không tìm thấy
      */
     public JPanel getScreen(int screen) {
@@ -81,14 +83,16 @@ public final class ScreenManager {
     }
 
     /**
-     * Đặt màn hình hiện tại ex: {@link #PLAY_SCREEN} là màn hình chơi game hoặc {@link #MENU_SCREEN}
+     * Đặt màn hình hiện tại ex: {@link #PLAY_SCREEN} là màn hình chơi game hoặc
+     * {@link #MENU_SCREEN}
      * là màn hình chính
      *
      * @param currentScreen số nguyên biểu diễn loại màn hình
      */
     public void setCurrentScreen(int currentScreen) {
         this.currentScreen = currentScreen;
-        getCurrentScreen().setPreferredSize(new Dimension(battleShip.getWidth(), battleShip.getHeight()));
+        getCurrentScreen().setPreferredSize(
+                new Dimension(battleShip.getWidth(), battleShip.getHeight()));
         getCurrentScreen().requestFocus();
     }
 }

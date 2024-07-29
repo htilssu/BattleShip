@@ -9,9 +9,9 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 
 public class GameButton extends JButton {
+
     private BufferedImage backgroundImage;
     private boolean isHovered = false;
-
 
     public GameButton(BufferedImage bufferedImage) throws HeadlessException {
         this();

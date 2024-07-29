@@ -8,6 +8,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 
 public class CustomSliderUI extends BasicSliderUI {
+
     private static final int THUMB_WIDTH = 8;
     private static final int THUMB_HEIGHT = 16;
     private static final int TRACK_HEIGHT = 12;
@@ -48,7 +49,8 @@ public class CustomSliderUI extends BasicSliderUI {
         Graphics2D g2d = (Graphics2D) g.create();
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+                RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 
         super.paint(g2d, c);
         g2d.dispose();
@@ -63,7 +65,8 @@ public class CustomSliderUI extends BasicSliderUI {
     public void paintTrack(Graphics g) {
         if (trackImage != null) {
             Graphics2D g2d = (Graphics2D) g.create();
-            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                    RenderingHints.VALUE_ANTIALIAS_ON);
 
             Rectangle trackBounds = trackRect;
             int trackX = trackBounds.x;
@@ -78,9 +81,11 @@ public class CustomSliderUI extends BasicSliderUI {
     public void paintThumb(Graphics g) {
         if (thumbImage != null) {
             Graphics2D g2d = (Graphics2D) g.create();
-            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                    RenderingHints.VALUE_ANTIALIAS_ON);
             g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-            g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+            g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+                    RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 
             int thumbX = thumbRect.x + (thumbRect.width - THUMB_WIDTH) / 2;
             int thumbY = thumbRect.y + (thumbRect.height - THUMB_HEIGHT) / 2;

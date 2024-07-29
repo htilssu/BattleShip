@@ -4,26 +4,27 @@ import com.htilssu.entity.component.AttackGrid;
 import com.htilssu.entity.component.SelfGrid;
 import com.htilssu.listener.ButtonClickListener;
 import com.htilssu.manager.SoundManager;
-import com.htilssu.setting.GameSetting;
 import com.htilssu.ui.component.GameButton;
 import com.htilssu.ui.component.GamePanel;
 import com.htilssu.util.AssetUtils;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.image.BufferedImage;
 
 public class Player2Screen extends JFrame implements ComponentListener {
 
     public static final int MAXIMIZED_BOTH = JFrame.MAXIMIZED_BOTH;
+    public static boolean flagVolumeplaySound = true;
     public JLabel ownShipSunk;
     public JLabel enemyShipSunk;
     int size;
     boolean isbeginningOfTheGameOfPlayer1 = true;
     boolean isbeginningOfTheGameOfPlayer2 = true;
-    public static boolean flagVolumeplaySound = true;
-
     Start2Player battleShip;
     JLabel shipBeginning;
     private BufferedImage backgroundImage;
@@ -44,7 +45,8 @@ public class Player2Screen extends JFrame implements ComponentListener {
 
         //full kich thuoc man hinh.
         setExtendedState(JFrame.MAXIMIZED_BOTH);
-        //setPreferredSize(new Dimension(GameSetting.WIDTH, GameSetting.HEIGHT));  //kich thuoc tu gameSetting
+        //setPreferredSize(new Dimension(GameSetting.WIDTH, GameSetting.HEIGHT));  //kich thuoc
+        // tu gameSetting
 
         // Thêm các thành phần khác vào contentPane
         SelfGrid selfGrid = new SelfGrid(name, startScreen);
@@ -54,22 +56,27 @@ public class Player2Screen extends JFrame implements ComponentListener {
         selfGrid.setBounds(1000, 70, 360, 360); //  vị trí và kích thước cho SelfGrid
         attackGrid.setBounds(100, 70, 420, 420); //  vị trí và kích thước cho AttackGrid
 
-        GameButton HeaderAttack = new GameButton(AssetUtils.getImage(AssetUtils.ASSET_BG_ATTACK)); //truyen hinh nen duoc
+        GameButton HeaderAttack = new GameButton(
+                AssetUtils.getImage(AssetUtils.ASSET_BG_ATTACK)); //truyen hinh nen duoc
         HeaderAttack.setBounds(170, 17, 250, 50); //xet vi tri
         HeaderAttack.setText("ATTACK SHIP");
-        GameButton HeaderSelf = new GameButton(AssetUtils.getImage(AssetUtils.ASSET_BG_ATTACK)); //truyen hinh nen duoc
+        GameButton HeaderSelf = new GameButton(
+                AssetUtils.getImage(AssetUtils.ASSET_BG_ATTACK)); //truyen hinh nen duoc
         HeaderSelf.setBounds(1070, 17, 250, 50); //xet vi tri
         HeaderSelf.setText("SELF SHIP");
 
-        GameButton btnNext = new GameButton(AssetUtils.getImage(AssetUtils.ASSET_BG_NEXT), 1); //truyen hinh nen duoc
+        GameButton btnNext = new GameButton(AssetUtils.getImage(AssetUtils.ASSET_BG_NEXT),
+                1); //truyen hinh nen duoc
         btnNext.setBounds(700, 290, 150, 50); //xet vi tri
         btnNext.setText("Next");
 
-        GameButton btnRotate = new GameButton(AssetUtils.getImage(AssetUtils.ASSET_BG_BTNLISTENER), 1);
+        GameButton btnRotate = new GameButton(AssetUtils.getImage(AssetUtils.ASSET_BG_BTNLISTENER),
+                1);
         btnRotate.setBounds(1000, 470, 170, 50);
         btnRotate.setText("Horizontal");
         //Nut an hien Luoi dat thuyen
-        GameButton btnHideSelfGrid = new GameButton(AssetUtils.getImage(AssetUtils.ASSET_BG_BTNLISTENER), 1);
+        GameButton btnHideSelfGrid = new GameButton(
+                AssetUtils.getImage(AssetUtils.ASSET_BG_BTNLISTENER), 1);
         btnHideSelfGrid.setBounds(1190, 470, 210, 50);
         btnHideSelfGrid.setText("Hide SelfGrid");
 
@@ -90,7 +97,8 @@ public class Player2Screen extends JFrame implements ComponentListener {
             selfGrid.rotateShip();
             if (btnRotate.getText().equals("Vertical")) {
                 btnRotate.setText("Horizontal");
-            } else {
+            }
+            else {
                 btnRotate.setText("Vertical");
             }
         });
@@ -101,7 +109,8 @@ public class Player2Screen extends JFrame implements ComponentListener {
             btnHideSelfGrid.setText(isSelfGridVisible ? "Hide SelfGrid" : "Show SelfGrid");
         });
 
-        ButtonClickListener buttonClickListener = new ButtonClickListener(name, startScreen, shipBeginning, isbeginningOfTheGameOfPlayer1, this);
+        ButtonClickListener buttonClickListener = new ButtonClickListener(name, startScreen,
+                shipBeginning, isbeginningOfTheGameOfPlayer1, this);
         btnNext.setActionCommand("next");
         btnNext.addActionListener(buttonClickListener);
 
@@ -119,44 +128,6 @@ public class Player2Screen extends JFrame implements ComponentListener {
 
     private void loadBackgroundImage() {
         backgroundImage = AssetUtils.loadImage("/images/sea1.png");
-    }
-
-    private void setButtonGame(GamePanel gamePanel) {
-        turnSound = new GameButton(AssetUtils.loadImage("/images/turnSound.png"));
-        turnSound.setBounds(1450, 30, 60, 60);
-        gamePanel.add(turnSound);
-        turnSound.addActionListener(e -> {
-            SoundManager.flagVolumeplaySound = !SoundManager.flagVolumeplaySound;
-            if (SoundManager.flagVolumeplaySound) {
-                turnSound.setBackgroundImage(AssetUtils.loadImage("/images/turnSound.png"));
-            } else {
-                turnSound.setBackgroundImage(AssetUtils.loadImage("/images/offSound.png"));
-            }
-        });
-
-        repaint();
-
-        // Tạo các mục cho JComboBox
-        String[] items = { "Item 1", "Item 2", "Item 3", "Item 4" };
-        // Tạo JComboBox nhưng không hiển thị ngay
-        JComboBox<String> comboBox = new JComboBox<>(items);
-        comboBox.setBounds(670, 290, 200, 30);
-        comboBox.setVisible(false); // Ẩn JComboBox ban đầu
-
-        GameButton Menu1 = new GameButton(AssetUtils.loadImage("/images/Menu1.png"));
-        Menu1.setBounds(1450, 100, 60, 60);
-
-        // Thêm ActionListener cho JButton
-        Menu1.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // Hiển thị hoặc ẩn JComboBox khi nhấn vào JButton
-                comboBox.setVisible(!comboBox.isVisible());
-            }
-        });
-
-        gamePanel.add(Menu1);
-        gamePanel.add(comboBox);
     }
 
     private void setInforBox(GamePanel gamePanel, String name) {
@@ -203,6 +174,50 @@ public class Player2Screen extends JFrame implements ComponentListener {
         gamePanel.add(gamePanelBox);
     }
 
+    private void setButtonGame(GamePanel gamePanel) {
+        turnSound = new GameButton(AssetUtils.loadImage("/images/turnSound.png"));
+        turnSound.setBounds(1450, 30, 60, 60);
+        gamePanel.add(turnSound);
+        turnSound.addActionListener(e -> {
+            SoundManager.flagVolumeplaySound = !SoundManager.flagVolumeplaySound;
+            if (SoundManager.flagVolumeplaySound) {
+                turnSound.setBackgroundImage(AssetUtils.loadImage("/images/turnSound.png"));
+            }
+            else {
+                turnSound.setBackgroundImage(AssetUtils.loadImage("/images/offSound.png"));
+            }
+        });
+
+        repaint();
+
+        // Tạo các mục cho JComboBox
+        String[] items = {"Item 1", "Item 2", "Item 3", "Item 4"};
+        // Tạo JComboBox nhưng không hiển thị ngay
+        JComboBox<String> comboBox = new JComboBox<>(items);
+        comboBox.setBounds(670, 290, 200, 30);
+        comboBox.setVisible(false); // Ẩn JComboBox ban đầu
+
+        GameButton Menu1 = new GameButton(AssetUtils.loadImage("/images/Menu1.png"));
+        Menu1.setBounds(1450, 100, 60, 60);
+
+        // Thêm ActionListener cho JButton
+        Menu1.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Hiển thị hoặc ẩn JComboBox khi nhấn vào JButton
+                comboBox.setVisible(!comboBox.isVisible());
+            }
+        });
+
+        gamePanel.add(Menu1);
+        gamePanel.add(comboBox);
+    }
+
+    private void setTypeText(JLabel label) {
+        label.setFont(new Font("Roboto", Font.BOLD, 15));
+        label.setForeground(Color.RED);
+    }
+
     private static JPanel createCenteredPanel(JComponent... components) {
         JPanel panel = new JPanel();
         //panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
@@ -213,11 +228,6 @@ public class Player2Screen extends JFrame implements ComponentListener {
             panel.add(Box.createHorizontalGlue());
         }
         return panel;
-    }
-
-    private void setTypeText(JLabel label) {
-        label.setFont(new Font("Roboto", Font.BOLD, 15));
-        label.setForeground(Color.RED);
     }
 
     public void showScreen() {
@@ -252,15 +262,18 @@ public class Player2Screen extends JFrame implements ComponentListener {
     public void componentResized(ComponentEvent e) {
 
     }
+
     @Override
     public void componentMoved(ComponentEvent e) {
 
     }
+
     @Override
     public void componentShown(ComponentEvent e) {
         if (SoundManager.flagVolumeplaySound) {
             turnSound.setBackgroundImage(AssetUtils.loadImage("/images/turnSound.png"));
-        } else {
+        }
+        else {
             turnSound.setBackgroundImage(AssetUtils.loadImage("/images/offSound.png"));
         }
         repaint();

@@ -3,6 +3,7 @@ package com.htilssu.render;
 import java.awt.*;
 
 public abstract class Collision {
+
     protected Point location = new Point(0, 0);
     Dimension dimension = new Dimension(0, 0);
 
@@ -33,7 +34,6 @@ public abstract class Collision {
     public void setSize(int width, int height) {
         dimension.setSize(width, height);
     }
-
 
     public Point getLocation() {
         return location;

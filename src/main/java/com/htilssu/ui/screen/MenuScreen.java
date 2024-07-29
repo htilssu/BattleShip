@@ -17,34 +17,36 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MenuScreen extends JPanel {
-  private BufferedImage backgroundImage, menuImage, cursorImage;
-  private BattleShip window;
-  private List<CustomButton> buttons;
-  public MenuScreen(BattleShip battleShip) {
-    window = battleShip;
-    setLayout(null); // We will use absolute positioning
-    loadBackgroundImage();
-    loadMenu();
-    setPreferredSize(new Dimension(GameSetting.WIDTH, GameSetting.HEIGHT));
-    buttons = new ArrayList<>();
-    createButtons();
+
+    private BufferedImage backgroundImage, menuImage, cursorImage;
+    private BattleShip window;
+    private List<CustomButton> buttons;
+
+    public MenuScreen(BattleShip battleShip) {
+        window = battleShip;
+        setLayout(null); // We will use absolute positioning
+        loadBackgroundImage();
+        loadMenu();
+        setPreferredSize(new Dimension(GameSetting.WIDTH, GameSetting.HEIGHT));
+        buttons = new ArrayList<>();
+        createButtons();
 
 
-    addComponentListener(
-            new ComponentAdapter() {
-                @Override
-                public void componentResized(ComponentEvent e) {
-                    super.componentResized(e);
-                    repositionButtons();
-                    playBackgroundMusic();
+        addComponentListener(
+                new ComponentAdapter() {
+                    @Override
+                    public void componentResized(ComponentEvent e) {
+                        super.componentResized(e);
+                        repositionButtons();
+                        playBackgroundMusic();
+                    }
                 }
-            }
-    );
-  }
+        );
+    }
 
-  private void loadBackgroundImage() {
-    backgroundImage = AssetUtils.loadImage("/images/sea1.png");
-  }
+    private void loadBackgroundImage() {
+        backgroundImage = AssetUtils.loadImage("/images/sea1.png");
+    }
 
     private void loadMenu() {
         menuImage = AssetUtils.loadImage("/images/MENU2.png"); // Tải hình ảnh biểu tượng menu
@@ -72,14 +74,15 @@ public class MenuScreen extends JPanel {
 
         for (int i = 0; i < buttons.size(); i++) {
             CustomButton button = buttons.get(i);
-            button.setBounds(centerX, startY + i * (buttonHeight + spacing), buttonWidth, buttonHeight);
+            button.setBounds(centerX, startY + i * (buttonHeight + spacing), buttonWidth,
+                    buttonHeight);
         }
-  }
+    }
 
     private void playBackgroundMusic() {
         if (!SoundManager.isBackgroundPlaying()) {
             SoundManager.playBackGround(SoundManager.BACKGROUND_MENU);
-    }
+        }
     }
 
     private void addButton(String imagePath, String actionCommand) {
@@ -91,23 +94,24 @@ public class MenuScreen extends JPanel {
     }
 
     private void handleButtonClick(String actionCommand) {
-    switch (actionCommand) {
-      case "PLAY":
-          ((PickScreen) window.getScreenManager().getScreen(ScreenManager.PICK_SCREEN)).setGameMode(
-                  GameManager.SINGLE_PLAYER);
-        window.changeScreen(ScreenManager.PICK_SCREEN);
-        break;
-      case "SETTING":
-        window.changeScreen(ScreenManager.SETTING_SCREEN);
-        break;
-      case "Multiplayer":
-        window.changeScreen(ScreenManager.NETWORK_SCREEN);
-        break;
-      case "QUIT":
-        System.exit(0);
-        break;
+        switch (actionCommand) {
+            case "PLAY":
+                ((PickScreen) window.getScreenManager().getScreen(
+                        ScreenManager.PICK_SCREEN)).setGameMode(
+                        GameManager.SINGLE_PLAYER);
+                window.changeScreen(ScreenManager.PICK_SCREEN);
+                break;
+            case "SETTING":
+                window.changeScreen(ScreenManager.SETTING_SCREEN);
+                break;
+            case "Multiplayer":
+                window.changeScreen(ScreenManager.NETWORK_SCREEN);
+                break;
+            case "QUIT":
+                System.exit(0);
+                break;
+        }
     }
-  }
 
     @Override
     protected void paintComponent(Graphics g) {

@@ -21,21 +21,23 @@ public class PlayScreen extends JPanel
         setPreferredSize(new Dimension(GameSetting.WIDTH, GameSetting.HEIGHT));
         setFocusable(true);
         setBackground(Color.GRAY);
+        setLayout(null);
         addMouseListener(this);
         addMouseMotionListener(this);
         addComponentListener(this);
         addKeyListener(window);
     }
 
-  @Override
-  protected void paintComponent(Graphics g) {
-    super.paintComponent(g);
-    Graphics2D g2d = (Graphics2D) g;
-    g.drawImage(
-        AssetUtils.getImage(AssetUtils.ASSET_BACK_SEA_2), 0, 0, getWidth(), getHeight(), null);
-    window.getGameManager().getCurrentGamePlay().render(g2d);
-    g2d.setColor(Color.BLACK);
-  }
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        Graphics2D g2d = (Graphics2D) g;
+        g.drawImage(
+                AssetUtils.getImage(AssetUtils.ASSET_BACK_SEA_2), 0, 0, getWidth(), getHeight(),
+                null);
+        window.getGameManager().getCurrentGamePlay().render(g2d);
+        g2d.setColor(Color.BLACK);
+    }
 
     @Override
     public void mouseClicked(MouseEvent e) {

@@ -9,6 +9,7 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 
 public class CustomButton extends JButton {
+
     private BufferedImage normalImage;
     private boolean isHovered; // tao check xem da hover chua
 
@@ -53,7 +54,8 @@ public class CustomButton extends JButton {
             int xOffset = (getWidth() - newWidth) / 2; // toa do x kho hover
             int yOffset = (getHeight() - newHeight) / 2; // toa do y khi hover
             g.drawImage(normalImage, xOffset, yOffset, newWidth, newHeight, this);
-        } else {
+        }
+        else {
             g.drawImage(normalImage, 0, 0, getWidth(), getHeight(), this);
         }
     }

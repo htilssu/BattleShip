@@ -194,7 +194,8 @@ public class NetworkScreen extends GamePanel implements ComponentListener {
             updateUI();
             repaint();
 
-            hostSettingPanel.setLocation((getWidth() - newWidth) / 2, (getHeight() - newHeight) / 2);
+            hostSettingPanel.setLocation((getWidth() - newWidth) / 2,
+                    (getHeight() - newHeight) / 2);
 
             if (newWidth == targetWidth && newHeight == targetHeight) {
                 ((Timer) e.getSource()).stop();
@@ -272,7 +273,8 @@ public class NetworkScreen extends GamePanel implements ComponentListener {
             hostSettingPanel.setSize(newWidth, newHeight);
             updateUI();
             repaint();
-            hostSettingPanel.setLocation((getWidth() - newWidth) / 2, (getHeight() - newHeight) / 2);
+            hostSettingPanel.setLocation((getWidth() - newWidth) / 2,
+                    (getHeight() - newHeight) / 2);
 
             if (newWidth == targetWidth && newHeight == targetHeight) {
                 ((Timer) e.getSource()).stop();
@@ -298,15 +300,18 @@ public class NetworkScreen extends GamePanel implements ComponentListener {
 
     @Override
     public void componentResized(ComponentEvent e) {
-        hostListPanel.setSize((int) (getWidth() - margin * GameSetting.SCALE * 6), getHeight() - margin * 2);
+        hostListPanel.setSize((int) (getWidth() - margin * GameSetting.SCALE * 6),
+                getHeight() - margin * 2);
         hostListPanel.setMaximumSize(
-                new Dimension((int) (getWidth() - margin * GameSetting.SCALE * 6), getHeight() - margin * 3));
+                new Dimension((int) (getWidth() - margin * GameSetting.SCALE * 6),
+                        getHeight() - margin * 3));
         hostListPanel.setLocation((getWidth() - hostListPanel.getWidth()) / 2,
-                                  (getHeight() - hostListPanel.getHeight()) / 2);
+                (getHeight() - hostListPanel.getHeight()) / 2);
         textHostPanel.setLocation((getWidth() - textHostPanel.getWidth()) / 2,
-                                  hostListPanel.getY() - textHostPanel.getHeight() / 2);
+                hostListPanel.getY() - textHostPanel.getHeight() / 2);
 
-        buttonPanel.setLocation(hostListPanel.getX(), hostListPanel.getY() + hostListPanel.getHeight());
+        buttonPanel.setLocation(hostListPanel.getX(),
+                hostListPanel.getY() + hostListPanel.getHeight());
         buttonPanel.setSize(new Dimension(hostListPanel.getWidth(), 64));
 
         hostListPanel.setRadius(40);

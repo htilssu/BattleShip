@@ -33,8 +33,13 @@ public final class GameAction {
      */
     public static final int RESPONSE_SHOOT = 6;
     /**
-     * Kết thúc trò chơi, người nhận được sự kiện {@link #END_GAME} từ {@link #RESPONSE_SHOOT} sẽ là người chiến thắng
+     * Kết thúc trò chơi, người nhận được sự kiện {@link #END_GAME} từ {@link #RESPONSE_SHOOT} sẽ
+     * là người chiến thắng
      */
     public static final int END_GAME = 7;
     public static final int END_TURN = 8;
+    /**
+     * Khi kết thúc game thông tin thuyền còn lại của đối thủ sẽ được hiện lên
+     */
+    public static final int SHIP_LEAK = 9;
 }

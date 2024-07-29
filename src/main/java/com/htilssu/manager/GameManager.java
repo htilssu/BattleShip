@@ -11,7 +11,8 @@ public final class GameManager {
 
     public static final int MAX_PLAYER = 2;
     public static final Player gamePlayer = new Player();
-    public static final int TIME_PER_TURN = 35;
+    public static final int TIME_PER_TURN = 40;
+    public static final int TIME_PER_MATCH = 10 * 60;
     public static final int SINGLE_PLAYER = 1;
     public static final int MULTI_PLAYER = 2;
     public int turn = 0;
@@ -50,9 +51,9 @@ public final class GameManager {
         }
 
         GamePlay newGamePlay = new GamePlay(players,
-                                            turn,
-                                            DifficultyManager.getGameBoardSize(DifficultyManager.difficulty),
-                                            multiPlayer
+                turn,
+                DifficultyManager.getGameBoardSize(DifficultyManager.difficulty),
+                multiPlayer
         );
         newGamePlay.setGameManager(this);
 

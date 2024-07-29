@@ -30,9 +30,14 @@ public class Ship extends Collision implements Renderable {
     Position position;
     PlayerBoard playerBoard;
     int shipType;
+    private boolean isSunk = false;
 
     public Ship(
-            int direction, Sprite sprite, Position position, int shipType, PlayerBoard playerBoard) {
+            int direction,
+            Sprite sprite,
+            Position position,
+            int shipType,
+            PlayerBoard playerBoard) {
         this(direction, sprite, position, shipType);
         this.playerBoard = playerBoard;
     }
@@ -139,5 +144,13 @@ public class Ship extends Collision implements Renderable {
         else {
             sprite.setSize(playerBoard.getCellSize(), (int) (playerBoard.getCellSize() * ratio));
         }
+    }
+
+    public void setIsSunk(boolean b) {
+        this.isSunk = b;
+    }
+
+    public boolean isSunk() {
+        return isSunk;
     }
 }

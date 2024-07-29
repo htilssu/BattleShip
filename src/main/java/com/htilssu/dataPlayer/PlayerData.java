@@ -23,12 +23,14 @@ public class PlayerData {
 
     // Thêm một tàu mới vào flotilla
     public void addShip(ArrayList<Coordinate> coords) {
-        // Kiểm tra xem tàu có bị chồng chéo không hoặc Kiểm tra xem tàu có nằm ở biên của lưới không
-        if (isEdge(coords) || isOverlap(coords)  ) {
+        // Kiểm tra xem tàu có bị chồng chéo không hoặc Kiểm tra xem tàu có nằm ở biên của lưới
+        // không
+        if (isEdge(coords) || isOverlap(coords)) {
             SoundManager.playSound(SoundManager.ERROR_SOUND);
             System.out.println("DAT TAU KHONG HOP LE! DAT LAI.");
             return;
-        } else {
+        }
+        else {
             SoundManager.playSound(SoundManager.PUT_SHIP_SOUND);
             // Nếu không có tàu nào chồng lên nhau và danh sách tàu chưa đầy, thêm tàu mới
             fleet.add(new Ship2(coords));
@@ -48,6 +50,7 @@ public class PlayerData {
         }
         return false;
     }
+
     // Kiểm tra xem tàu có bị chồng chéo không
     private boolean isOverlap(ArrayList<Coordinate> coords) {
         for (Coordinate coord : coords) {
@@ -61,7 +64,7 @@ public class PlayerData {
     }
 
     // returns number of ships count
-    public int shipsCount(){
+    public int shipsCount() {
         int temp = fleet.size();
         return temp;
     }
@@ -88,18 +91,18 @@ public class PlayerData {
     //Tấn công tàu
     public void attackShip(Coordinate hitCord) {
         Iterator itr = fleet.iterator();
-        while (itr.hasNext()){
-            Ship2 temp = (Ship2)itr.next();
+        while (itr.hasNext()) {
+            Ship2 temp = (Ship2) itr.next();
             //temp.Hit(hitCord); // Hit the point in the ship
         }
     }
 
     //Cập nhật dữ liệu tấn công
     public void setAttackData(int x, int y, String result) {
-        if(result.equals("success")){
+        if (result.equals("success")) {
             attackData[x][y] = 1;
         }
-        else if(result.equals("failure")){
+        else if (result.equals("failure")) {
             attackData[x][y] = 2;
         }
     }
@@ -110,29 +113,31 @@ public class PlayerData {
     }
 
     //Lấy dữ liệu tấn công
-    public int[][] getAttackData(){
+    public int[][] getAttackData() {
         return attackData;
     }
+
     //Lấy dữ liệu từ ô cụ thể
-    public int getDataFromCell(int x, int y){
+    public int getDataFromCell(int x, int y) {
         for (int i = 0; i < 11; i++) {
             for (int j = 0; j < 11; j++) {
-                if(i == x && j ==y){
+                if (i == x && j == y) {
                     return selfData[i][j];
                 }
             }
         }
         return -1;
     }
+
     /*All the boolean methods to check for state*/
     // isHit trả về true nếu có tàu tại thời điểm bị đánh
-    public boolean isHit(Coordinate point){
-        for (int i=0;i<fleet.size();){
+    public boolean isHit(Coordinate point) {
+        for (int i = 0; i < fleet.size(); ) {
             Ship2 temp = fleet.get(i);
-            if(temp.isPointHit(point)){
+            if (temp.isPointHit(point)) {
                 return true;
             }
-            else{
+            else {
                 i++; // increase the counter if the the ship i didn't contain a point
             }
         }
@@ -140,25 +145,25 @@ public class PlayerData {
     }
 
     // Kiểm tra người chơi thua
-    public boolean isPlayerLost(){
-        if(fleet.size()==0){
+    public boolean isPlayerLost() {
+        if (fleet.size() == 0) {
             return true; // Player lost
         }
-        else{
+        else {
             return false;
         }
     }
 
     // Kiểm tra tàu bị đánh chìm
-    public boolean isSunk(Coordinate hitCord){
-        for (int i=0;i<fleet.size();){
+    public boolean isSunk(Coordinate hitCord) {
+        for (int i = 0; i < fleet.size(); ) {
             Ship2 temp = fleet.get(i);
-            if(temp.isShipSunk()){
+            if (temp.isShipSunk()) {
                 numberOfShipSunk++;
                 fleet.remove(i);
                 return true;
             }
-            else{
+            else {
                 i++; // increase the counter if the ship wasn't sunk
             }
         }
