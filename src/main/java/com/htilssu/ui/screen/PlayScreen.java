@@ -82,7 +82,6 @@ public class PlayScreen extends JPanel
     @Override
     public void componentShown(ComponentEvent e) {
         window.getGameManager().getCurrentGamePlay().update();
-        repaint();
     }
 
     @Override

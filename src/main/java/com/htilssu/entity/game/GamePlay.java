@@ -24,7 +24,6 @@ import com.htilssu.util.AssetUtils;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -165,6 +164,7 @@ public class GamePlay implements Renderable {
         timer.stop();
         matchTimer.stop();
         setGameMode(END_MODE);
+        battleShip.getScreenManager().getCurrentScreen().removeAll();
         final JPanel endScreen = battleShip.getScreenManager()
                 .getScreen(ScreenManager.END_GAME_SCREEN);
         Player opponent = playerList.get(1);
@@ -172,14 +172,7 @@ public class GamePlay implements Renderable {
         if (opponent != null) {
             if (endScreen instanceof EndGameScreen endGameScreen) {
                 endGameScreen.setOpponentBoard(opponent.getBoard());
-                Player loser;
-                if (matchCountDown == 0) {
-                    loser = getLoserByScore();
-                }
-                else {
-                    loser = getLoser();
-                }
-                endGameScreen.setWin(loser != GameManager.gamePlayer);
+                endGameScreen.setWin(getWinner() == 0);
             }
         }
 
@@ -320,6 +313,9 @@ public class GamePlay implements Renderable {
                 }
             }
         }
+
+        currentScreen.updateUI();
+        currentScreen.repaint();
 
     }
 
@@ -564,14 +560,14 @@ public class GamePlay implements Renderable {
                 if (playerBoard.isInside(point)) {
                     if (playerCursor == null) playerCursor = getScreen().getCursor();
                     //hide cursor
-                    getScreen().setCursor(getScreen().getToolkit()
-                            .createCustomCursor(new BufferedImage(1,
-                                            1,
-                                            BufferedImage.TYPE_INT_ARGB
-                                    ),
-                                    new Point(0, 0),
-                                    "null"
-                            ));
+                    //                    getScreen().setCursor(getScreen().getToolkit()
+                    //                            .createCustomCursor(new BufferedImage(1,
+                    //                                            1,
+                    //                                            BufferedImage.TYPE_INT_ARGB
+                    //                                    ),
+                    //                                    new Point(0, 0),
+                    //                                    "null"
+                    //                            ));
 
                     var mouseLocation = playerBoard.getBoardRowCol(point);
                     selectSprite.setSize(playerBoard.getCellSize(), playerBoard.getCellSize());
@@ -668,7 +664,7 @@ public class GamePlay implements Renderable {
         getScreen().add(scorePanel);
         //render select sprite
         if (isSelectSpriteInBoard && getCurrentPlayer().getId()
-                .equals(GameManager.gamePlayer.getId()))
+                .equals(playerList.getFirst().getId()))
             selectSprite.render(g);
 
         getScreen().updateUI();

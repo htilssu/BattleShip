@@ -93,6 +93,8 @@ public final class ScreenManager {
         this.currentScreen = currentScreen;
         getCurrentScreen().setPreferredSize(
                 new Dimension(battleShip.getWidth(), battleShip.getHeight()));
+
+        battleShip.repaint();
         getCurrentScreen().requestFocus();
     }
 }
