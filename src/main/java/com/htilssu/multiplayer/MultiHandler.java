@@ -9,10 +9,7 @@ import com.htilssu.entity.player.PlayerBoard;
 import com.htilssu.event.game.GameAction;
 import com.htilssu.event.player.PlayerJoinEvent;
 import com.htilssu.event.player.PlayerShootEvent;
-import com.htilssu.manager.DifficultyManager;
-import com.htilssu.manager.GameManager;
-import com.htilssu.manager.ScreenManager;
-import com.htilssu.manager.ShipManager;
+import com.htilssu.manager.*;
 import com.htilssu.ui.screen.NetworkScreen;
 import com.htilssu.ui.screen.PickScreen;
 import com.htilssu.util.GameLogger;
@@ -296,9 +293,16 @@ public abstract class MultiHandler {
 
         playerBoard.shoot(pos, shootStatus);
 
-        if (shootStatus == SHOOT_MISS) gamePlay.endTurn();
-        if (shootStatus == SHOOT_HIT) gamePlay.getCurrentPlayer()
-                .plusScore(ScoreUtil.calculateScore(gamePlay.getTimeCountDown()));
+        if (shootStatus == SHOOT_MISS) {
+            SoundManager.playSound(SoundManager.DUCK_SOUND);
+            gamePlay.endTurn();
+        }
+        if (shootStatus == SHOOT_HIT) {
+            gamePlay.getCurrentPlayer()
+                    .plusScore(ScoreUtil.calculateScore(gamePlay.getTimeCountDown()));
+            SoundManager.playSound(SoundManager.ATTACK_SOUND);
+
+        }
 
         gamePlay.resetCountDown();
         gamePlay.startCount();

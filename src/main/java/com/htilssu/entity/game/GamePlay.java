@@ -394,7 +394,6 @@ public class GamePlay implements Renderable {
 
         timer.stop();
         resetCountDown();
-        SoundManager.playSound(SoundManager.ATTACK_SOUND);
 
         battleShip.getListenerManager()
                 .callEvent(new PlayerShootEvent(getCurrentPlayer(), getOpponent().getBoard(), pos),
