@@ -58,6 +58,7 @@ public class MenuScreen extends JPanel {
         addButton("/images/MultiPlayer.png", "Multiplayer");
         addButton("/images/continue.png", "Continue");
         addButton("/images/setting2.png", "SETTING");
+        addButton("/images/Bgintroduction1.png", "INTRODUCTION"); // Nút giới thiệu game
         addButton("/images/exit.png", "QUIT");
         repositionButtons();
     }
@@ -96,9 +97,6 @@ public class MenuScreen extends JPanel {
     private void handleButtonClick(String actionCommand) {
         switch (actionCommand) {
             case "PLAY":
-                ((PickScreen) window.getScreenManager().getScreen(
-                        ScreenManager.PICK_SCREEN)).setGameMode(
-                        GameManager.SINGLE_PLAYER);
                 window.changeScreen(ScreenManager.PICK_SCREEN);
                 break;
             case "SETTING":
@@ -107,11 +105,15 @@ public class MenuScreen extends JPanel {
             case "Multiplayer":
                 window.changeScreen(ScreenManager.NETWORK_SCREEN);
                 break;
+            case "INTRODUCTION":
+                window.changeScreen(ScreenManager.INTRODUCTION_SCREEN);
+                break;
             case "QUIT":
                 System.exit(0);
                 break;
         }
     }
+
 
     @Override
     protected void paintComponent(Graphics g) {

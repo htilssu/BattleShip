@@ -4,27 +4,26 @@ import com.htilssu.entity.component.AttackGrid;
 import com.htilssu.entity.component.SelfGrid;
 import com.htilssu.listener.ButtonClickListener;
 import com.htilssu.manager.SoundManager;
+import com.htilssu.setting.GameSetting;
 import com.htilssu.ui.component.GameButton;
 import com.htilssu.ui.component.GamePanel;
 import com.htilssu.util.AssetUtils;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
+import java.awt.event.*;
 import java.awt.image.BufferedImage;
 
 public class Player2Screen extends JFrame implements ComponentListener {
 
     public static final int MAXIMIZED_BOTH = JFrame.MAXIMIZED_BOTH;
-    public static boolean flagVolumeplaySound = true;
     public JLabel ownShipSunk;
     public JLabel enemyShipSunk;
     int size;
     boolean isbeginningOfTheGameOfPlayer1 = true;
     boolean isbeginningOfTheGameOfPlayer2 = true;
+    public static boolean flagVolumeplaySound = true;
+
     Start2Player battleShip;
     JLabel shipBeginning;
     private BufferedImage backgroundImage;
@@ -45,8 +44,7 @@ public class Player2Screen extends JFrame implements ComponentListener {
 
         //full kich thuoc man hinh.
         setExtendedState(JFrame.MAXIMIZED_BOTH);
-        //setPreferredSize(new Dimension(GameSetting.WIDTH, GameSetting.HEIGHT));  //kich thuoc
-        // tu gameSetting
+        //setPreferredSize(new Dimension(GameSetting.WIDTH, GameSetting.HEIGHT));  //kich thuoc tu gameSetting
 
         // Thêm các thành phần khác vào contentPane
         SelfGrid selfGrid = new SelfGrid(name, startScreen);
@@ -56,29 +54,30 @@ public class Player2Screen extends JFrame implements ComponentListener {
         selfGrid.setBounds(1000, 70, 360, 360); //  vị trí và kích thước cho SelfGrid
         attackGrid.setBounds(100, 70, 420, 420); //  vị trí và kích thước cho AttackGrid
 
-        GameButton HeaderAttack = new GameButton(
-                AssetUtils.getImage(AssetUtils.ASSET_BG_ATTACK)); //truyen hinh nen duoc
+        GameButton HeaderAttack = new GameButton(AssetUtils.getImage(AssetUtils.ASSET_BG_ATTACK)); //truyen hinh nen duoc
         HeaderAttack.setBounds(170, 17, 250, 50); //xet vi tri
         HeaderAttack.setText("ATTACK SHIP");
-        GameButton HeaderSelf = new GameButton(
-                AssetUtils.getImage(AssetUtils.ASSET_BG_ATTACK)); //truyen hinh nen duoc
+        GameButton HeaderSelf = new GameButton(AssetUtils.getImage(AssetUtils.ASSET_BG_ATTACK)); //truyen hinh nen duoc
         HeaderSelf.setBounds(1070, 17, 250, 50); //xet vi tri
         HeaderSelf.setText("SELF SHIP");
 
-        GameButton btnNext = new GameButton(AssetUtils.getImage(AssetUtils.ASSET_BG_NEXT),
-                1); //truyen hinh nen duoc
+        GameButton btnNext = new GameButton(AssetUtils.getImage(AssetUtils.ASSET_BG_NEXT), 1); //truyen hinh nen duoc
         btnNext.setBounds(700, 290, 150, 50); //xet vi tri
         btnNext.setText("Next");
 
-        GameButton btnRotate = new GameButton(AssetUtils.getImage(AssetUtils.ASSET_BG_BTNLISTENER),
-                1);
+        GameButton btnRotate = new GameButton(AssetUtils.getImage(AssetUtils.ASSET_BG_BTNLISTENER), 1);
         btnRotate.setBounds(1000, 470, 170, 50);
         btnRotate.setText("Horizontal");
         //Nut an hien Luoi dat thuyen
-        GameButton btnHideSelfGrid = new GameButton(
-                AssetUtils.getImage(AssetUtils.ASSET_BG_BTNLISTENER), 1);
+        GameButton btnHideSelfGrid = new GameButton(AssetUtils.getImage(AssetUtils.ASSET_BG_BTNLISTENER), 1);
         btnHideSelfGrid.setBounds(1190, 470, 210, 50);
         btnHideSelfGrid.setText("Hide SelfGrid");
+
+        //Ten nguoi choi
+        GameButton NamePlayer = new GameButton(AssetUtils.getImage(AssetUtils.ASSET_BG_NEXT)); //truyen hinh nen duoc
+        NamePlayer.setBounds(650, 460, 250, 50); //xet vi tri
+        NamePlayer.setText("Status "+ name);
+        contentPane.add(NamePlayer);
 
         //Add cac phan tu vao GamePanel
         contentPane.add(selfGrid);
@@ -90,15 +89,14 @@ public class Player2Screen extends JFrame implements ComponentListener {
         contentPane.add(btnHideSelfGrid);
 
         //cac du lieu dang choi game
-        setInforBox(contentPane, name);
+        setInforBox(contentPane);
         setButtonGame(contentPane);
 
         btnRotate.addActionListener(e -> {
             selfGrid.rotateShip();
             if (btnRotate.getText().equals("Vertical")) {
                 btnRotate.setText("Horizontal");
-            }
-            else {
+            } else {
                 btnRotate.setText("Vertical");
             }
         });
@@ -109,8 +107,7 @@ public class Player2Screen extends JFrame implements ComponentListener {
             btnHideSelfGrid.setText(isSelfGridVisible ? "Hide SelfGrid" : "Show SelfGrid");
         });
 
-        ButtonClickListener buttonClickListener = new ButtonClickListener(name, startScreen,
-                shipBeginning, isbeginningOfTheGameOfPlayer1, this);
+        ButtonClickListener buttonClickListener = new ButtonClickListener(name, startScreen, shipBeginning, isbeginningOfTheGameOfPlayer1, this);
         btnNext.setActionCommand("next");
         btnNext.addActionListener(buttonClickListener);
 
@@ -130,50 +127,6 @@ public class Player2Screen extends JFrame implements ComponentListener {
         backgroundImage = AssetUtils.loadImage("/images/sea1.png");
     }
 
-    private void setInforBox(GamePanel gamePanel, String name) {
-        GamePanel gamePanelBox = new GamePanel();
-        // Tạo các hộp chứa thông tin
-        JLabel statusLabel = new JLabel("Status for " + name);
-        statusLabel.setFont(new Font("Roboto", Font.BOLD, 20));
-        statusLabel.setForeground(Color.RED);
-
-        JLabel ownShipsLabel = new JLabel("So tau cua minh : ");
-        shipBeginning = new JLabel("" + Integer.toString(size));
-        setTypeText(ownShipsLabel);
-        setTypeText(shipBeginning);
-
-        JLabel ownShipsSunkLabel = new JLabel("Tau da bi chim : ");
-        ownShipSunk = new JLabel("" + Integer.toString(size));
-        setTypeText(ownShipsSunkLabel);
-        setTypeText(ownShipSunk);
-
-        JLabel enemyShipsSunkLabel = new JLabel("Tau dich da bi chim : ");
-        enemyShipSunk = new JLabel("" + size);
-        setTypeText(enemyShipsSunkLabel);
-        setTypeText(enemyShipSunk);
-
-        //bo goc nhon
-        gamePanelBox.setRadius(50);
-
-        // Thêm các thông tin vào contentPane
-        gamePanelBox.add(createCenteredPanel(statusLabel));
-        gamePanelBox.add(Box.createVerticalStrut(10));
-
-        gamePanelBox.add(createCenteredPanel(ownShipsLabel, shipBeginning));
-        gamePanelBox.add(Box.createVerticalStrut(2));
-
-        gamePanelBox.add(createCenteredPanel(ownShipsSunkLabel, ownShipSunk));
-        gamePanelBox.add(Box.createVerticalStrut(2));
-
-        gamePanelBox.add(createCenteredPanel(enemyShipsSunkLabel, enemyShipSunk));
-
-        gamePanelBox.setBackground(new Color(0, 0, 0, 0.5f));
-        gamePanelBox.setBounds(600, 460, 300, 300);
-        gamePanelBox.setLayout(new BoxLayout(gamePanelBox, BoxLayout.Y_AXIS));
-
-        gamePanel.add(gamePanelBox);
-    }
-
     private void setButtonGame(GamePanel gamePanel) {
         turnSound = new GameButton(AssetUtils.loadImage("/images/turnSound.png"));
         turnSound.setBounds(1450, 30, 60, 60);
@@ -182,8 +135,7 @@ public class Player2Screen extends JFrame implements ComponentListener {
             SoundManager.flagVolumeplaySound = !SoundManager.flagVolumeplaySound;
             if (SoundManager.flagVolumeplaySound) {
                 turnSound.setBackgroundImage(AssetUtils.loadImage("/images/turnSound.png"));
-            }
-            else {
+            } else {
                 turnSound.setBackgroundImage(AssetUtils.loadImage("/images/offSound.png"));
             }
         });
@@ -191,7 +143,7 @@ public class Player2Screen extends JFrame implements ComponentListener {
         repaint();
 
         // Tạo các mục cho JComboBox
-        String[] items = {"Item 1", "Item 2", "Item 3", "Item 4"};
+        String[] items = { "Item 1", "Item 2", "Item 3", "Item 4" };
         // Tạo JComboBox nhưng không hiển thị ngay
         JComboBox<String> comboBox = new JComboBox<>(items);
         comboBox.setBounds(670, 290, 200, 30);
@@ -213,9 +165,42 @@ public class Player2Screen extends JFrame implements ComponentListener {
         gamePanel.add(comboBox);
     }
 
-    private void setTypeText(JLabel label) {
-        label.setFont(new Font("Roboto", Font.BOLD, 15));
-        label.setForeground(Color.RED);
+    private void setInforBox(GamePanel gamePanel) {
+        GamePanel gamePanelBox = new GamePanel();
+        // Tạo các hộp chứa thông tin
+
+        JLabel ownShipsLabel = new JLabel("So tau cua minh : ");
+        shipBeginning = new JLabel("" + Integer.toString(size));
+        setTypeText(ownShipsLabel);
+        setTypeText(shipBeginning);
+
+        JLabel ownShipsSunkLabel = new JLabel("Tau da bi chim : ");
+        ownShipSunk = new JLabel("" + Integer.toString(size));
+        setTypeText(ownShipsSunkLabel);
+        setTypeText(ownShipSunk);
+
+        JLabel enemyShipsSunkLabel = new JLabel("Tau dich da bi chim : ");
+        enemyShipSunk = new JLabel("" + size);
+        setTypeText(enemyShipsSunkLabel);
+        setTypeText(enemyShipSunk);
+
+        //bo goc nhon
+        gamePanelBox.setRadius(50);
+
+        // Thêm các thông tin vào contentPane
+        gamePanelBox.add(createCenteredPanel(ownShipsLabel, shipBeginning));
+        gamePanelBox.add(Box.createVerticalStrut(2));
+
+        gamePanelBox.add(createCenteredPanel(ownShipsSunkLabel, ownShipSunk));
+        gamePanelBox.add(Box.createVerticalStrut(2));
+
+        gamePanelBox.add(createCenteredPanel(enemyShipsSunkLabel, enemyShipSunk));
+
+        gamePanelBox.setBackground(new Color(0, 0, 0, 0.5f));
+        gamePanelBox.setBounds(625, 510, 300, 200);
+        gamePanelBox.setLayout(new BoxLayout(gamePanelBox, BoxLayout.Y_AXIS));
+
+        gamePanel.add(gamePanelBox);
     }
 
     private static JPanel createCenteredPanel(JComponent... components) {
@@ -228,6 +213,11 @@ public class Player2Screen extends JFrame implements ComponentListener {
             panel.add(Box.createHorizontalGlue());
         }
         return panel;
+    }
+
+    private void setTypeText(JLabel label) {
+        label.setFont(new Font("Roboto", Font.BOLD, 15));
+        label.setForeground(Color.RED);
     }
 
     public void showScreen() {
@@ -262,18 +252,15 @@ public class Player2Screen extends JFrame implements ComponentListener {
     public void componentResized(ComponentEvent e) {
 
     }
-
     @Override
     public void componentMoved(ComponentEvent e) {
 
     }
-
     @Override
     public void componentShown(ComponentEvent e) {
         if (SoundManager.flagVolumeplaySound) {
             turnSound.setBackgroundImage(AssetUtils.loadImage("/images/turnSound.png"));
-        }
-        else {
+        } else {
             turnSound.setBackgroundImage(AssetUtils.loadImage("/images/offSound.png"));
         }
         repaint();

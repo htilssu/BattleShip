@@ -37,14 +37,14 @@ public class GameButton extends JButton {
             @Override
             public void mouseEntered(MouseEvent e) {
                 isHovered = true;
-                setFont(getFont().deriveFont(23f));  // Tăng kích thước chữ
+                setFont(getFont().deriveFont(19f));  // Tăng kích thước chữ
                 repaint();
             }
 
             @Override
             public void mouseExited(MouseEvent e) {
                 isHovered = false;
-                setFont(getFont().deriveFont(20f));  // Giảm kích thước chữ về ban đầu
+                setFont(getFont().deriveFont(21f));  // Giảm kích thước chữ về ban đầu
                 repaint();
             }
         });
