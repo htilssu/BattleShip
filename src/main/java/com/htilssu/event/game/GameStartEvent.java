@@ -3,22 +3,22 @@ package com.htilssu.event.game;
 import com.htilssu.BattleShip;
 import com.htilssu.entity.game.GamePlay;
 import com.htilssu.event.GameEvent;
-import com.htilssu.manager.ScreenManager;
 
 public class GameStartEvent implements GameEvent {
-  GamePlay gamePlay;
-  BattleShip battleShip;
 
-  public GameStartEvent(GamePlay gamePlay, BattleShip battleShip) {
-    this.gamePlay = gamePlay;
-    this.battleShip = battleShip;
-  }
+    GamePlay gamePlay;
+    BattleShip battleShip;
 
-  public GamePlay getGamePlay() {
-    return gamePlay;
-  }
+    public GameStartEvent(GamePlay gamePlay, BattleShip battleShip) {
+        this.gamePlay = gamePlay;
+        this.battleShip = battleShip;
+    }
 
-  public BattleShip getBattleShip() {
-    return battleShip;
-  }
+    public GamePlay getGamePlay() {
+        return gamePlay;
+    }
+
+    public BattleShip getBattleShip() {
+        return battleShip;
+    }
 }

@@ -14,11 +14,13 @@ public class Player {
     /**
      * Mảng lưu lịch sử bắn của người chơi
      *
-     * <p>đánh dấu là {@code 0} nếu vị trí đó chưa được bắn, đánh dấu là {@code 2} nếu bắn trúng tàu,
+     * <p>đánh dấu là {@code 0} nếu vị trí đó chưa được bắn, đánh dấu là {@code 2} nếu bắn trúng
+     * tàu,
      * đánh dấu là {@code 1} nếu bắn trượt, đánh dấu là {@code 3} nếu tàu đó đã bị chìm
      */
     byte[][] shot;
     private GamePlay gamePlay;
+
     public Player(String id, String name) {
         this.id = id;
         this.name = name;

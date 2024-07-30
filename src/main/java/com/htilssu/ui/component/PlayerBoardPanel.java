@@ -12,6 +12,10 @@ public class PlayerBoardPanel extends GamePanel {
         this.playerBoard = playerBoard;
     }
 
+    public void setPlayerBoard(PlayerBoard playerBoard) {
+        this.playerBoard = playerBoard;
+    }
+
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);

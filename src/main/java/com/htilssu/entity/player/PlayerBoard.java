@@ -45,7 +45,8 @@ public class PlayerBoard extends Collision implements Renderable {
     }
 
     /**
-     * Cập nhật kích thước của bảng người chơi bao gồm {@link PlayerBoard#cellSize} và kích thước của các tàu
+     * Cập nhật kích thước của bảng người chơi bao gồm {@link PlayerBoard#cellSize} và kích thước
+     * của các tàu
      */
     public void update() {
         cellSize = getHeight() / size;
@@ -96,9 +97,9 @@ public class PlayerBoard extends Collision implements Renderable {
 
     public boolean canAddShip(Ship ship) {
         return canAddShip(ship.getPosition().y,
-                          ship.getPosition().x,
-                          ship.getDirection(),
-                          ship.getShipType()
+                ship.getPosition().x,
+                ship.getDirection(),
+                ship.getShipType()
         );
     }
 
@@ -193,9 +194,9 @@ public class PlayerBoard extends Collision implements Renderable {
 
             g2d.drawLine(getX(), getY() + i * cellSize, getX() + getWidth(), getY() + i * cellSize);
             g2d.drawLine(getX() + i * cellSize,
-                         getY(),
-                         getX() + i * cellSize,
-                         getY() + getHeight()
+                    getY(),
+                    getX() + i * cellSize,
+                    getY() + getHeight()
             );
         }
 
@@ -220,20 +221,20 @@ public class PlayerBoard extends Collision implements Renderable {
         switch (shotBoard[row][col]) {
             case (byte) SHOOT_MISS:
                 g.drawImage(AssetUtils.getImage(AssetUtils.ASSET_SHOOT_MISS),
-                            x,
-                            y,
-                            cellSize,
-                            cellSize,
-                            null
+                        x,
+                        y,
+                        cellSize,
+                        cellSize,
+                        null
                 );
                 break;
             case (byte) SHOOT_HIT:
                 g.drawImage(AssetUtils.getImage(AssetUtils.ASSET_SHOOT_HIT),
-                            x,
-                            y,
-                            cellSize,
-                            cellSize,
-                            null
+                        x,
+                        y,
+                        cellSize,
+                        cellSize,
+                        null
                 );
                 break;
         }
@@ -386,9 +387,6 @@ public class PlayerBoard extends Collision implements Renderable {
                     remainingShips.add(ship);
                 }
             }
-        }
-        else {
-            return null;
         }
 
         return remainingShips;

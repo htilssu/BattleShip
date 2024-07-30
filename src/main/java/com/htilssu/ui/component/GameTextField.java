@@ -53,7 +53,8 @@ public class GameTextField extends JTextField {
         //anti alias
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         //set clip round
-        g2d.setClip(new Area(new RoundRectangle2D.Float(0, 0, getWidth(), getHeight(), radius, radius)));
+        g2d.setClip(new Area(
+                new RoundRectangle2D.Float(0, 0, getWidth(), getHeight(), radius, radius)));
         //fill background
         g2d.setColor(getBackground());
         g2d.fill(new RoundRectangle2D.Float(0, 0, getWidth(), getHeight(), radius, radius));

@@ -1,16 +1,25 @@
 package com.htilssu.setting;
 
 public class GameSetting {
-    /** Kích thước của 1 TILE */
+
+    /**
+     * Kích thước của 1 TILE
+     */
     public static final int TILE_SIZE = 32;
 
-    /** S&#x1ED1; l&#x1B0;&#x1EE3;ng TILE trong chi&#x1EC1;u r&#x1ED9;ng */
+    /**
+     * S&#x1ED1; l&#x1B0;&#x1EE3;ng TILE trong chi&#x1EC1;u r&#x1ED9;ng
+     */
     public static final int TILE_IN_WIDTH = 28;
 
-    /** S&#x1ED1; l&#x1B0;&#x1EE3;ng TILE trong chi&#x1EC1;u cao */
+    /**
+     * S&#x1ED1; l&#x1B0;&#x1EE3;ng TILE trong chi&#x1EC1;u cao
+     */
     public static final int TILE_IN_HEIGHT = 20;
 
-    /** */
+    /**
+     *
+     */
     public static final short DEFAULT_PORT = 5555;
 
     /**
@@ -35,9 +44,13 @@ public class GameSetting {
      */
     public static final int HEIGHT = (int) (TILE_SIZE * TILE_IN_HEIGHT * SCALE);
 
-    /** Số lượng frame mỗi giây */
+    /**
+     * Số lượng frame mỗi giây
+     */
     public static int FPS = 60;
 
-    /** Số lượng tick mỗi giây */
+    /**
+     * Số lượng tick mỗi giây
+     */
     public static int TPS = 120;
 }

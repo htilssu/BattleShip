@@ -3,8 +3,6 @@ package com.htilssu.event.player;
 import com.htilssu.entity.component.Position;
 import com.htilssu.entity.player.Player;
 import com.htilssu.entity.player.PlayerBoard;
-import com.htilssu.manager.GameManager;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * Sự kiện người chơi thực hiện hành động bắn tàu đối phương, chứa thông tin của người chơi ({@link
@@ -27,7 +25,6 @@ public class PlayerShootEvent extends PlayerEvent {
         board = playerBoard;
 
     }
-
 
     public PlayerBoard getBoard() {
         return board;

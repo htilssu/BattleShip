@@ -38,7 +38,8 @@ public class NetworkUtils {
                         if (subnetMask != null) {
                             inetAddresses.addAll(
                                     checkPort(
-                                            Objects.requireNonNull(getDefaultGateway(inetAddress, subnetMask)),
+                                            Objects.requireNonNull(
+                                                    getDefaultGateway(inetAddress, subnetMask)),
                                             subnetMask,
                                             port));
                         }
@@ -90,7 +91,8 @@ public class NetworkUtils {
                         () -> {
                             try (Socket socket = new Socket()) {
                                 socket.connect(
-                                        new InetSocketAddress(InetAddress.getByAddress(currentAddress), port),
+                                        new InetSocketAddress(
+                                                InetAddress.getByAddress(currentAddress), port),
                                         SOCKET_TIMEOUT);
                                 inetAddresses.add(socket.getInetAddress());
                             } catch (IOException e) {

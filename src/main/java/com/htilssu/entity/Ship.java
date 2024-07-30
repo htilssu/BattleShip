@@ -33,7 +33,11 @@ public class Ship extends Collision implements Renderable {
     private boolean isSunk = false;
 
     public Ship(
-            int direction, Sprite sprite, Position position, int shipType, PlayerBoard playerBoard) {
+            int direction,
+            Sprite sprite,
+            Position position,
+            int shipType,
+            PlayerBoard playerBoard) {
         this(direction, sprite, position, shipType);
         this.playerBoard = playerBoard;
     }

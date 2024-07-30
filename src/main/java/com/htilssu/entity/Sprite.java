@@ -62,7 +62,8 @@ public class Sprite extends Collision implements Renderable {
     @Override
     public void render(Graphics g) {
         if (isHover) {
-            g.drawImage(asset, getX() + hoverOffset / 2, getY() + hoverOffset / 2, hoverWidth, hoverHeight, null);
+            g.drawImage(asset, getX() + hoverOffset / 2, getY() + hoverOffset / 2, hoverWidth,
+                    hoverHeight, null);
         }
         else {
             g.drawImage(asset, getX(), getY(), getWidth(), getHeight(), null);

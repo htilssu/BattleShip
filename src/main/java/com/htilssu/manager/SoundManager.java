@@ -72,7 +72,8 @@ một AudioInputStream mới sẽ được tạo và sử dụng, am thanh co th
 
     public static void setVolume(Clip clip, int volume) {
         if (clip != null) {
-            FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+            FloatControl gainControl = (FloatControl) clip.getControl(
+                    FloatControl.Type.MASTER_GAIN);
             float minVol = gainControl.getMinimum();
             float maxVolume = gainControl.getMaximum();
             float newVolume = -30 + Math.abs(-30 - maxVolume) * volume / 100;
@@ -106,7 +107,7 @@ một AudioInputStream mới sẽ được tạo và sử dụng, am thanh co th
             backgroundClip.open(audioInputStream);
             setVolume(backgroundClip, currentVolume); //  Đặt âm lượng cho nhạc nền
             //TODO:Delete comment to loop background sound
-//            backgroundClip.loop(Clip.LOOP_CONTINUOUSLY);
+            //            backgroundClip.loop(Clip.LOOP_CONTINUOUSLY);
             isBackgroundPlaying = true;
         } catch (LineUnavailableException | IOException e) {
             GameLogger.log(e.getMessage());

@@ -1,9 +1,11 @@
 package com.htilssu.entity.component;
 
 // Lớp Ship đại diện cho một con TÀU
+
 import java.util.ArrayList;
 
 public class Ship2 {
+
     private ArrayList<Coordinate> coordinates;
     private boolean[] hits;
 
@@ -12,6 +14,7 @@ public class Ship2 {
         this.coordinates = new ArrayList<>(coords);
         this.hits = new boolean[coords.size()];
     }
+
     //
     public ArrayList<Coordinate> getCoordinates() {
         return coordinates;

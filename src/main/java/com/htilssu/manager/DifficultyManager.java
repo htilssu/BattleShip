@@ -25,6 +25,7 @@ public final class DifficultyManager {
      * Lấy kích thước bảng game dựa vào độ khó
      *
      * @param difficulty độ khó của game
+     *
      * @return kích thước bảng game
      */
     public static int getGameBoardSize(int difficulty) {

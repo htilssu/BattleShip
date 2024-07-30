@@ -56,7 +56,8 @@ public class EndGameScreen extends GamePanel implements ComponentListener {
         endPanel = Box.createHorizontalBox();
         endPanel.add(Box.createHorizontalGlue());
 
-        GameButton endGameLabel = new GameButton(AssetUtils.getImage(AssetUtils.ASSET_TEXT_FIELD_2));
+        GameButton endGameLabel = new GameButton(
+                AssetUtils.getImage(AssetUtils.ASSET_TEXT_FIELD_2));
         endGameLabel.setText(isWin ? "You Win" : "You Lose");
         endGameLabel.setPreferredSize(new Dimension(300, 100));
         endGameLabel.setMaximumSize(new Dimension(300, 100));
@@ -75,6 +76,7 @@ public class EndGameScreen extends GamePanel implements ComponentListener {
         backToMainMenuButton.setSize(new Dimension(200, 70));
         backToMainMenuButton.addActionListener(e -> {
             battleShip.changeScreen(ScreenManager.MENU_SCREEN);
+            battleShip.getClient().disconnect();
         });
 
         add(backToMainMenuButton, 0);
@@ -110,15 +112,15 @@ public class EndGameScreen extends GamePanel implements ComponentListener {
                 setForeground(color);
             }});
         }
-//        statisticPanel.add(new GameLabel("Total Hit: " + 1){{
-//            setForeground(color);
-//        }});
-//        statisticPanel.add(new GameLabel("Total Miss: " + 1){{
-//            setForeground(color);
-//        }});
-//        statisticPanel.add(new GameLabel("Total Ship Destroyed: " + 1){{
-//            setForeground(color);
-//        }});
+        //        statisticPanel.add(new GameLabel("Total Hit: " + 1){{
+        //            setForeground(color);
+        //        }});
+        //        statisticPanel.add(new GameLabel("Total Miss: " + 1){{
+        //            setForeground(color);
+        //        }});
+        //        statisticPanel.add(new GameLabel("Total Ship Destroyed: " + 1){{
+        //            setForeground(color);
+        //        }});
         statisticPanel.add(new GameLabel("Score: " + GameManager.gamePlayer.getScore()) {{
             setForeground(color);
         }});
@@ -137,6 +139,7 @@ public class EndGameScreen extends GamePanel implements ComponentListener {
 
     public void setOpponentBoard(PlayerBoard opponentBoard) {
         this.opponentBoard = opponentBoard;
+        playerBoardPanel.setPlayerBoard(opponentBoard);
         updateComponents();
     }
 
@@ -146,22 +149,22 @@ public class EndGameScreen extends GamePanel implements ComponentListener {
 
         resultBoard.setSize(new Dimension(getWidth() - marginX, getHeight() - marginY));
         resultBoard.setLocation(getWidth() / 2 - resultBoard.getWidth() / 2,
-                                getHeight() / 2 - resultBoard.getHeight() / 2
+                getHeight() / 2 - resultBoard.getHeight() / 2
         );
 
         endPanel.setSize(new Dimension(300, 100));
         endPanel.setLocation((getWidth() - endPanel.getWidth()) / 2,
-                             (marginY - endPanel.getHeight()) / 2
+                (marginY - endPanel.getHeight()) / 2
         );
 
 
         playerBoardPanel.setMaximumSize(new Dimension(resultBoard.getWidth() - 300,
-                                                      resultBoard.getHeight() - 150
+                resultBoard.getHeight() - 150
         ));
         if (opponentBoard != null) {
             opponentBoard.setLocation(50, 0);
             opponentBoard.setSize(playerBoardPanel.getMaximumSize().width,
-                                  playerBoardPanel.getMaximumSize().height
+                    playerBoardPanel.getMaximumSize().height
             );
             opponentBoard.update();
         }
@@ -171,7 +174,7 @@ public class EndGameScreen extends GamePanel implements ComponentListener {
 
 
         backToMainMenuButton.setLocation((getWidth() - backToMainMenuButton.getWidth()) / 2,
-                                         (resultBoard.getY() + resultBoard.getHeight()) - backToMainMenuButton.getHeight() / 2
+                (resultBoard.getY() + resultBoard.getHeight()) - backToMainMenuButton.getHeight() / 2
         );
 
     }

@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MenuScreen extends JPanel {
+
     private BufferedImage backgroundImage, menuImage, cursorImage;
     private BattleShip window;
     private List<CustomButton> buttons;
@@ -74,7 +75,8 @@ public class MenuScreen extends JPanel {
 
         for (int i = 0; i < buttons.size(); i++) {
             CustomButton button = buttons.get(i);
-            button.setBounds(centerX, startY + i * (buttonHeight + spacing), buttonWidth, buttonHeight);
+            button.setBounds(centerX, startY + i * (buttonHeight + spacing), buttonWidth,
+                    buttonHeight);
         }
     }
 
