@@ -154,8 +154,9 @@ public abstract class MultiHandler {
                     if (messageParts.size() > 1) {
                         var hostId = messageParts.get(1);
                         Client client = battleShip.getClient();
-                        if (!battleShip.getHost().getId().equals(hostId))
+                        if (!battleShip.getHost().getId().equals(hostId)) {
                             client.getHostList().add(client.socket.getInetAddress());
+                        }
 
                         client.disconnect();
 

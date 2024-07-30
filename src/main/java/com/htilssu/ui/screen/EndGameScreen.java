@@ -18,8 +18,9 @@ import java.awt.event.ComponentListener;
 public class EndGameScreen extends GamePanel implements ComponentListener {
 
     private final BattleShip battleShip;
+    GameLabel scoreLabel = new GameLabel("Score: 0");
     private GamePanel resultBoard, statisticPanel;
-    private GameButton backToMainMenuButton;
+    private GameButton backToMainMenuButton, endGameLabel;
     private PlayerBoardPanel playerBoardPanel;
     private PlayerBoard opponentBoard = new PlayerBoard(10, GameManager.gamePlayer);
     private Box endPanel;
@@ -56,7 +57,7 @@ public class EndGameScreen extends GamePanel implements ComponentListener {
         endPanel = Box.createHorizontalBox();
         endPanel.add(Box.createHorizontalGlue());
 
-        GameButton endGameLabel = new GameButton(
+        endGameLabel = new GameButton(
                 AssetUtils.getImage(AssetUtils.ASSET_TEXT_FIELD_2));
         endGameLabel.setText(isWin ? "You Win" : "You Lose");
         endGameLabel.setPreferredSize(new Dimension(300, 100));
@@ -121,9 +122,10 @@ public class EndGameScreen extends GamePanel implements ComponentListener {
         //        statisticPanel.add(new GameLabel("Total Ship Destroyed: " + 1){{
         //            setForeground(color);
         //        }});
-        statisticPanel.add(new GameLabel("Score: " + GameManager.gamePlayer.getScore()) {{
+        scoreLabel = new GameLabel("Score: " + GameManager.gamePlayer.getScore()) {{
             setForeground(color);
-        }});
+        }};
+        statisticPanel.add(scoreLabel);
 
 
         resultBoard.add(statisticPanel);
@@ -152,6 +154,8 @@ public class EndGameScreen extends GamePanel implements ComponentListener {
                 getHeight() / 2 - resultBoard.getHeight() / 2
         );
 
+        scoreLabel.setText("Score: " + GameManager.gamePlayer.getScore());
+
         endPanel.setSize(new Dimension(300, 100));
         endPanel.setLocation((getWidth() - endPanel.getWidth()) / 2,
                 (marginY - endPanel.getHeight()) / 2
@@ -169,7 +173,7 @@ public class EndGameScreen extends GamePanel implements ComponentListener {
             opponentBoard.update();
         }
 
-
+        endGameLabel.setText(isWin ? "You Win" : "You Lose");
         statisticPanel.setMaximumSize(new Dimension(300, resultBoard.getHeight() - 150));
 
 

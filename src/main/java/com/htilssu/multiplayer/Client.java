@@ -147,7 +147,6 @@ public class Client extends MultiHandler implements Runnable {
     public void run() {
         while (isConnected()) {
             readData(socket);
-            disconnect();
         }
     }
 }
