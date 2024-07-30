@@ -188,7 +188,6 @@ public class Player2Screen extends JFrame implements ComponentListener {
         gamePanelBox.setRadius(50);
 
         // Thêm các thông tin vào contentPane
-
         gamePanelBox.add(createCenteredPanel(ownShipsLabel, shipBeginning));
         gamePanelBox.add(Box.createVerticalStrut(2));
 
