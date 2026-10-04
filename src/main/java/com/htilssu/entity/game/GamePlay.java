@@ -54,6 +54,11 @@ public class GamePlay implements Renderable {
     private final Sprite selectSprite;
     private final Sprite readyButton = new Sprite(
             AssetUtils.getImage(AssetUtils.ASSET_READY_BUTTON));
+    private final GameButton autoPlaceButton = new GameButton(
+            AssetUtils.getImage(AssetUtils.ASSET_BUTTON_2)) {{
+        setText("Auto Place");
+        setTextSize(22);
+    }};
     private final GameButton previewLabel = new GameButton(
             AssetUtils.getImage(AssetUtils.ASSET_TEXT_FIELD_2)) {{
         this.setText("Preview Board");
@@ -319,6 +324,12 @@ public class GamePlay implements Renderable {
                 readyButton.setLocation(xMidPosition - readyButton.getWidth() / 2,
                         currentScreen.getHeight() - readyButton.getHeight() - shipSpriteMargin / 2
                 );
+                autoPlaceButton.setBounds(
+                        readyButton.getX() - readyButton.getWidth() - shipSpriteMargin / 2,
+                        readyButton.getY(),
+                        readyButton.getWidth(),
+                        readyButton.getHeight()
+                );
                 playerBoard.setSize(currentScreen.getWidth() / 2,
                         currentScreen.getHeight() - (currentScreen.getHeight() - readyButton.getY()) - shipSpriteMargin
                 );
@@ -419,6 +430,13 @@ public class GamePlay implements Renderable {
      */
     public Player getOpponent() {
         return playerList.get((turn + 1) % playerList.size());
+    }
+
+    public Player getOpponentOf(Player player) {
+        for (Player candidate : playerList) {
+            if (!candidate.getId().equals(player.getId())) return candidate;
+        }
+        return player;
     }
 
     /**
@@ -729,13 +747,32 @@ public class GamePlay implements Renderable {
         attachPlayComponents();
     }
 
+    private void autoPlacePlayerFleet() {
+        if (gameMode != SETUP_MODE) return;
+        if (isReady) unReady();
+
+        PlayerBoard board = GameManager.gamePlayer.getBoard();
+        board.clearShips();
+        setUpSprite = null;
+        direction = VERTICAL;
+        placeBotFleet(board);
+        shipInBoard.replaceAll((shipType, count) -> 0);
+        SoundManager.playSound(SoundManager.PUT_SHIP_SOUND);
+        getScreen().repaint();
+    }
+
     private void attachPlayComponents() {
         JPanel screen = getScreen();
+        if (autoPlaceButton.getParent() != screen) {
+            autoPlaceButton.addActionListener(e -> autoPlacePlayerFleet());
+            screen.add(autoPlaceButton);
+        }
         if (gameProgress.getParent() != screen) screen.add(gameProgress);
         if (targetPanel.getParent() != screen) screen.add(targetPanel);
         if (scorePanel.getParent() != screen) screen.add(scorePanel);
         if (previewLabel.getParent() != screen) screen.add(previewLabel);
         boolean visible = gameMode == PLAY_MODE;
+        autoPlaceButton.setVisible(gameMode == SETUP_MODE);
         gameProgress.setVisible(visible);
         targetPanel.setVisible(visible);
         scorePanel.setVisible(visible);
@@ -801,11 +838,12 @@ public class GamePlay implements Renderable {
      * Vẽ bảng của đối thủ của người chơi hiện tại
      */
     private void renderPreviewBoard(Graphics g) {
-        PlayerBoard playerBoard = getCurrentPlayer().getBoard();
-        if (previewBoard == null || previewBoardPlayer != getCurrentPlayer()
+        Player localPlayer = GameManager.gamePlayer;
+        PlayerBoard playerBoard = localPlayer.getBoard();
+        if (previewBoard == null || previewBoardPlayer != localPlayer
                 || previewBoardVersion != playerBoard.getStateVersion()) {
             previewBoard = new PlayerBoard(playerBoard);
-            previewBoardPlayer = getCurrentPlayer();
+            previewBoardPlayer = localPlayer;
             previewBoardVersion = playerBoard.getStateVersion();
             previewBoard.setSize(previewBoardSize, previewBoardSize);
             previewBoard.setLocation(previewBoardX, 100);
@@ -886,6 +924,7 @@ public class GamePlay implements Renderable {
             startCount();
         }
         else {
+            autoPlaceButton.setVisible(gameMode == SETUP_MODE);
             gameProgress.setVisible(false);
             targetPanel.setVisible(false);
             scorePanel.setVisible(false);
@@ -899,6 +938,7 @@ public class GamePlay implements Renderable {
      */
     public void destroy() {
         if (botTurnTimer != null) botTurnTimer.stop();
+        getScreen().remove(autoPlaceButton);
         getScreen().remove(previewLabel);
         getScreen().remove(gameProgress);
         getScreen().remove(targetPanel);

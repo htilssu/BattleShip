@@ -63,6 +63,7 @@ public class Ship extends Collision implements Renderable {
         this.position = new Position(ship.position.x, ship.position.y);
         this.shipType = ship.shipType;
         this.playerBoard = ship.playerBoard;
+        this.isSunk = ship.isSunk;
     }
 
     public int getDirection() {
@@ -131,18 +132,18 @@ public class Ship extends Collision implements Renderable {
      * Cập nhật lại kích thước, vị trí của tàu dựa theo {@link Ship#playerBoard}
      */
     public void update() {
-        float ratio = (float) sprite.getHeight() / sprite.getWidth();
+        if (playerBoard == null || position == null) return;
+
+        int cellSize = playerBoard.getCellSize();
         sprite.setLocation(
-                playerBoard.getX() + playerBoard.getCellSize() * position.x,
-                playerBoard.getY() + playerBoard.getCellSize() * position.y);
+                playerBoard.getX() + cellSize * position.x,
+                playerBoard.getY() + cellSize * position.y);
 
-        if (ratio < 1 && ratio > 0) {
-            ratio = 1 / ratio;
-            sprite.setSize((int) (playerBoard.getCellSize() * ratio), playerBoard.getCellSize());
-
+        if (direction == HORIZONTAL) {
+            sprite.setSize(cellSize * shipType, cellSize);
         }
         else {
-            sprite.setSize(playerBoard.getCellSize(), (int) (playerBoard.getCellSize() * ratio));
+            sprite.setSize(cellSize, cellSize * shipType);
         }
     }
 

@@ -308,8 +308,8 @@ public abstract class MultiHandler {
 
         GamePlay gamePlay = battleShip.getGameManager().getCurrentGamePlay();
 
-        Player currentPlayer = gamePlay.getCurrentPlayer();
-        PlayerBoard playerBoard = gamePlay.getOpponent().getBoard();
+        Player currentPlayer = GameManager.gamePlayer;
+        PlayerBoard playerBoard = gamePlay.getOpponentOf(currentPlayer).getBoard();
 
         Ship ship;
         if (shootStatus == PlayerBoard.SHOOT_DESTROYED) {
@@ -351,7 +351,7 @@ public abstract class MultiHandler {
 
         battleShip.getListenerManager()
                 .callEvent(new PlayerShootEvent(currentPlayer,
-                                gamePlay.getOpponent().getBoard(),
+                                playerBoard,
                                 new Position(x, y)
                         ),
                         battleShip.getGameManager()

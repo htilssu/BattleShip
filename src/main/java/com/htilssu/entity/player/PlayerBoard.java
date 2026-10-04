@@ -3,6 +3,7 @@ package com.htilssu.entity.player;
 import com.htilssu.entity.Ship;
 import com.htilssu.entity.component.Position;
 import com.htilssu.entity.game.GamePlay;
+import com.htilssu.manager.ShipManager;
 import com.htilssu.render.Collision;
 import com.htilssu.render.Renderable;
 import com.htilssu.util.AssetUtils;
@@ -26,6 +27,7 @@ public class PlayerBoard extends Collision implements Renderable {
     private final Ship[][] shipBoard;
     Player player;
     private final List<Ship> ships = new ArrayList<>();
+    private final List<Ship> sunkShips = new ArrayList<>();
     int size;
     int cellSize;
     private int remainingShips;
@@ -94,9 +96,10 @@ public class PlayerBoard extends Collision implements Renderable {
     public void addShip(Ship ship) {
         if (canAddShip(ship)) {
             ships.add(ship);
-            remainingShips++;
+            if (!ship.isSunk()) remainingShips++;
             ship.setBoard(this);
             setShipCells(ship, ship);
+            if (ship.isSunk()) sunkShips.add(ship);
             stateVersion++;
         }
     }
@@ -171,7 +174,7 @@ public class PlayerBoard extends Collision implements Renderable {
         // Vẽ tàu còn sống trước lớp đánh dấu trúng.
         for (Ship ship : ships) {
             if (showShips && !ship.isSunk()) {
-                ship.render(g);
+                ship.render(g2d);
             }
         }
 
@@ -203,16 +206,15 @@ public class PlayerBoard extends Collision implements Renderable {
         //render shot mark
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
-                renderShot(g, i, j);
+                renderShot(g2d, i, j);
             }
         }
 
         // Tàu đã chìm luôn được hiển thị trên lớp đỏ, kể cả ở bảng đối thủ.
-        for (Ship ship : ships) {
-            if (ship.isSunk()) {
-                ship.render(g);
-            }
+        for (Ship ship : sunkShips) {
+            ship.render(g2d);
         }
+        renderUntrackedSunkShips(g2d);
 
         g2d.dispose();
 
@@ -281,9 +283,69 @@ public class PlayerBoard extends Collision implements Renderable {
     public void removeShip(Ship ship) {
         if (ships.remove(ship)) {
             setShipCells(ship, null);
+            sunkShips.remove(ship);
             remainingShips--;
             stateVersion++;
         }
+    }
+
+    private void renderUntrackedSunkShips(Graphics g) {
+        boolean[][] visited = new boolean[size][size];
+        for (Ship ship : sunkShips) {
+            Position position = ship.getPosition();
+            for (int offset = 0; offset < ship.getShipType(); offset++) {
+                int row = position.y + (ship.getDirection() == Ship.VERTICAL ? offset : 0);
+                int col = position.x + (ship.getDirection() == Ship.HORIZONTAL ? offset : 0);
+                if (row >= 0 && row < size && col >= 0 && col < size) visited[row][col] = true;
+            }
+        }
+
+        for (int row = 0; row < size; row++) {
+            for (int col = 0; col < size; col++) {
+                if (visited[row][col] || shotBoard[row][col] != SHOOT_DESTROYED) continue;
+
+                int horizontalLength = destroyedRunLength(row, col, 0, 1, visited);
+                int verticalLength = destroyedRunLength(row, col, 1, 0, visited);
+                int direction = horizontalLength >= verticalLength ? Ship.HORIZONTAL : Ship.VERTICAL;
+                int length = Math.max(horizontalLength, verticalLength);
+                if (length < Ship.SHIP_2 || length > Ship.SHIP_5) continue;
+
+                Ship revealedShip = ShipManager.createShip(length, direction);
+                revealedShip.setPosition(new Position(col, row));
+                revealedShip.setBoard(this);
+                revealedShip.render(g);
+
+                for (int offset = 0; offset < length; offset++) {
+                    int targetRow = row + (direction == Ship.VERTICAL ? offset : 0);
+                    int targetCol = col + (direction == Ship.HORIZONTAL ? offset : 0);
+                    visited[targetRow][targetCol] = true;
+                }
+            }
+        }
+    }
+
+    private int destroyedRunLength(int row, int col, int rowStep, int colStep,
+                                   boolean[][] visited) {
+        int length = 0;
+        while (row < size && col < size && !visited[row][col]
+                && shotBoard[row][col] == SHOOT_DESTROYED) {
+            length++;
+            row += rowStep;
+            col += colStep;
+        }
+        return length;
+    }
+
+    public void clearShips() {
+        if (ships.isEmpty()) return;
+
+        for (Ship ship : ships) {
+            setShipCells(ship, null);
+        }
+        ships.clear();
+        sunkShips.clear();
+        remainingShips = 0;
+        stateVersion++;
     }
 
     public Ship getShip(Point point) {
@@ -352,9 +414,27 @@ public class PlayerBoard extends Collision implements Renderable {
     }
 
     public void markShipDestroyed(Ship ship) {
+        if (ship == null || ship.getPosition() == null) return;
+
+        if (!ships.contains(ship)) {
+            Ship boardShip = getShipAtPosition(ship.getPosition());
+            if (boardShip == null) {
+                addShip(ship);
+                boardShip = getShipAtPosition(ship.getPosition());
+            }
+            if (boardShip != null) {
+                ship = boardShip;
+            }
+            else {
+                ship.setBoard(this);
+            }
+        }
+        if (ship.isSunk()) return;
+
         Position pos = ship.getPosition();
-        remainingShips--;
+        if (ships.contains(ship)) remainingShips--;
         ship.setIsSunk(true);
+        if (!sunkShips.contains(ship)) sunkShips.add(ship);
         stateVersion++;
 
         for (int i = 0; i < ship.getShipType(); i++) {
