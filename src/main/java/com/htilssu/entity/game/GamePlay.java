@@ -4,12 +4,14 @@ import com.htilssu.BattleShip;
 import com.htilssu.entity.Ship;
 import com.htilssu.entity.Sprite;
 import com.htilssu.entity.component.Position;
+import com.htilssu.entity.player.Bot;
 import com.htilssu.entity.player.Player;
 import com.htilssu.entity.player.PlayerBoard;
 import com.htilssu.event.game.GameAction;
 import com.htilssu.event.player.PlayerShootEvent;
 import com.htilssu.manager.GameManager;
 import com.htilssu.manager.ScreenManager;
+import com.htilssu.manager.ShipManager;
 import com.htilssu.manager.SoundManager;
 import com.htilssu.multiplayer.Client;
 import com.htilssu.multiplayer.Host;
@@ -21,6 +23,7 @@ import com.htilssu.ui.component.GamePanel;
 import com.htilssu.ui.component.GameProgress;
 import com.htilssu.ui.screen.EndGameScreen;
 import com.htilssu.util.AssetUtils;
+import com.htilssu.util.ScoreUtil;
 
 import javax.swing.*;
 import java.awt.*;
@@ -28,6 +31,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.htilssu.entity.Ship.VERTICAL;
@@ -60,6 +64,7 @@ public class GamePlay implements Renderable {
     private final GameButton scorePanel = new GameButton(
             AssetUtils.getImage(AssetUtils.ASSET_TEXT_FIELD_2));
     private Timer matchTimer = null;
+    private Timer botTurnTimer;
     private int totalShot = 0;
     private int timeCountDown;
     private int matchCountDown = GameManager.TIME_PER_MATCH;
@@ -74,6 +79,11 @@ public class GamePlay implements Renderable {
     private boolean isSelectSpriteInBoard;
     private BattleShip battleShip;
     private Cursor playerCursor;
+    private PlayerBoard previewBoard;
+    private Player previewBoardPlayer;
+    private long previewBoardVersion = -1;
+    private int previewBoardX;
+    private int previewBoardSize;
 
     {
         sprites.put(Ship.SHIP_2, new Sprite(AssetUtils.getImage(AssetUtils.ASSET_SHIP_2)));
@@ -103,7 +113,11 @@ public class GamePlay implements Renderable {
             timeCountDown--;
             gameProgress.setProgress(timeCountDown);
             if (timeCountDown == 0) {
-                if (battleShip.getHost().isConnected()) {
+                if (!isMultiPlayer) {
+                    endTurn();
+                    scheduleBotTurn();
+                }
+                else if (battleShip.getHost().isConnected()) {
                     battleShip.getHost().send(GameAction.END_TURN);
                     endTurn();
                 }
@@ -157,12 +171,40 @@ public class GamePlay implements Renderable {
         }
     }
 
+    public void prepareSinglePlayer() {
+        for (Player player : playerList) {
+            if (player instanceof Bot) {
+                placeBotFleet(player.getBoard());
+                break;
+            }
+        }
+    }
+
+    private void placeBotFleet(PlayerBoard board) {
+        Random random = new Random();
+        int[] fleet = {Ship.SHIP_2, Ship.SHIP_3, Ship.SHIP_3, Ship.SHIP_4, Ship.SHIP_5};
+
+        for (int shipType : fleet) {
+            boolean placed = false;
+            while (!placed) {
+                int shipDirection = random.nextBoolean() ? Ship.HORIZONTAL : Ship.VERTICAL;
+                Ship ship = ShipManager.createShip(shipType, shipDirection);
+                ship.setPosition(new Position(random.nextInt(size), random.nextInt(size)));
+                if (board.canAddShip(ship)) {
+                    board.addShip(ship);
+                    placed = true;
+                }
+            }
+        }
+    }
+
     /**
      * Kết thúc game
      */
     public void endGame() {
         timer.stop();
         matchTimer.stop();
+        if (botTurnTimer != null) botTurnTimer.stop();
         setGameMode(END_MODE);
         battleShip.getScreenManager().getCurrentScreen().removeAll();
         final JPanel endScreen = battleShip.getScreenManager()
@@ -179,7 +221,7 @@ public class GamePlay implements Renderable {
         battleShip.changeScreen(ScreenManager.END_GAME_SCREEN);
     }
 
-    private int getBoardSize() {
+    public int getBoardSize() {
         return size;
     }
 
@@ -311,10 +353,11 @@ public class GamePlay implements Renderable {
                     gameProgress.setSize(currentScreen.getWidth() - 100, 30);
                     gameProgress.setLocation(50, 25);
                 }
+                layoutPlayComponents();
             }
         }
 
-        currentScreen.updateUI();
+        currentScreen.revalidate();
         currentScreen.repaint();
 
     }
@@ -385,7 +428,11 @@ public class GamePlay implements Renderable {
      */
     private void shoot(Position pos) {
         totalShot++;
-        if (battleShip.getHost().isConnected()) {
+        if (!isMultiPlayer) {
+            resolveSinglePlayerShot(pos);
+            return;
+        }
+        else if (battleShip.getHost().isConnected()) {
             battleShip.getHost().sendShoot(pos);
         }
         else {
@@ -399,6 +446,61 @@ public class GamePlay implements Renderable {
                 .callEvent(new PlayerShootEvent(getCurrentPlayer(), getOpponent().getBoard(), pos),
                         gameManager
                 );
+    }
+
+    private void resolveSinglePlayerShot(Position pos) {
+        Player shooter = getCurrentPlayer();
+        PlayerBoard targetBoard = getOpponent().getBoard();
+        if (!targetBoard.canShoot(pos)) return;
+
+        Ship ship = targetBoard.getShipAtPosition(pos);
+        int shootStatus = PlayerBoard.SHOOT_MISS;
+        if (ship != null) {
+            shootStatus = PlayerBoard.SHOOT_HIT;
+            shooter.plusScore(ScoreUtil.calculateScore(getTimeCountDown()));
+        }
+        targetBoard.shoot(pos, shootStatus);
+
+        if (ship != null && targetBoard.isShipDestroyed(ship)) {
+            targetBoard.markShipDestroyed(ship);
+        }
+
+        battleShip.getListenerManager().callEvent(
+                new PlayerShootEvent(shooter, targetBoard, pos), gameManager);
+
+        if (targetBoard.isAllShipsDestroyed()) {
+            setWinner(turn);
+            endGame();
+            return;
+        }
+
+        resetCountDown();
+        if (shootStatus == PlayerBoard.SHOOT_MISS) {
+            endTurn();
+        }
+        else {
+            startCount();
+        }
+        scheduleBotTurn();
+    }
+
+    private void scheduleBotTurn() {
+        if (isMultiPlayer || gameMode != PLAY_MODE || !(getCurrentPlayer() instanceof Bot)) return;
+        if (botTurnTimer != null && botTurnTimer.isRunning()) return;
+
+        botTurnTimer = new Timer(500, e -> {
+            botTurnTimer.stop();
+            botTurnTimer = null;
+            PlayerBoard targetBoard = getOpponent().getBoard();
+            Position pos;
+            Random random = new Random();
+            do {
+                pos = new Position(random.nextInt(size), random.nextInt(size));
+            } while (!targetBoard.canShoot(pos));
+            resolveSinglePlayerShot(pos);
+        });
+        botTurnTimer.setRepeats(false);
+        botTurnTimer.start();
     }
 
     private void handleReadyButtonOnClick(Point position) {
@@ -482,6 +584,9 @@ public class GamePlay implements Renderable {
     private void unReady() {
         isReady = false;
         readyButton.setAsset(AssetUtils.getImage(AssetUtils.ASSET_READY_BUTTON), null);
+        if (!isMultiPlayer) {
+            return;
+        }
         if (Host.getInstance().isConnected()) {
             Host.getInstance().unReady();
         }
@@ -510,7 +615,11 @@ public class GamePlay implements Renderable {
     private void ready() {
         isReady = true;
         readyButton.setAsset(AssetUtils.getImage(AssetUtils.ASSET_UNREADY_BUTTON), null);
-        if (Host.getInstance().isConnected()) {
+        if (!isMultiPlayer) {
+            setGameMode(PLAY_MODE);
+            scheduleBotTurn();
+        }
+        else if (Host.getInstance().isConnected()) {
             Host.getInstance().ready();
         }
         else {
@@ -613,6 +722,20 @@ public class GamePlay implements Renderable {
     public void setGameManager(GameManager gameManager) {
         this.gameManager = gameManager;
         battleShip = gameManager.getBattleShip();
+        attachPlayComponents();
+    }
+
+    private void attachPlayComponents() {
+        JPanel screen = getScreen();
+        if (gameProgress.getParent() != screen) screen.add(gameProgress);
+        if (targetPanel.getParent() != screen) screen.add(targetPanel);
+        if (scorePanel.getParent() != screen) screen.add(scorePanel);
+        if (previewLabel.getParent() != screen) screen.add(previewLabel);
+        boolean visible = gameMode == PLAY_MODE;
+        gameProgress.setVisible(visible);
+        targetPanel.setVisible(visible);
+        scorePanel.setVisible(visible);
+        previewLabel.setVisible(visible);
     }
 
     @Override
@@ -655,25 +778,19 @@ public class GamePlay implements Renderable {
     private void renderPlayMode(Graphics g) {
         renderShootBoard(g);
         renderPreviewBoard(g);
-        renderScoreBoard(g);
-        renderTargetPanel();
-
-        getScreen().add(gameProgress);
-        getScreen().add(targetPanel);
-        getScreen().add(scorePanel);
         //render select sprite
         if (isSelectSpriteInBoard && getCurrentPlayer().getId()
                 .equals(playerList.getFirst().getId()))
             selectSprite.render(g);
 
-        getScreen().updateUI();
     }
 
     /**
      * Vẽ bảng chơi của đối phương để người chơi hiện tại có thể thực hiện bắn
      */
     public void renderShootBoard(Graphics g) {
-        getOpponent().getBoard().render(g);
+        boolean showShips = getOpponent().getId().equals(GameManager.gamePlayer.getId());
+        getOpponent().getBoard().render(g, showShips);
     }
 
     /**
@@ -681,30 +798,19 @@ public class GamePlay implements Renderable {
      */
     private void renderPreviewBoard(Graphics g) {
         PlayerBoard playerBoard = getCurrentPlayer().getBoard();
-        int startX = playerBoard.getWidth() + playerBoard.getX();
-        int remainWidth = getScreen().getWidth() - startX;
-
-        var tempBoard = new PlayerBoard(playerBoard);
-        tempBoard.setSize(300, 300);
-
-        int startXWithMargin = startX + (remainWidth - tempBoard.getWidth()) / 2;
-
-
-        tempBoard.setLocation(startXWithMargin, 100);
-        tempBoard.update();
-        tempBoard.render(g);
-
-        //game preview label
-        getScreen().add(previewLabel);
-        previewLabel.setBounds(startXWithMargin,
-                tempBoard.getY() + tempBoard.getHeight() + 20,
-                300,
-                70
-        );
-
+        if (previewBoard == null || previewBoardPlayer != getCurrentPlayer()
+                || previewBoardVersion != playerBoard.getStateVersion()) {
+            previewBoard = new PlayerBoard(playerBoard);
+            previewBoardPlayer = getCurrentPlayer();
+            previewBoardVersion = playerBoard.getStateVersion();
+            previewBoard.setSize(previewBoardSize, previewBoardSize);
+            previewBoard.setLocation(previewBoardX, 100);
+            previewBoard.update();
+        }
+        previewBoard.render(g);
     }
 
-    private void renderScoreBoard(Graphics g) {
+    private void renderScoreBoard() {
         var scoreY = previewLabel.getY() + previewLabel.getHeight() + 25;
         var scoreX = previewLabel.getX();
 
@@ -720,6 +826,29 @@ public class GamePlay implements Renderable {
         targetPanel.setSize(playerBoard.getX() - 50, playerBoard.getHeight());
 
         targetPanel.setLocation(25, playerBoard.getY());
+    }
+
+    private void layoutPlayComponents() {
+        if (gameManager == null || gameMode != PLAY_MODE) return;
+
+        JPanel screen = getScreen();
+        PlayerBoard playerBoard = getCurrentPlayer().getBoard();
+        int startX = playerBoard.getX() + playerBoard.getWidth();
+        int remainWidth = Math.max(0, screen.getWidth() - startX);
+        int previewSize = Math.max(0, Math.min(300,
+                Math.min(remainWidth - 40, screen.getHeight() - 320)));
+        int previewX = startX + Math.max(0, (remainWidth - previewSize) / 2);
+        previewBoardSize = previewSize;
+        previewBoardX = previewX;
+
+        if (previewBoard != null) {
+            previewBoard.setSize(previewSize, previewSize);
+            previewBoard.setLocation(previewX, 100);
+            previewBoard.update();
+        }
+        previewLabel.setBounds(previewX, 100 + previewSize + 20, previewSize, 70);
+        renderScoreBoard();
+        renderTargetPanel();
     }
 
     /**
@@ -748,7 +877,16 @@ public class GamePlay implements Renderable {
     public void setGameMode(int gameMode) {
 
         if (gameMode != END_MODE) this.gameMode = gameMode;
-        if (gameMode == PLAY_MODE) startCount();
+        if (gameMode == PLAY_MODE) {
+            attachPlayComponents();
+            startCount();
+        }
+        else {
+            gameProgress.setVisible(false);
+            targetPanel.setVisible(false);
+            scorePanel.setVisible(false);
+            previewLabel.setVisible(false);
+        }
         update();
     }
 
@@ -756,9 +894,11 @@ public class GamePlay implements Renderable {
      * Hàm xóa các component khỏi playscreen
      */
     public void destroy() {
+        if (botTurnTimer != null) botTurnTimer.stop();
         getScreen().remove(previewLabel);
         getScreen().remove(gameProgress);
         getScreen().remove(targetPanel);
+        getScreen().remove(scorePanel);
     }
 
     public int getTotalShot() {

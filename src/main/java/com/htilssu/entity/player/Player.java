@@ -35,6 +35,7 @@ public class Player {
 
     public void resetData() {
         totalShoot = 0;
+        score = 0;
     }
 
     public int getScore() {

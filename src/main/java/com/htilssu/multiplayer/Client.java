@@ -145,8 +145,12 @@ public class Client extends MultiHandler implements Runnable {
 
     @Override
     public void run() {
-        while (isConnected()) {
-            readData(socket);
+        Socket connectedSocket = socket;
+        if (connectedSocket != null) {
+            readData(connectedSocket);
+            if (socket == connectedSocket) {
+                disconnect();
+            }
         }
     }
 }

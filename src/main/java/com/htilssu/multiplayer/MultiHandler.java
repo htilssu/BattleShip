@@ -15,9 +15,11 @@ import com.htilssu.ui.screen.PickScreen;
 import com.htilssu.util.GameLogger;
 import com.htilssu.util.ScoreUtil;
 
+import javax.swing.SwingUtilities;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.InvocationTargetException;
 import java.net.Socket;
 import java.util.Arrays;
 import java.util.List;
@@ -57,10 +59,19 @@ public abstract class MultiHandler {
                 if (message == null) {
                     break;
                 }
-                handle(message);
+                if (SwingUtilities.isEventDispatchThread()) {
+                    handle(message);
+                }
+                else {
+                    SwingUtilities.invokeAndWait(() -> handle(message));
+                }
             }
         } catch (IOException e) {
-            //empty
+            GameLogger.log("Connection closed: " + e.getMessage());
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        } catch (InvocationTargetException e) {
+            GameLogger.error("Unable to process multiplayer message: " + e.getCause());
         }
     }
 
@@ -86,6 +97,7 @@ public abstract class MultiHandler {
                     playerId = messageParts.get(1);
                     String playerName = messageParts.get(2);
                     Player player = new Player(playerId, playerName);
+                    gameManager.setMultiPlayer(true);
 
 
                     if (messageParts.size() >= 4) {
@@ -105,7 +117,7 @@ public abstract class MultiHandler {
                             GameLogger.error("Invalid turn: " + messageParts.get(4));
                         }
                     }
-                    else gameManager.setTurn(new Random().nextInt(1));
+                    else gameManager.setTurn(new Random().nextInt(2));
 
 
                     if (this instanceof Client) {
@@ -210,13 +222,32 @@ public abstract class MultiHandler {
 
     private void handleShootRequest(List<String> messageParts) {
         var playerId = messageParts.get(1);
-        Position pos = new Position(Integer.parseInt(messageParts.get(2)),
-                Integer.parseInt(messageParts.get(3))
-        );
+        final Position pos;
+        try {
+            pos = new Position(Integer.parseInt(messageParts.get(2)),
+                    Integer.parseInt(messageParts.get(3))
+            );
+        } catch (NumberFormatException e) {
+            GameLogger.error("Invalid shoot coordinates: " + messageParts);
+            return;
+        }
+
         GamePlay gamePlay = battleShip.getGameManager().getCurrentGamePlay();
+        if (gamePlay == null
+                || pos.getX() < 0 || pos.getX() >= gamePlay.getBoardSize()
+                || pos.getY() < 0 || pos.getY() >= gamePlay.getBoardSize()) {
+            GameLogger.error("Shoot coordinates are outside the board: " + pos.getX() + "," + pos.getY());
+            return;
+        }
+
         Player currentPlayer = gamePlay.getCurrentPlayer();
-        if (currentPlayer.getId().equals(playerId)) {
+        if (currentPlayer.getId().equals(playerId)
+                && !currentPlayer.getId().equals(gamePlayer.getId())) {
             PlayerBoard playerBoard = gamePlayer.getBoard();
+            if (!playerBoard.canShoot(pos)) {
+                GameLogger.error("Duplicate shoot request: " + pos.getX() + "," + pos.getY());
+                return;
+            }
             var ship = playerBoard.getShipAtPosition(pos);
             var responseStatus = SHOOT_MISS;
 
@@ -264,6 +295,11 @@ public abstract class MultiHandler {
     }
 
     private void handleResponseShoot(List<String> messageParts) {
+        if (messageParts.size() < 4) {
+            GameLogger.error("Invalid shoot response: " + messageParts);
+            return;
+        }
+
         var shootStatus = Integer.parseInt(messageParts.get(1));
         var x = Integer.parseInt(messageParts.get(2));
         var y = Integer.parseInt(messageParts.get(3));
@@ -277,7 +313,7 @@ public abstract class MultiHandler {
 
         Ship ship;
         if (shootStatus == PlayerBoard.SHOOT_DESTROYED) {
-            if (messageParts.size() > 4) {
+            if (messageParts.size() >= 6) {
                 var shipType = Integer.parseInt(messageParts.get(4));
                 var direction = Integer.parseInt(messageParts.get(5));
                 ship = ShipManager.createShip(shipType, direction);
@@ -286,6 +322,9 @@ public abstract class MultiHandler {
 
                 playerBoard.addShip(ship);
                 gamePlay.getScreen().repaint();
+            }
+            else {
+                GameLogger.error("Invalid destroyed ship response: " + messageParts);
             }
 
             return;

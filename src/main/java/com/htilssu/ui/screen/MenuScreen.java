@@ -1,11 +1,10 @@
 package com.htilssu.ui.screen;
 
 import com.htilssu.BattleShip;
-import com.htilssu.manager.GameManager;
 import com.htilssu.manager.ScreenManager;
 import com.htilssu.manager.SoundManager;
 import com.htilssu.setting.GameSetting;
-import com.htilssu.ui.component.CustomButton;
+import com.htilssu.ui.component.GameButton;
 import com.htilssu.util.AssetUtils;
 
 import javax.swing.*;
@@ -18,13 +17,13 @@ import java.util.List;
 
 public class MenuScreen extends JPanel {
 
-    private BufferedImage backgroundImage, menuImage, cursorImage;
-    private BattleShip window;
-    private List<CustomButton> buttons;
+    private BufferedImage backgroundImage, menuImage;
+    private final BattleShip window;
+    private final List<GameButton> buttons;
 
     public MenuScreen(BattleShip battleShip) {
         window = battleShip;
-        setLayout(null); // We will use absolute positioning
+        setLayout(null);
         loadBackgroundImage();
         loadMenu();
         setPreferredSize(new Dimension(GameSetting.WIDTH, GameSetting.HEIGHT));
@@ -54,27 +53,26 @@ public class MenuScreen extends JPanel {
 
     private void createButtons() {
 
-        addButton("/images/play2.png", "PLAY");
-        addButton("/images/MultiPlayer.png", "Multiplayer");
-        addButton("/images/continue.png", "Continue");
-        addButton("/images/setting2.png", "SETTING");
-        addButton("/images/Bgintroduction1.png", "INTRODUCTION"); // Nút giới thiệu game
-        addButton("/images/exit.png", "QUIT");
+        addButton("Play", "PLAY");
+        addButton("Multiplayer", "MULTIPLAYER");
+        addButton("Continue", "CONTINUE");
+        addButton("Settings", "SETTING");
+        addButton("Introduction", "INTRODUCTION");
+        addButton("Quit", "QUIT");
         repositionButtons();
     }
 
-    private void repositionButtons() { // định hinh cac nut khi thay doi kich thuoc man hinh
-        int buttonWidth = 200;
-        int buttonHeight = 60;
+    private void repositionButtons() {
+        int buttonWidth = 240;
+        int buttonHeight = 64;
         int centerX = (getWidth() - buttonWidth) / 2;
         int totalButtons = buttons.size();
-        int spacing = 20;
+        int spacing = 12;
         int totalHeight = (buttonHeight * totalButtons) + (spacing * (totalButtons - 1));
-        int menuImageHeight = (menuImage != null) ? menuImage.getHeight() : 0;
-        int startY = (getHeight() - totalHeight) / 2 + menuImageHeight - 10;
+        int startY = Math.max(180, (getHeight() - totalHeight) / 2 + 50);
 
         for (int i = 0; i < buttons.size(); i++) {
-            CustomButton button = buttons.get(i);
+            GameButton button = buttons.get(i);
             button.setBounds(centerX, startY + i * (buttonHeight + spacing), buttonWidth,
                     buttonHeight);
         }
@@ -86,8 +84,10 @@ public class MenuScreen extends JPanel {
         }
     }
 
-    private void addButton(String imagePath, String actionCommand) {
-        CustomButton button = new CustomButton(imagePath);
+    private void addButton(String text, String actionCommand) {
+        GameButton button = new GameButton(AssetUtils.getImage(AssetUtils.ASSET_BUTTON_2));
+        button.setText(text);
+        button.setTextSize(22);
         button.setActionCommand(actionCommand);
         button.addActionListener(e -> handleButtonClick(e.getActionCommand()));
         buttons.add(button);
@@ -102,7 +102,7 @@ public class MenuScreen extends JPanel {
             case "SETTING":
                 window.changeScreen(ScreenManager.SETTING_SCREEN);
                 break;
-            case "Multiplayer":
+            case "MULTIPLAYER":
                 window.changeScreen(ScreenManager.NETWORK_SCREEN);
                 break;
             case "INTRODUCTION":

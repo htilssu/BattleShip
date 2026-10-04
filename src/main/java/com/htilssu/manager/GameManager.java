@@ -2,6 +2,7 @@ package com.htilssu.manager;
 
 import com.htilssu.BattleShip;
 import com.htilssu.entity.game.GamePlay;
+import com.htilssu.entity.player.Bot;
 import com.htilssu.entity.player.Player;
 
 import java.util.ArrayList;
@@ -29,6 +30,7 @@ public final class GameManager {
 
     private void initPlayerList() {
         players = new ArrayList<>();
+        gamePlayer.resetData();
         players.add(gamePlayer);
     }
 
@@ -60,6 +62,15 @@ public final class GameManager {
 
         initPlayerList();
         setCurrentGamePlay(newGamePlay);
+    }
+
+    public synchronized void createSinglePlayerGame() {
+        initPlayerList();
+        players.add(new Bot("Computer"));
+        turn = 0;
+        multiPlayer = false;
+        createNewGamePlay();
+        currentGamePlay.prepareSinglePlayer();
     }
 
     public GamePlay getCurrentGamePlay() {

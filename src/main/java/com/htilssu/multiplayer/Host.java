@@ -21,7 +21,7 @@ public class Host extends MultiHandler implements Runnable {
     final String id = UUID.randomUUID().toString();
     ServerSocket serverSocket;
     Socket socket;
-    Thread hostListenThread = new Thread(this);
+    Thread hostListenThread;
     int ready = 0;
     private String hostName;
     private boolean isRunning;
@@ -40,10 +40,19 @@ public class Host extends MultiHandler implements Runnable {
         return instance;
     }
 
-    public void start() {
+    public synchronized void start() {
         if (!isRunning) {
-            isRunning = true;
-            hostListenThread.start();
+            try {
+                if (serverSocket == null || serverSocket.isClosed()) {
+                    serverSocket = new ServerSocket(GameSetting.DEFAULT_PORT);
+                }
+                isRunning = true;
+                hostListenThread = new Thread(this, "battleship-host-listener");
+                hostListenThread.start();
+            } catch (IOException e) {
+                isRunning = false;
+                GameLogger.error("Unable to start host: " + e.getMessage());
+            }
         }
     }
 
@@ -57,7 +66,9 @@ public class Host extends MultiHandler implements Runnable {
             try {
                 socket = serverSocket.accept();
             } catch (IOException e) {
-                GameLogger.error(e.getMessage());
+                if (isRunning) {
+                    GameLogger.error(e.getMessage());
+                }
             }
 
             if (socket != null) {
@@ -102,12 +113,15 @@ public class Host extends MultiHandler implements Runnable {
         }
     }
 
-    public void stop() {
+    public synchronized void stop() {
         isRunning = false;
         try {
             if (socket != null) {
                 socket.close();
                 socket = null;
+            }
+            if (serverSocket != null && !serverSocket.isClosed()) {
+                serverSocket.close();
             }
         } catch (IOException e) {
             GameLogger.error(e.getMessage());

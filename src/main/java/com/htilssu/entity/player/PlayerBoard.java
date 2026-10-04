@@ -1,7 +1,6 @@
 package com.htilssu.entity.player;
 
 import com.htilssu.entity.Ship;
-import com.htilssu.entity.Sprite;
 import com.htilssu.entity.component.Position;
 import com.htilssu.entity.game.GamePlay;
 import com.htilssu.render.Collision;
@@ -24,11 +23,13 @@ public class PlayerBoard extends Collision implements Renderable {
     public static final int SHOOT_DESTROYED = 3;
     private final BufferedImage bg;
     private final byte[][] shotBoard;
+    private final Ship[][] shipBoard;
     Player player;
-    List<Ship> ships = new ArrayList<>();
+    private final List<Ship> ships = new ArrayList<>();
     int size;
     int cellSize;
     private int remainingShips;
+    private long stateVersion;
     private GamePlay gamePlay;
 
     /**
@@ -40,6 +41,7 @@ public class PlayerBoard extends Collision implements Renderable {
         this.size = size;
         this.player = player;
         shotBoard = new byte[size][size];
+        shipBoard = new Ship[size][size];
         update();
         this.bg = AssetUtils.getImage(AssetUtils.ASSET_BACK_SEA);
     }
@@ -66,8 +68,8 @@ public class PlayerBoard extends Collision implements Renderable {
      */
     @Override
     public void setSize(int width, int height) {
-        //noinspection SuspiciousNameCombination
-        super.setSize(height, height);
+        int side = Math.max(0, Math.min(width, height));
+        super.setSize(side, side);
     }
 
     public PlayerBoard(PlayerBoard board) {
@@ -76,14 +78,16 @@ public class PlayerBoard extends Collision implements Renderable {
         this.cellSize = board.cellSize;
         this.gamePlay = board.gamePlay;
         this.player = board.player;
+        this.shotBoard = new byte[size][size];
+        this.shipBoard = new Ship[size][size];
         remainingShips = 0;
         for (Ship ship : board.ships) {
             addShip(new Ship(ship));
         }
-        this.shotBoard = new byte[size][size];
         for (int i = 0; i < size; i++) {
             System.arraycopy(board.shotBoard[i], 0, shotBoard[i], 0, size);
         }
+        this.stateVersion = board.stateVersion;
         this.bg = AssetUtils.getImage(AssetUtils.ASSET_BACK_SEA);
     }
 
@@ -92,11 +96,13 @@ public class PlayerBoard extends Collision implements Renderable {
             ships.add(ship);
             remainingShips++;
             ship.setBoard(this);
+            setShipCells(ship, ship);
+            stateVersion++;
         }
     }
 
     public boolean canAddShip(Ship ship) {
-        return canAddShip(ship.getPosition().y,
+        return ship != null && ship.getPosition() != null && canAddShip(ship.getPosition().y,
                 ship.getPosition().x,
                 ship.getDirection(),
                 ship.getShipType()
@@ -104,47 +110,34 @@ public class PlayerBoard extends Collision implements Renderable {
     }
 
     public boolean canAddShip(int row, int col, int direction, int shipType) {
-        //max x cua ship duoc them
-        int xMax;
-        //max y cua ship duoc them
-        int yMax;
-        //vi tri x bat dau ship duoc them
-        int x = getX() + col * cellSize;
-        //vi tri y bat adu ship duoc them
-        int y = getY() + row * cellSize;
-
-        if (direction == Ship.HORIZONTAL) {
-            xMax = x + shipType * cellSize;
-            yMax = y + cellSize;
-        }
-        else {
-            yMax = y + shipType * cellSize;
-            xMax = x + cellSize;
-        }
-
-        if (xMax > getX() + getWidth() || yMax > getY() + getHeight()) {
+        if (row < 0 || col < 0 || shipType <= 0
+                || (direction != Ship.HORIZONTAL && direction != Ship.VERTICAL)) {
             return false;
         }
 
+        int lastRow = row + (direction == Ship.VERTICAL ? shipType - 1 : 0);
+        int lastCol = col + (direction == Ship.HORIZONTAL ? shipType - 1 : 0);
+        if (lastRow >= size || lastCol >= size) {
+            return false;
+        }
 
-        for (Ship s : ships) {
-            Sprite sp = s.getSprite();
-            int spX = sp.getX();
-            int spY = sp.getY();
-            int maxSpWidth = sp.getX() + sp.getWidth();
-            int maxSpHeight = sp.getY() + sp.getHeight();
-
-            if (spX >= xMax
-                    || x >= maxSpWidth
-                    || y >= maxSpHeight
-                    || sp.getY() >= yMax) {
-            }
-            else {
+        for (int offset = 0; offset < shipType; offset++) {
+            int targetRow = row + (direction == Ship.VERTICAL ? offset : 0);
+            int targetCol = col + (direction == Ship.HORIZONTAL ? offset : 0);
+            if (shipBoard[targetRow][targetCol] != null) {
                 return false;
             }
-
         }
         return true;
+    }
+
+    private void setShipCells(Ship ship, Ship value) {
+        Position position = ship.getPosition();
+        for (int offset = 0; offset < ship.getShipType(); offset++) {
+            int row = position.y + (ship.getDirection() == Ship.VERTICAL ? offset : 0);
+            int col = position.x + (ship.getDirection() == Ship.HORIZONTAL ? offset : 0);
+            shipBoard[row][col] = value;
+        }
     }
 
     public int getCellSize() {
@@ -153,6 +146,10 @@ public class PlayerBoard extends Collision implements Renderable {
 
     @Override
     public void render(Graphics g) {
+        render(g, true);
+    }
+
+    public void render(Graphics g, boolean showShips) {
 
         // Vẽ bảng người chơi
         Graphics2D g2d = (Graphics2D) g.create();
@@ -173,7 +170,9 @@ public class PlayerBoard extends Collision implements Renderable {
         g2d.drawImage(bg, getX(), getY(), getWidth(), getHeight(), null);
         //vẽ tàu
         for (Ship ship : ships) {
-            ship.render(g);
+            if (showShips || ship.isSunk()) {
+                ship.render(g);
+            }
         }
 
         //set màu cho ô đã bắn
@@ -190,7 +189,7 @@ public class PlayerBoard extends Collision implements Renderable {
 
         //vẽ đường kẻ
         g2d.setColor(Color.black);
-        for (int i = 0; i < size; i++) {
+        for (int i = 0; i <= size; i++) {
 
             g2d.drawLine(getX(), getY() + i * cellSize, getX() + getWidth(), getY() + i * cellSize);
             g2d.drawLine(getX() + i * cellSize,
@@ -273,7 +272,11 @@ public class PlayerBoard extends Collision implements Renderable {
     }
 
     public void removeShip(Ship ship) {
-        ships.remove(ship);
+        if (ships.remove(ship)) {
+            setShipCells(ship, null);
+            remainingShips--;
+            stateVersion++;
+        }
     }
 
     public Ship getShip(Point point) {
@@ -293,27 +296,17 @@ public class PlayerBoard extends Collision implements Renderable {
     }
 
     public Ship getShipAtPosition(Position position) {
-        for (Ship ship : ships) {
-            Position pos = ship.getPosition();
-            switch (ship.getDirection()) {
-                case Ship.HORIZONTAL -> {
-                    if (pos.x <= position.x && position.x < pos.x + ship.getShipType() && pos.y == position.y) {
-                        return ship;
-                    }
-                }
-                case Ship.VERTICAL -> {
-                    if (pos.y <= position.y && position.y < pos.y + ship.getShipType() && pos.x == position.x) {
-                        return ship;
-                    }
-                }
-            }
+        if (position == null || position.x < 0 || position.x >= size
+                || position.y < 0 || position.y >= size) {
+            return null;
         }
-        return null;
+        return shipBoard[position.y][position.x];
     }
 
     public void shoot(Position position, int status) {
         if (canShoot(position)) {
             shotBoard[position.y][position.x] = (byte) status;
+            stateVersion++;
             //repaint
             gamePlay.getScreen().repaint();
         }
@@ -355,6 +348,7 @@ public class PlayerBoard extends Collision implements Renderable {
         Position pos = ship.getPosition();
         remainingShips--;
         ship.setIsSunk(true);
+        stateVersion++;
 
         for (int i = 0; i < ship.getShipType(); i++) {
             switch (ship.getDirection()) {
@@ -372,6 +366,10 @@ public class PlayerBoard extends Collision implements Renderable {
         return remainingShips == 0;
     }
 
+    public long getStateVersion() {
+        return stateVersion;
+    }
+
     /**
      * Lấy những thuyền chưa chìm
      * chỉ trả về khi {@link GamePlay#getGameMode()}  == {@link GamePlay#END_MODE} nếu không phải
@@ -383,7 +381,7 @@ public class PlayerBoard extends Collision implements Renderable {
         List<Ship> remainingShips = new ArrayList<>();
         if (gamePlay.getGameMode() == GamePlay.END_MODE) {
             for (Ship ship : ships) {
-                if (ship.isSunk()) {
+                if (!ship.isSunk()) {
                     remainingShips.add(ship);
                 }
             }

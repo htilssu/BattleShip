@@ -139,7 +139,8 @@ public class PickScreen extends JPanel {
     }
 
     private void transitionToGameScreen() {
-        window.changeScreen(ScreenManager.START2_PLAYER_SCREEN);
+        window.getGameManager().createSinglePlayerGame();
+        window.changeScreen(ScreenManager.PLAY_SCREEN);
     }
 
     private boolean isInsideImage(int mouseX,
