@@ -206,7 +206,7 @@ public class GamePlay implements Renderable {
         matchTimer.stop();
         if (botTurnTimer != null) botTurnTimer.stop();
         setGameMode(END_MODE);
-        battleShip.getScreenManager().getCurrentScreen().removeAll();
+        destroy();
         final JPanel endScreen = battleShip.getScreenManager()
                 .getScreen(ScreenManager.END_GAME_SCREEN);
         Player opponent = playerList.get(1);
@@ -664,7 +664,11 @@ public class GamePlay implements Renderable {
                 setUpSprite.setLocation(x, y);
             }
             case PLAY_MODE -> {
-                PlayerBoard playerBoard = getCurrentPlayer().getBoard();
+                if (!getCurrentPlayer().getId().equals(GameManager.gamePlayer.getId())) {
+                    isSelectSpriteInBoard = false;
+                    return;
+                }
+                PlayerBoard playerBoard = getOpponent().getBoard();
                 if (playerBoard.isInside(point)) {
                     if (playerCursor == null) playerCursor = getScreen().getCursor();
                     //hide cursor
@@ -702,7 +706,7 @@ public class GamePlay implements Renderable {
     }
 
     public JPanel getScreen() {
-        return battleShip.getScreenManager().getCurrentScreen();
+        return battleShip.getScreenManager().getScreen(ScreenManager.PLAY_SCREEN);
     }
 
     /**
@@ -876,7 +880,7 @@ public class GamePlay implements Renderable {
      */
     public void setGameMode(int gameMode) {
 
-        if (gameMode != END_MODE) this.gameMode = gameMode;
+        this.gameMode = gameMode;
         if (gameMode == PLAY_MODE) {
             attachPlayComponents();
             startCount();

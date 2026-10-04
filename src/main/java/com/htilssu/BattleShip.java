@@ -215,6 +215,7 @@ public class BattleShip extends JFrame implements Runnable, KeyListener, Compone
         add(screenManager.getCurrentScreen());
         screenManager.getCurrentScreen().requestFocusInWindow();
 
+        revalidate();
         pack();
         repaint();
     }

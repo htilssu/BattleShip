@@ -168,9 +168,9 @@ public class PlayerBoard extends Collision implements Renderable {
 
 
         g2d.drawImage(bg, getX(), getY(), getWidth(), getHeight(), null);
-        //vẽ tàu
+        // Vẽ tàu còn sống trước lớp đánh dấu trúng.
         for (Ship ship : ships) {
-            if (showShips || ship.isSunk()) {
+            if (showShips && !ship.isSunk()) {
                 ship.render(g);
             }
         }
@@ -204,6 +204,13 @@ public class PlayerBoard extends Collision implements Renderable {
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
                 renderShot(g, i, j);
+            }
+        }
+
+        // Tàu đã chìm luôn được hiển thị trên lớp đỏ, kể cả ở bảng đối thủ.
+        for (Ship ship : ships) {
+            if (ship.isSunk()) {
+                ship.render(g);
             }
         }
 

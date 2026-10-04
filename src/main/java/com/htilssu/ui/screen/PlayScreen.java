@@ -44,17 +44,15 @@ public class PlayScreen extends JPanel
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        Point position = new Point(e.getX(), e.getY());
-
-        // handle click on gameBoard (shoot)
-        window.getGameManager().getCurrentGamePlay().handleClick(position);
-
-        repaint();
+        // Actions are handled on mousePressed so a small drag cannot drop the click.
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
-        // empty
+        if (!SwingUtilities.isLeftMouseButton(e)) return;
+        window.getGameManager().getCurrentGamePlay().handleClick(e.getPoint());
+        requestFocusInWindow();
+        repaint();
     }
 
     @Override

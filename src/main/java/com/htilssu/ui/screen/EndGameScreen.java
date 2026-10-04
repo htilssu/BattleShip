@@ -205,12 +205,6 @@ public class EndGameScreen extends GamePanel implements ComponentListener {
 
     }
 
-    @Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        paintChildren(g);
-    }
-
     public BattleShip getBattleShip() {
         return battleShip;
     }

@@ -316,11 +316,13 @@ public abstract class MultiHandler {
             if (messageParts.size() >= 6) {
                 var shipType = Integer.parseInt(messageParts.get(4));
                 var direction = Integer.parseInt(messageParts.get(5));
-                ship = ShipManager.createShip(shipType, direction);
-                ship.setPosition(pos);
+                ship = playerBoard.getShipAtPosition(pos);
+                if (ship == null) {
+                    ship = ShipManager.createShip(shipType, direction);
+                    ship.setPosition(pos);
+                    playerBoard.addShip(ship);
+                }
                 playerBoard.markShipDestroyed(ship);
-
-                playerBoard.addShip(ship);
                 gamePlay.getScreen().repaint();
             }
             else {
